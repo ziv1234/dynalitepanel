@@ -2,7 +2,13 @@
   "name": "dynalitepanel",
   "version": "0.0.1",
   "description": "Home Assistant custom panel to configure the Dynalite integration",
-  "main": "index.js",
+  "source": "src/main.ts",
+  "main": "dynalite_frontend/entrypoint.js",
+  "scripts": {
+    "postinstall": "patch-package",
+    "start": "./script/develop",
+    "build": "./script/build"
+  },
   "repository": "https://github.com/ziv1234/dynalitepanel.git",
   "author": "Ziv <16467659+ziv1234@users.noreply.github.com>",
   "license": "Apache",
