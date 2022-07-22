@@ -16,7 +16,7 @@ bootstrap: ## Run yarn
 build: ## Build the frontend
 	yarn build;
 
-update: ## Pull main from insteon-panel/frontend
+update: ## Pull main from upstream
 	git pull upstream main;
 
 update-submodule: ## Udpate submodules
