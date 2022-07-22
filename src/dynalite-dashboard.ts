@@ -49,6 +49,7 @@ export class DynaliteDashboard extends LitElement {
       </hass-subpage>
     `;
   }
+}
 
 declare global {
   interface HTMLElementTagNameMap {
