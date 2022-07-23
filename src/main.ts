@@ -20,6 +20,7 @@ class DynaliteFrontend extends ProvideHassLitMixin(LitElement) {
   @property({ attribute: false }) public dynalite!: boolean;
 
   protected firstUpdated(changedProps) {
+    console.log("XXX dynalite-frontend firstUpdated");
     super.firstUpdated(changedProps);
     if (!this.hass) {
       return;
@@ -29,17 +30,19 @@ class DynaliteFrontend extends ProvideHassLitMixin(LitElement) {
     //);
 
     makeDialogManager(this, this.shadowRoot!);
-    if (this.route.path === "") {
-      navigate("/dynalite/devices", { replace: true });
-    }
+    //if (this.route.path === "") {
+    //  navigate("/dynalite/devices", { replace: true });
+    //}
 
     this._applyTheme();
   }
 
   protected render(): TemplateResult | void {
+    console.log("XXX dynalite-frontend render 1");
     if (!this.hass /*|| !this.dynalite*/) {
       return html``;
     }
+    console.log("XXX dynalite-frontend render 2");
 
     return html`
       <dynalite-router
