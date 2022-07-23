@@ -9,9 +9,9 @@ gulp.task("cleanup", (task) => {
     "./homeassistant-frontend/build",
   ]);
   del.sync([
-    "./dynalite_frontend/*.js",
-    "./dynalite_frontend/*.json",
-    "./dynalite_frontend/*.gz",
+    "./dynalite_panel/*.js",
+    "./dynalite_panel/*.json",
+    "./dynalite_panel/*.gz",
   ]);
   task();
 });

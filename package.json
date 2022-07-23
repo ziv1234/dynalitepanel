@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Home Assistant custom panel to configure the Dynalite integration",
   "source": "src/main.ts",
-  "main": "dynalite_frontend/entrypoint.js",
+  "main": "dynalite_panel/entrypoint.js",
   "scripts": {
     "postinstall": "patch-package",
     "start": "./script/develop",

@@ -1,0 +1,2 @@
+graft dynalite_panel
+global-exclude *.py[cod]

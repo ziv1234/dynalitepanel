@@ -52,7 +52,7 @@ const DevelopPlugins = [
     extensions,
     exclude: [require.resolve("@mdi/js/mdi.js")],
   }),
-  entrypointHashmanifest({ manifestName: "./dynalite_frontend/manifest.json" }),
+  entrypointHashmanifest({ manifestName: "./dynalite_panel/manifest.json" }),
 ];
 
 const BuildPlugins = DevelopPlugins.concat([
@@ -69,7 +69,7 @@ const inputconfig = {
 };
 const outputconfig = (isDev) => {
   return {
-    dir: "./dynalite_frontend/",
+    dir: "./dynalite_panel/",
     chunkFileNames: !isDev ? "c.[hash].js" : "[name]-dev.js",
     assetFileNames: !isDev ? "a.[hash].js" : "[name]-dev.js",
     entryFileNames: !isDev ? "[name]-[hash].js" : "[name]-dev.js",
@@ -82,7 +82,7 @@ const outputconfig = (isDev) => {
 function createServer() {
   const server = http.createServer((request, response) => {
     return handler(request, response, {
-      public: "./dynalite_frontend/",
+      public: "./dynalite_panel/",
     });
   });
 
@@ -138,10 +138,10 @@ gulp.task("rollup-build", async function (task) {
 
 function writeEntrypoint() {
   const entrypointManifest = require(path.resolve(
-    "./dynalite_frontend/manifest.json"
+    "./dynalite_panel/manifest.json"
   ));
   fs.writeFileSync(
-    path.resolve("./dynalite_frontend/entrypoint.js"),
+    path.resolve("./dynalite_panel/entrypoint.js"),
     `
 import './${entrypointManifest[main]}';
 

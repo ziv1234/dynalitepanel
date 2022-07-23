@@ -22,7 +22,7 @@ zip-safe  = false
 include-package-data = true
 
 [tool.setuptools.packages.find]
-include = ["dynalite_frontend*"]
+include = ["dynalite_panel", "dynalite_panel.*"]
 
 [tool.mypy]
 python_version = 3.4

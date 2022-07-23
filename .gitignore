@@ -1,4 +1,12 @@
 .vscode
 node_modules
 src/localize/generated.ts
-dynalite_frontend/*
+dynalite_panel/*.js
+dynalite_panel/*.json
+dynalite_panel/*.js.gz
+!dynalite_panel/*.py
+package-lock.json
+build
+!script/build
+*.egg-info
+__pycache__
