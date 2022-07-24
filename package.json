@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Home Assistant custom panel to configure the Dynalite integration",
   "source": "src/entrypoint.ts",
-  "main": "dynalite_panel/entrypoint.js",
+  "main": "build/entrypoint.js",
   "scripts": {
     "develop": "./script/develop",
     "build": "./script/build",
@@ -20,13 +20,21 @@
   "author": "Ziv <16467659+ziv1234@users.noreply.github.com>",
   "license": "Apache",
   "resolutions": {
-    "@polymer/polymer": "patch:@polymer/polymer@3.4.1#./.yarn/patches/@polymer/polymer/pr-5569.patch",
+    "@polymer/polymer": "patch:@polymer/polymer@3.4.1#./homeassistant-frontend/.yarn/patches/@polymer/polymer/pr-5569.patch",
     "@webcomponents/webcomponentsjs": "^2.2.10",
     "lit": "^2.1.2",
     "lit-html": "2.1.2",
     "lit-element": "3.1.2",
     "@lit/reactive-element": "1.2.1"
   },
+  "resolutionsOverride": {
+    "@polymer/polymer": "patch:@polymer/polymer@3.4.1#./homeassistant-frontend/.yarn/patches/@polymer/polymer/pr-5569.patch"
+  },
+  "dependenciesOverride": {
+    "@lit-labs/virtualizer": "patch:@lit-labs/virtualizer@0.7.0-pre.2#./homeassistant-frontend/.yarn/patches/@lit-labs/virtualizer/event-target-shim.patch",
+    "@material/mwc-icon-button": "patch:@material/mwc-icon-button@0.25.3#./homeassistant-frontend/.yarn/patches/@material/mwc-icon-button/remove-icon.patch"
+  },
+  "devDependenciesOverride": {},
   "dependencies": {
     "@braintree/sanitize-url": "^5.0.2",
     "@codemirror/autocomplete": "^0.19.12",
@@ -54,7 +62,7 @@
     "@fullcalendar/interaction": "5.9.0",
     "@fullcalendar/list": "5.9.0",
     "@lit-labs/motion": "^1.0.2",
-    "@lit-labs/virtualizer": "patch:@lit-labs/virtualizer@0.7.0-pre.2#./.yarn/patches/@lit-labs/virtualizer/event-target-shim.patch",
+    "@lit-labs/virtualizer": "patch:@lit-labs/virtualizer@0.7.0-pre.2#./homeassistant-frontend/.yarn/patches/@lit-labs/virtualizer/event-target-shim.patch",
     "@material/chips": "14.0.0-canary.261f2db59.0",
     "@material/data-table": "14.0.0-canary.261f2db59.0",
     "@material/mwc-button": "0.25.3",
@@ -64,7 +72,7 @@
     "@material/mwc-drawer": "^0.25.3",
     "@material/mwc-fab": "0.25.3",
     "@material/mwc-formfield": "0.25.3",
-    "@material/mwc-icon-button": "patch:@material/mwc-icon-button@0.25.3#./.yarn/patches/@material/mwc-icon-button/remove-icon.patch",
+    "@material/mwc-icon-button": "patch:@material/mwc-icon-button@0.25.3#./homeassistant-frontend/.yarn/patches/@material/mwc-icon-button/remove-icon.patch",
     "@material/mwc-linear-progress": "0.25.3",
     "@material/mwc-list": "^0.25.3",
     "@material/mwc-menu": "0.25.3",
