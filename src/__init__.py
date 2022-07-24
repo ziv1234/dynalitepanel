@@ -1,11 +1,14 @@
 """Dynalite Frontend"""
-from .version import VERSION
+from .constants import FILE_HASH
+
 
 def locate_dir():
+    """Return the location of the frontend files."""
     return __path__[0]
+
 
 def get_build_id(is_dev):
     """Get the Dynalite panel build id."""
     if is_dev:
         return "dev"
-    return "abcdef12"
+    return FILE_HASH

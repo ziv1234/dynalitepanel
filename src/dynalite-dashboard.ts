@@ -30,7 +30,7 @@ export class DynaliteDashboard extends LitElement {
   public updated(changedProperties) {
     super.updated(changedProperties);
 
-    if (!this.hass || !this.insteon) {
+    if (!this.hass /*|| !this.dynalite */) {
       return;
     }
     //if (!this._unsubs) {
@@ -40,11 +40,7 @@ export class DynaliteDashboard extends LitElement {
 
   protected render(): TemplateResult | void {
     return html`
-      <hass-subpage
-        .hass=${this.hass}
-        header="Dynalite Dashboard"
-        .narrow=${this.narrow}
-      >
+      <hass-subpage .hass=${this.hass} header="Dynalite Dashboard" .narrow=${this.narrow}>
         Hello World!!!
       </hass-subpage>
     `;
