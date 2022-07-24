@@ -9,8 +9,8 @@ import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { ProvideHassLitMixin } from "../homeassistant-frontend/src/mixins/provide-hass-lit-mixin";
 import "./dynalite-router";
 
-@customElement("dynalite-frontend")
-class DynaliteFrontend extends ProvideHassLitMixin(LitElement) {
+@customElement("dynalite-panel")
+class DynalitePanel extends ProvideHassLitMixin(LitElement) {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
   @property({ attribute: false }) public narrow!: boolean;
@@ -20,7 +20,7 @@ class DynaliteFrontend extends ProvideHassLitMixin(LitElement) {
   @property({ attribute: false }) public dynalite!: boolean;
 
   protected firstUpdated(changedProps) {
-    console.log("XXX dynalite-frontend firstUpdated");
+    console.log("XXX dynalite-panel firstUpdated");
     super.firstUpdated(changedProps);
     if (!this.hass) {
       return;
@@ -38,11 +38,11 @@ class DynaliteFrontend extends ProvideHassLitMixin(LitElement) {
   }
 
   protected render(): TemplateResult | void {
-    console.log("XXX dynalite-frontend render 1");
+    console.log("XXX dynalite-panel render 1");
     if (!this.hass /*|| !this.dynalite*/) {
       return html``;
     }
-    console.log("XXX dynalite-frontend render 2");
+    console.log("XXX dynalite-panel render 2");
 
     return html`
       <dynalite-router
@@ -80,13 +80,12 @@ class DynaliteFrontend extends ProvideHassLitMixin(LitElement) {
       ...options,
       dark: this.hass.themes.darkMode,
     });
-    this.parentElement!.style.backgroundColor =
-      "var(--primary-background-color)";
+    this.parentElement!.style.backgroundColor = "var(--primary-background-color)";
   }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    "dynalite-frontend": DynaliteFrontend;
+    "dynalite-panel": DynalitePanel;
   }
 }
