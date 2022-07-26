@@ -24,27 +24,18 @@ module.exports.emptyPackages = ({ latestBuild, isHassioBuild }) =>
     latestBuild &&
       // wrapped in require.resolve so it blows up if file no longer exists
       require.resolve(
-        path.resolve(
-          paths.polymer_dir,
-          "homeassistant-frontend/src/resources/compatibility.ts"
-        )
+        path.resolve(paths.polymer_dir, "homeassistant-frontend/src/resources/compatibility.ts")
       ),
     // This polyfill is loaded in workers to support ES5, filter it out.
     latestBuild && require.resolve("proxy-polyfill/src/index.js"),
     // Icons in supervisor conflict with icons in HA so we don't load.
     isHassioBuild &&
       require.resolve(
-        path.resolve(
-          paths.polymer_dir,
-          "homeassistant-frontend/src/components/ha-icon.ts"
-        )
+        path.resolve(paths.polymer_dir, "homeassistant-frontend/src/components/ha-icon.ts")
       ),
     isHassioBuild &&
       require.resolve(
-        path.resolve(
-          paths.polymer_dir,
-          "homeassistant-frontend/src/components/ha-icon-picker.ts"
-        )
+        path.resolve(paths.polymer_dir, "homeassistant-frontend/src/components/ha-icon-picker.ts")
       ),
     // Icons in supervisor conflict with icons in HA so we don't load.
     isHassioBuild &&
@@ -64,9 +55,7 @@ module.exports.definedVars = ({ isProdBuild, latestBuild, defineOverlay }) => ({
   __SUPERVISOR__: false,
   __BACKWARDS_COMPAT__: false,
   __STATIC_PATH__: "/static/",
-  "process.env.NODE_ENV": JSON.stringify(
-    isProdBuild ? "production" : "development"
-  ),
+  "process.env.NODE_ENV": JSON.stringify(isProdBuild ? "production" : "development"),
   ...defineOverlay,
 });
 
@@ -92,10 +81,7 @@ module.exports.babelOptions = ({ latestBuild }) => ({
   ].filter(Boolean),
   plugins: [
     [
-      path.resolve(
-        paths.polymer_dir,
-        "build-scripts/babel-plugins/inline-constants-plugin.js"
-      ),
+      path.resolve(paths.polymer_dir, "build-scripts/babel-plugins/inline-constants-plugin.js"),
       {
         modules: ["@mdi/js"],
         ignoreModuleNotFound: true,

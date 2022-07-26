@@ -1,11 +1,11 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators";
-import "../homeassistant-frontend/src/components/ha-card";
-import "../homeassistant-frontend/src/layouts/hass-subpage";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
+import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
+import { panelTabs } from "./common";
 
-@customElement("dynalite-dashboard")
-export class DynaliteDashboard extends LitElement {
+@customElement("dynalite-global-settings")
+export class DynaliteGlobalSettings extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
   @property({ type: Object }) public dynalite!: boolean;
@@ -39,16 +39,30 @@ export class DynaliteDashboard extends LitElement {
   }
 
   protected render(): TemplateResult | void {
+    console.log("XXX global settings render");
+    console.dir(this.hass);
+    if (!this.hass || !this.dynalite) {
+      return html``;
+    }
+    console.log("XXX render global settings");
     return html`
-      <hass-subpage .hass=${this.hass} header="Dynalite Dashboard" .narrow=${this.narrow}>
-        Hello World!!!
-      </hass-subpage>
+      <hass-tabs-subpage
+        .hass=${this.hass}
+        .narrow=${this.narrow}
+        .tabs=${panelTabs}
+        .route=${this.route}
+        searchLabel="abcde1"
+        )}
+        clickable
+      >
+        HELLO WORLD
+      </hass-tabs-subpage>
     `;
   }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    "dynalite-dashboard": DynaliteDashboard;
+    "dynalite-global-settings": DynaliteGlobalSettings;
   }
 }
