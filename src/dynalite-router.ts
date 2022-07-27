@@ -1,11 +1,11 @@
-import { PolymerElement } from "@polymer/polymer";
-import { customElement, property, state } from "lit/decorators";
+import { PropertyValues } from "lit";
+import { customElement, property } from "lit/decorators";
 import {
   HassRouterPage,
   RouterOptions,
 } from "../homeassistant-frontend/src/layouts/hass-router-page";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
-import { Dynalite } from "./common";
+import { Dynalite, ROUTE_AREAS, ROUTE_GLOBAL_SETTINGS, ROUTE_EDIT } from "./common";
 
 @customElement("dynalite-router")
 class DynaliteRouter extends HassRouterPage {
@@ -17,14 +17,10 @@ class DynaliteRouter extends HassRouterPage {
 
   @property({ type: Boolean }) public narrow!: boolean;
 
-  @state() private _wideSidebar = false;
-
-  @state() private _wide = false;
-
   protected routerOptions: RouterOptions = {
     defaultPage: "areas",
     routes: {
-      areas: {
+      [ROUTE_AREAS]: {
         tag: "dynalite-areas",
         load: () => {
           // eslint-disable-next-line no-console
@@ -32,7 +28,7 @@ class DynaliteRouter extends HassRouterPage {
           return import("./dynalite-areas");
         },
       },
-      "global-settings": {
+      [ROUTE_GLOBAL_SETTINGS]: {
         tag: "dynalite-global-settings",
         load: () => {
           // eslint-disable-next-line no-console
@@ -40,56 +36,28 @@ class DynaliteRouter extends HassRouterPage {
           return import("./dynalite-global-settings");
         },
       },
+      [ROUTE_EDIT]: {
+        tag: "dynalite-edit-area",
+        load: () => {
+          // eslint-disable-next-line no-console
+          console.info("Importing dynalite-edit-area");
+          return import("./dynalite-edit-area");
+        },
+      },
     },
   };
 
-  protected updatePageEl(el) {
-    const isWide = this.hass.dockedSidebar === "docked" ? this._wideSidebar : this._wide;
-    console.log("XXX router updatepage");
+  protected updatePageEl(el, changedProps: PropertyValues) {
+    console.log("XXX router updatepage current=%s", this._currentPage);
     console.dir(this.hass);
-    if ("setProperties" in el) {
-      // As long as we have Polymer panels
-      (el as PolymerElement).setProperties({
-        route: this.routeTail,
-        hass: this.hass,
-        dynalite: this.dynalite,
-        //showAdvanced: Boolean(this.hass.userData?.showAdvanced),
-        //isWide,
-        narrow: this.narrow,
-      });
-    } else {
-      el.route = this.routeTail;
-      el.hass = this.hass;
-      el.dynalite = this.dynalite;
-      //el.showAdvanced = Boolean(this.hass.userData?.showAdvanced);
-      //el.isWide = isWide;
-      el.narrow = this.narrow;
-    }
-  }
-
-  protected updatePageElOld(el) {
-    const section = this.route.path.replace("/", "");
-    const isWide = this.hass.dockedSidebar === "docked" ? this._wideSidebar : this._wide;
-    el.hass = this.hass;
     el.route = this.routeTail;
-    el.narrow = this.narrow;
-    el.isWide = isWide;
-    el.section = section;
-
-    // eslint-disable-next-line no-console
-    console.info("Current Page: " + this._currentPage + " in dynalite-router");
-
-    // eslint-disable-next-line no-console
-    console.info("Route " + this.route.path + " in dynalite-router");
-
-    if (this._currentPage != "devices") {
-      const routeSplit = this.routeTail.path.split("/");
-      el.deviceId = routeSplit[routeSplit.length - 1];
-
-      // eslint-disable-next-line no-console
-      console.info("Device ID: " + el.deviceId + " in dynalite-router");
-    }
+    el.hass = this.hass;
     el.dynalite = this.dynalite;
+    el.narrow = this.narrow;
+    if ((!changedProps || changedProps.has("route")) && this._currentPage !== "dashboard") {
+      const areaNumber = decodeURIComponent(this.routeTail.path.substring(1));
+      el.areaNumber = areaNumber === "new" ? null : areaNumber;
+    }
   }
 }
 

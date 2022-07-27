@@ -4,8 +4,8 @@ import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
 import { Dynalite, panelTabs } from "./common";
 
-@customElement("dynalite-global-settings")
-export class DynaliteGlobalSettings extends LitElement {
+@customElement("dynalite-edit-area")
+export class DynaliteEditArea extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
   @property({ type: Object }) public dynalite!: Dynalite;
@@ -13,6 +13,8 @@ export class DynaliteGlobalSettings extends LitElement {
   @property({ type: Object }) public route!: Route;
 
   @property({ type: Boolean }) public narrow = false;
+
+  @property({ attribute: false }) public areaNumber!: string;
 
   @state() private _showDisabled = false;
 
@@ -39,12 +41,12 @@ export class DynaliteGlobalSettings extends LitElement {
   }
 
   protected render(): TemplateResult | void {
-    console.log("XXX global settings render");
+    console.log("XXX edit area render");
     console.dir(this.hass);
     if (!this.hass || !this.dynalite) {
       return html``;
     }
-    console.log("XXX render global settings");
+    console.log("XXX render edit area");
     return html`
       <hass-tabs-subpage
         .hass=${this.hass}
@@ -55,7 +57,7 @@ export class DynaliteGlobalSettings extends LitElement {
         )}
         clickable
       >
-        HELLO WORLD
+        HELLO WORLD edit-area ${this.areaNumber}
       </hass-tabs-subpage>
     `;
   }
@@ -63,6 +65,6 @@ export class DynaliteGlobalSettings extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "dynalite-global-settings": DynaliteGlobalSettings;
+    "dynalite-edit-area": DynaliteEditArea;
   }
 }

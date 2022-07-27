@@ -97,12 +97,12 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
       })
       .then(
         (resp) => {
-          console.log("XXX Message success!", resp);
+          console.log("XXX Message success!");
+          console.dir(resp);
+          const config_data = (resp as DynaliteConfigResponse).config[0];
+          if (!config_data.area) config_data.area = {};
           this.dynalite = {
-            language: "en",
-            config_data: (resp as DynaliteConfigResponse).config,
-            localize: (string: string, replace?: Record<string, any>) =>
-              localize(this.dynalite?.language || "en", string, replace),
+            config_data: config_data,
           };
         },
         (err) => {

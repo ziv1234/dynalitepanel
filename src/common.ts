@@ -2,9 +2,7 @@ import { mdiDevices, mdiPuzzle } from "@mdi/js";
 import { Route } from "../homeassistant-frontend/src/types";
 
 export interface Dynalite {
-  language: string;
   config_data: any;
-  localize(string: string, replace?: Record<string, any>): string;
 }
 
 export interface DynaliteConfigResponse {
@@ -15,22 +13,33 @@ export interface LocationChangedEvent {
   detail?: { route: Route; force?: boolean };
 }
 
-export interface DynaliteAreaInfo {
-  number: number;
+export interface DynaliteAreaRowInfo {
+  number: string;
+  name: string;
+  template: string;
+  channel: string;
+  preset: string;
+}
+
+export const ROUTE_AREAS = "areas";
+export const ROUTE_GLOBAL_SETTINGS = "global-settings";
+export const ROUTE_EDIT = "edit";
+export const BASE_URL = "/dynalite";
+
+function _fullPath(route: string) {
+  return `${BASE_URL}/${route}`;
 }
 
 export const panelTabs = [
   {
-    component: "areas",
-    path: "/dynalite/areas",
+    path: _fullPath(ROUTE_AREAS),
     name: "Dynalite Areas",
     iconPath: mdiPuzzle,
     iconColor: "#2D338F",
     core: true,
   },
   {
-    component: "global-settings",
-    path: "/dynalite/global-settings",
+    path: _fullPath(ROUTE_GLOBAL_SETTINGS),
     name: "Global Settings",
     iconPath: mdiDevices,
     iconColor: "#2D338F",

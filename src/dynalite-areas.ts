@@ -2,20 +2,23 @@ import { html, LitElement, TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators";
 import "../homeassistant-frontend/src/components/ha-card";
 import "../homeassistant-frontend/src/layouts/hass-subpage";
+import "../homeassistant-frontend/src/components/ha-fab";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import "../homeassistant-frontend/src/layouts/hass-tabs-subpage-data-table";
-import { DynaliteAreaInfo, panelTabs } from "./common";
+import { Dynalite, panelTabs, DynaliteAreaRowInfo } from "./common";
 import {
   DataTableColumnContainer,
   DataTableRowData,
 } from "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import memoizeOne from "memoize-one";
+import { mdiPlus } from "@mdi/js";
+import { navigate } from "../homeassistant-frontend/src/common/navigate";
 
 @customElement("dynalite-areas")
 export class DynaliteAreas extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
-  @property({ type: Object }) public dynalite!: boolean;
+  @property({ type: Object }) public dynalite!: Dynalite;
 
   @property({ type: Object }) public route!: Route;
 
@@ -51,28 +54,21 @@ export class DynaliteAreas extends LitElement {
     if (!this.hass || !this.dynalite) {
       return html``;
     }
-    const junkNumHidden = 777;
-    console.log(
-      "XXX render areas localize=%s",
-      this.hass.localize("ui.panel.config.devices.picker.search")
-    );
+    console.log("XXX render areas");
+    const data = this._calculateData();
     return html`
       <hass-tabs-subpage-data-table
         .hass=${this.hass}
         .narrow=${this.narrow}
         .tabs=${panelTabs}
         .route=${this.route}
-        .numHidden=${junkNumHidden}
-        .searchLabel=${this.hass.localize("ui.panel.config.devices.picker.search")}
-        .hiddenLabel=${this.hass.localize(
-          "ui.panel.config.devices.picker.filter.hidden_devices",
-          "number",
-          junkNumHidden
-        )}
         .columns=${this._columns(this.narrow)}
-        .data=${this._data}
+        .data=${data}
         clickable
       >
+        <ha-fab slot="fab" label="Define New Area" extended @click=${this._createNew}>
+          <ha-svg-icon slot="icon" .path=${mdiPlus}></ha-svg-icon>
+        </ha-fab>
       </hass-tabs-subpage-data-table>
     `;
   }
@@ -84,25 +80,68 @@ export class DynaliteAreas extends LitElement {
       return columns;
     }
     const columns: DataTableColumnContainer = {
-      manufacturer: {
-        title: this.hass.localize("ui.panel.config.devices.data_table.manufacturer"),
+      number: {
+        title: "Area Number",
         sortable: true,
-        hidden: narrow,
+        hidden: false,
+        filterable: true,
+        width: "10%",
+      },
+      name: {
+        title: "Name",
+        sortable: true,
+        hidden: false,
         filterable: true,
         width: "15%",
       },
-      model: {
-        title: "bla bla",
+      template: {
+        title: "Behavior",
         sortable: true,
         hidden: narrow,
         filterable: true,
-        width: "15%",
+        width: "10%",
+      },
+      preset: {
+        title: "Presets",
+        sortable: true,
+        hidden: narrow,
+        filterable: true,
+        width: "25%",
+      },
+      channel: {
+        title: "Channels",
+        sortable: true,
+        hidden: narrow,
+        filterable: true,
+        width: "25%",
       },
     };
     return columns;
   });
 
-  private _data: DataTableRowData[] = [];
+  private _calculateData(): DataTableRowData[] {
+    function calcSingleArea(areaNum: string, areaConfig: any): DynaliteAreaRowInfo {
+      const templateNames = { room: "On/Off Switch", time_cover: "Blind or Cover" };
+      return {
+        name: areaConfig.name,
+        number: areaNum,
+        template: areaConfig.template ? templateNames[areaConfig.template] : "Manual",
+        preset: areaConfig.preset ? Object.keys(areaConfig.preset).join(", ") : "-",
+        channel: areaConfig.channel ? Object.keys(areaConfig.channel).join(", ") : "-",
+      };
+    }
+    console.log("XXX calculateData");
+    console.dir(this.dynalite.config_data.area);
+    const areas = this.dynalite.config_data.area;
+    const areaNumbers = Object.keys(areas);
+    const data = areaNumbers.map((area) => calcSingleArea(area, areas[area]));
+    console.log("XXX areas=%s", Object.keys(areas));
+    return data;
+  }
+
+  private _createNew() {
+    navigate("/dynalite/edit/new");
+  }
 }
 
 declare global {
