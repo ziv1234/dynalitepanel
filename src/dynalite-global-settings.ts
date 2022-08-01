@@ -7,14 +7,13 @@ import "../homeassistant-frontend/src/components/ha-settings-row";
 import "../homeassistant-frontend/src/components/ha-switch";
 import "../homeassistant-frontend/src/components/ha-textfield";
 import "../homeassistant-frontend/src/components/ha-select";
-import "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import { Dynalite, panelTabs } from "./common";
 import "@material/mwc-button/mwc-button";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
 import { HaSwitch } from "../homeassistant-frontend/src/components/ha-switch";
-import { DataTableColumnContainer } from "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import { mdiPlus } from "@mdi/js";
+import "./dynalite-preset-table";
 
 @customElement("dynalite-global-settings")
 export class DynaliteGlobalSettings extends LitElement {
@@ -51,30 +50,6 @@ export class DynaliteGlobalSettings extends LitElement {
       return html``;
     }
     console.log("XXX render global settings");
-    const columns: DataTableColumnContainer = {
-      number: {
-        title: "Number",
-        sortable: false,
-        hidden: false,
-        filterable: false,
-        width: "25%",
-      },
-      name: {
-        title: "Name",
-        sortable: true,
-        hidden: false,
-        filterable: false,
-        width: "35%",
-      },
-      level: {
-        title: "Level",
-        sortable: true,
-        hidden: false,
-        filterable: false,
-        width: "15%",
-      },
-    };
-
     return html`
       <hass-tabs-subpage
         .hass=${this.hass}
@@ -150,18 +125,14 @@ export class DynaliteGlobalSettings extends LitElement {
                 </ha-select>
               </ha-settings-row>
               <h2>Default Presets</h2>
-              <ha-data-table
+              <dynalite-preset-table
                 .hass=${this.hass}
                 .narrow=${this.narrow}
                 .route=${this.route}
-                .columns=${columns}
-                .data=${[{ number: 12 }, { level: 3.0 }]}
-                clickable
-                id="number"
-                auto-height
-                @row-click=${this._handleChange}
-              >
-              </ha-data-table>
+                .presets=${this.dynalite.config.preset || {}}
+                >
+              </dynalite-preset-table>
+              </dynalite-preset-table>
             </div>
             <div class="card-actions">
               <mwc-button @click=${this._save}> Save </mwc-button>
