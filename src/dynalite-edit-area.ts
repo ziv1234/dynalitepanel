@@ -1,5 +1,5 @@
 import { html, LitElement, TemplateResult } from "lit";
-import { customElement, property, state } from "lit/decorators";
+import { customElement, property } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
 import { Dynalite, panelTabs } from "./common";
@@ -15,30 +15,6 @@ export class DynaliteEditArea extends LitElement {
   @property({ type: Boolean }) public narrow = false;
 
   @property({ attribute: false }) public areaNumber!: string;
-
-  @state() private _showDisabled = false;
-
-  public firstUpdated(changedProperties) {
-    super.firstUpdated(changedProperties);
-
-    if (!this.hass /*|| !this.dynalite*/) {
-      return;
-    }
-    //    if (!this._unsubs) {
-    //this._getDevices();
-    //}
-  }
-
-  public updated(changedProperties) {
-    super.updated(changedProperties);
-
-    if (!this.hass /*|| !this.dynalite */) {
-      return;
-    }
-    //if (!this._unsubs) {
-    //  this._getDevices();
-    //}
-  }
 
   protected render(): TemplateResult | void {
     console.log("XXX edit area render");

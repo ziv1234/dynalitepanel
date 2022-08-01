@@ -24,30 +24,6 @@ export class DynaliteAreas extends LitElement {
 
   @property({ type: Boolean }) public narrow = false;
 
-  @state() private _showDisabled = false;
-
-  public firstUpdated(changedProperties) {
-    super.firstUpdated(changedProperties);
-
-    if (!this.hass /*|| !this.dynalite*/) {
-      return;
-    }
-    //    if (!this._unsubs) {
-    //this._getDevices();
-    //}
-  }
-
-  public updated(changedProperties) {
-    super.updated(changedProperties);
-
-    if (!this.hass /*|| !this.dynalite */) {
-      return;
-    }
-    //if (!this._unsubs) {
-    //  this._getDevices();
-    //}
-  }
-
   protected render(): TemplateResult | void {
     console.log("XXX areas render");
     console.dir(this.hass);
@@ -131,8 +107,8 @@ export class DynaliteAreas extends LitElement {
       };
     }
     console.log("XXX calculateData");
-    console.dir(this.dynalite.config_data.area);
-    const areas = this.dynalite.config_data.area;
+    console.dir(this.dynalite.config.area);
+    const areas = this.dynalite.config.area;
     const areaNumbers = Object.keys(areas);
     const data = areaNumbers.map((area) => calcSingleArea(area, areas[area]));
     console.log("XXX areas=%s", Object.keys(areas));

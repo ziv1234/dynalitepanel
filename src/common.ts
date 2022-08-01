@@ -1,12 +1,35 @@
 import { mdiDevices, mdiPuzzle } from "@mdi/js";
 import { Route } from "../homeassistant-frontend/src/types";
 
+export interface DynaliteConfigData {
+  host: string;
+  port: string;
+  name?: string;
+  autodiscover?: boolean;
+  default?: { fade?: number };
+  active: string;
+  area: {
+    [key: string]: any;
+  };
+}
+
+export interface DynaliteDefaultData {
+  DEFAULT_NAME: string;
+}
+
 export interface Dynalite {
-  config_data: any;
+  config: DynaliteConfigData;
+  default: DynaliteDefaultData;
 }
 
 export interface DynaliteConfigResponse {
-  config: any;
+  config: DynaliteConfigData[];
+  default: DynaliteDefaultData;
+}
+
+export interface DynaliteEntryIdentifier {
+  host: string;
+  port: string;
 }
 
 export interface LocationChangedEvent {

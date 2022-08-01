@@ -1,13 +1,16 @@
 import { html, TemplateResult, LitElement } from "lit";
-import { customElement, property } from "lit/decorators";
-import { applyThemesOnElement } from "../homeassistant-frontend/src/common/dom/apply_themes_on_element";
+import { customElement, property, state } from "lit/decorators";
 import { makeDialogManager } from "../homeassistant-frontend/src/dialogs/make-dialog-manager";
 import "../homeassistant-frontend/src/resources/ha-style";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { ProvideHassLitMixin } from "../homeassistant-frontend/src/mixins/provide-hass-lit-mixin";
 import "./dynalite-router";
-import { Dynalite, DynaliteConfigResponse, LocationChangedEvent } from "./common";
-import { localize } from "./localize/localize";
+import {
+  Dynalite,
+  DynaliteConfigResponse,
+  DynaliteEntryIdentifier,
+  LocationChangedEvent,
+} from "./common";
 import { navigate } from "../homeassistant-frontend/src/common/navigate";
 
 @customElement("dynalite-panel")
@@ -20,7 +23,22 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
 
   @property({ attribute: false }) public dynalite!: Dynalite;
 
+  @state() private _activeEntry?: DynaliteEntryIdentifier;
+
+  public connectedCallback() {
+    console.log("XXX addEventListener");
+    super.connectedCallback();
+    this.addEventListener("value-changed", this._updateDynalite);
+  }
+
+  public disconnectedCallback() {
+    console.log("XXX removeEventListener");
+    this.removeEventListener("value-changed", this._updateDynalite);
+    super.disconnectedCallback();
+  }
+
   protected firstUpdated(changedProps) {
+    super.firstUpdated(changedProps);
     console.log("XXX dynalite-panel firstUpdated");
     super.firstUpdated(changedProps);
     if (!this.hass) {
@@ -35,7 +53,6 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
     );
 
     makeDialogManager(this, this.shadowRoot!);
-    //this._applyTheme();
   }
 
   protected render(): TemplateResult | void {
@@ -61,32 +78,10 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
   }
 
   private _setRoute(ev: LocationChangedEvent): void {
+    console.log("XXX setRoute - it may have a reason");
     this.route = ev.detail!.route;
     navigate(this.route.path, { replace: true });
     this.requestUpdate();
-  }
-
-  private _applyTheme() {
-    let options: Partial<HomeAssistant["selectedTheme"]> | undefined;
-
-    const themeName =
-      this.hass.selectedTheme?.theme ||
-      (this.hass.themes.darkMode && this.hass.themes.default_dark_theme
-        ? this.hass.themes.default_dark_theme!
-        : this.hass.themes.default_theme);
-
-    options = this.hass.selectedTheme;
-    if (themeName === "default" && options?.dark === undefined) {
-      options = {
-        ...this.hass.selectedTheme,
-      };
-    }
-
-    applyThemesOnElement(this.parentElement, this.hass.themes, themeName, {
-      ...options,
-      dark: this.hass.themes.darkMode,
-    });
-    this.parentElement!.style.backgroundColor = "var(--primary-background-color)";
   }
 
   private _getDynaliteConfig(): void {
@@ -99,16 +94,38 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
         (resp) => {
           console.log("XXX Message success!");
           console.dir(resp);
-          const config_data = (resp as DynaliteConfigResponse).config[0];
-          if (!config_data.area) config_data.area = {};
-          this.dynalite = {
-            config_data: config_data,
-          };
+          const completeConfig = (resp as DynaliteConfigResponse).config;
+          if (completeConfig.length == 1 || !this._activeEntry) {
+            this._activeEntry = { host: completeConfig[0].host, port: completeConfig[0].port };
+          }
+          for (const curConfig of completeConfig) {
+            if (
+              curConfig.host == this._activeEntry!.host &&
+              curConfig.port == this._activeEntry!.port
+            ) {
+              if (!curConfig.area) curConfig.area = {};
+              if (!curConfig.autodiscover) curConfig.autodiscover = false;
+              if (!curConfig.default || !curConfig.default.fade) {
+                curConfig.default = { fade: 0 };
+              }
+              if (!curConfig.active) curConfig.active = "off";
+              this.dynalite = {
+                config: curConfig,
+                default: (resp as DynaliteConfigResponse).default,
+              };
+              break;
+            }
+          }
         },
         (err) => {
           console.error("Message failed!", err);
         }
       );
+  }
+
+  private _updateDynalite(e: Event) {
+    console.log("XXX TBD _updateDynalite");
+    console.dir(e);
   }
 }
 
