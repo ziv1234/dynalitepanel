@@ -37,10 +37,15 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
     super.disconnectedCallback();
   }
 
-  protected firstUpdated(changedProps) {
-    super.firstUpdated(changedProps);
+  protected firstUpdated(_changedProperties: Map<string | number | symbol, unknown>): void {
     console.log("XXX dynalite-panel firstUpdated");
-    super.firstUpdated(changedProps);
+    super.firstUpdated(_changedProperties);
+    makeDialogManager(this, this.shadowRoot!);
+  }
+
+  protected willUpdate(_changedProperties: Map<string | number | symbol, unknown>): void {
+    console.log("XXX dynalite-panel willUpdate");
+    super.willUpdate(_changedProperties);
     if (!this.hass) {
       console.log("XXX no hass");
       return;
@@ -48,24 +53,15 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
     if (!this.dynalite) {
       this._getDynaliteConfig();
     }
-    this.addEventListener("dynalite-location-changed", (e) =>
-      this._setRoute(e as LocationChangedEvent)
-    );
-
-    makeDialogManager(this, this.shadowRoot!);
   }
 
   protected render(): TemplateResult | void {
     console.log("XXX dynalite-panel render 1");
     if (!this.hass || !this.dynalite) {
-      console.log("XXX render - no hass");
+      console.log("XXX render - no hass(%s) or dynalite(%s)", this.hass, this.dynalite);
       return html``;
     }
     console.log("XXX dynalite-panel render 2");
-    console.log(
-      "XXX render dynalite-panel localize=%s",
-      this.hass.localize("ui.panel.config.devices.picker.search")
-    );
     console.dir(this.hass);
     return html`
       <dynalite-router
@@ -75,13 +71,6 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
         .narrow=${this.narrow}
       ></dynalite-router>
     `;
-  }
-
-  private _setRoute(ev: LocationChangedEvent): void {
-    console.log("XXX setRoute - it may have a reason");
-    this.route = ev.detail!.route;
-    navigate(this.route.path, { replace: true });
-    this.requestUpdate();
   }
 
   private _getDynaliteConfig(): void {

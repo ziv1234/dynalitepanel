@@ -64,31 +64,40 @@ export class DynalitePresetTable extends LitElement {
     });
 
     return html`
-      <ha-data-table
-        .hass=${this.hass}
-        .narrow=${this.narrow}
-        .route=${this.route}
-        .columns=${columns}
-        .data=${data}
-        clickable
-        id="number"
-        auto-height
-        @row-click=${this._handleChange}
-      >
-      </ha-data-table>
-      <ha-fab
-        slot="fab"
-        class="dynalite-fab"
-        label="Add Preset"
-        extended
-        @click=${this._handleChange}
-      >
-        <ha-svg-icon slot="icon" .path=${mdiPlus}></ha-svg-icon>
-      </ha-fab>
+      <div class="dynalite-table">
+        <ha-data-table
+          .hass=${this.hass}
+          .narrow=${this.narrow}
+          .route=${this.route}
+          .columns=${columns}
+          .data=${data}
+          clickable
+          id="number"
+          auto-height
+          @row-click=${this._handleRowClicked}
+        >
+        </ha-data-table>
+        <ha-fab
+          slot="fab"
+          class="dynalite-fab md-fab-bottom-right"
+          label="Add Preset"
+          extended
+          @click=${this._addRow}
+        >
+          <ha-svg-icon slot="icon" .path=${mdiPlus}></ha-svg-icon>
+        </ha-fab>
+      </div>
     `;
   }
 
-  private _handleChange(ev) {
+  private _handleRowClicked(ev) {
+    const target = ev.detail.id;
+    console.log("XXX TBD preset table row-click id=%s", target);
+    console.dir(ev);
+    return;
+  }
+
+  private _addRow(ev) {
     const target = ev.detail.id;
     console.log("XXX TBD preset table row-click id=%s", target);
     console.dir(ev);
@@ -99,9 +108,14 @@ export class DynalitePresetTable extends LitElement {
     return [
       haStyle,
       css`
+        .dynalite-table {
+          position: relative;
+        }
         .dynalite-fab {
-          display: flex;
-          justify-content: flex-end;
+          display: inline-flex;
+          position: absolute;
+          bottom: -15px;
+          right: 0;
         }
       `,
     ];

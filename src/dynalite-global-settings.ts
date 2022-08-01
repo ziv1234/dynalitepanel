@@ -137,9 +137,6 @@ export class DynaliteGlobalSettings extends LitElement {
             <div class="card-actions">
               <mwc-button @click=${this._save}> Save </mwc-button>
             </div>
-            <ha-fab slot="fab" label="Define New Preset" extended @click=${console.log}>
-              <ha-svg-icon slot="icon" .path=${mdiPlus}></ha-svg-icon>
-            </ha-fab>
           </ha-card>
           <div class="footer">Learn more</div>
         </div>
@@ -171,6 +168,11 @@ export class DynaliteGlobalSettings extends LitElement {
       case "name": {
         console.log("updating name");
         this._name = target.value;
+        break;
+      }
+      case "fade": {
+        console.log("updating fade");
+        this._fade = target.value;
         break;
       }
       default: {
