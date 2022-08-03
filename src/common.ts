@@ -3,8 +3,8 @@ import { Route } from "../homeassistant-frontend/src/types";
 
 export interface DynalitePresetData {
   name?: string;
-  fade?: number;
-  level?: number;
+  fade?: string;
+  level?: string;
 }
 
 export interface DynaliteConfigData {

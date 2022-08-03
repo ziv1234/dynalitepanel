@@ -11,7 +11,10 @@ import { DynalitePresetData } from "./common";
 import { mdiPlus } from "@mdi/js";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import { showConfirmationDialog } from "../homeassistant-frontend/src/dialogs/generic/show-dialog-box";
-import { showDynaliteEditPresetDialog } from "./show-dialog-dynalite-edit-preset";
+import {
+  DynaliteEditPresetDialogParams,
+  showDynaliteEditPresetDialog,
+} from "./show-dialog-dynalite-edit-preset";
 
 interface DynalitePresetRowData extends DynalitePresetData {
   number?: string;
@@ -95,8 +98,18 @@ export class DynalitePresetTable extends LitElement {
     const target = ev.detail.id;
     console.log("XXX TBD preset table row-click id=%s", target);
     console.dir(ev);
-    showDynaliteEditPresetDialog(this, { hass: this.hass, number: "7" });
+    showDynaliteEditPresetDialog(this, {
+      hass: this.hass,
+      onSave: this._saveRow,
+      number: "7",
+      level: "0.333333333333",
+    });
     return;
+  }
+
+  private _saveRow(params: DynaliteEditPresetDialogParams): void {
+    console.log("saving row");
+    console.dir(params);
   }
 
   private async _addRow(ev) {

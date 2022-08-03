@@ -76,8 +76,9 @@ export class DynaliteGlobalSettings extends LitElement {
                   label="Name"
                   .value=${this._name || this.dynalite.default.DEFAULT_NAME}
                   @change=${this._handleChange}
-                ></ha-textfield> </ha-settings-row
-              ><ha-settings-row>
+                ></ha-textfield>
+              </ha-settings-row>
+              <ha-settings-row>
                 <span slot="heading" data-for="autodiscover"> Auto Discover </span>
                 <span slot="description" data-for="autodiscover">
                   Discover devices dynamically (useful for initial setup)
