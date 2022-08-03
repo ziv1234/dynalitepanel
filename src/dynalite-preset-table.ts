@@ -10,6 +10,8 @@ import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { DynalitePresetData } from "./common";
 import { mdiPlus } from "@mdi/js";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
+import { showConfirmationDialog } from "../homeassistant-frontend/src/dialogs/generic/show-dialog-box";
+import { showDynaliteEditPresetDialog } from "./show-dialog-dynalite-edit-preset";
 
 interface DynalitePresetRowData extends DynalitePresetData {
   number?: string;
@@ -24,6 +26,11 @@ export class DynalitePresetTable extends LitElement {
   @property({ type: Boolean }) public narrow = false;
 
   @property({ attribute: false }) public presets!: { [key: string]: DynalitePresetData };
+
+  protected firstUpdated(_changedProperties: Map<string | number | symbol, unknown>): void {
+    console.log("XXX dynalite-preset-table firstUpdated");
+    super.firstUpdated(_changedProperties);
+  }
 
   protected render(): TemplateResult | void {
     console.log("XXX preset table render");
@@ -77,13 +84,7 @@ export class DynalitePresetTable extends LitElement {
           @row-click=${this._handleRowClicked}
         >
         </ha-data-table>
-        <ha-fab
-          slot="fab"
-          class="dynalite-fab md-fab-bottom-right"
-          label="Add Preset"
-          extended
-          @click=${this._addRow}
-        >
+        <ha-fab slot="fab" class="dynalite-fab" label="Add Preset" extended @click=${this._addRow}>
           <ha-svg-icon slot="icon" .path=${mdiPlus}></ha-svg-icon>
         </ha-fab>
       </div>
@@ -94,14 +95,25 @@ export class DynalitePresetTable extends LitElement {
     const target = ev.detail.id;
     console.log("XXX TBD preset table row-click id=%s", target);
     console.dir(ev);
+    showDynaliteEditPresetDialog(this, { hass: this.hass, number: "7" });
     return;
   }
 
-  private _addRow(ev) {
+  private async _addRow(ev) {
     const target = ev.detail.id;
     console.log("XXX TBD preset table row-click id=%s", target);
     console.dir(ev);
-    return;
+    if (
+      !(await showConfirmationDialog(this, {
+        title: "abcde",
+        text: "deletetext",
+        confirmText: "confirmtext",
+      }))
+    ) {
+      console.log("received no");
+      return;
+    }
+    console.log("received yes");
   }
 
   static get styles(): CSSResultGroup {
