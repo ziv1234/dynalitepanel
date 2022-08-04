@@ -1,12 +1,20 @@
-import { html, LitElement, TemplateResult } from "lit";
+import { css, CSSResultGroup, html, LitElement, TemplateResult } from "lit";
 import { customElement, property, query, state } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { DynaliteEditPresetDialogParams } from "./show-dialog-dynalite-edit-preset";
 import "../homeassistant-frontend/src/components/ha-dialog";
 import "../homeassistant-frontend/src/components/ha-settings-row";
 import "../homeassistant-frontend/src/components/ha-textfield";
+import "../homeassistant-frontend/src/components/ha-card";
+import "../homeassistant-frontend/src/components/ha-button-menu";
+import "../homeassistant-frontend/src/components/ha-icon-button";
+import "../homeassistant-frontend/src/components/ha-header-bar";
 import { HaTextField } from "../homeassistant-frontend/src/components/ha-textfield";
 import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
+import { mdiDotsVertical } from "@mdi/js";
+import { haStyle } from "../homeassistant-frontend/src/resources/styles";
+import "@material/mwc-list";
+import "@material/mwc-button";
 
 @customElement("dynalite-edit-preset-dialog")
 export class DynaliteEditPresetDialog extends LitElement {
@@ -18,18 +26,55 @@ export class DynaliteEditPresetDialog extends LitElement {
 
   @state() private _params?: DynaliteEditPresetDialogParams;
 
+  @state() private _isNew = false;
+
   @query("#number-text-field", true) private _numTextField?: HaTextField;
 
   public async showDialog(params: DynaliteEditPresetDialogParams): Promise<void> {
     this.hass = params.hass;
     this._params = Object.assign({}, params); // XXX TBD check if needed
-    console.log("show");
+    this._isNew = "number" in this._params;
+    console.log("show %s", this._isNew);
   }
 
   protected render(): TemplateResult | void {
     if (!this._params) return html``;
     return html`
-      <ha-dialog open @closed=${this._close} heading="Edit Preset">
+      <ha-dialog open .heading=${"abcde"} @closed=${this._close}>
+        <div slot="heading">
+          <ha-header-bar>
+            <span slot="title"> XXX correct title </span>
+            <span slot="actionItems">
+              <ha-button-menu
+                @action=${console.log}
+                @closed=${(ev) => {
+                  ev.stopPropagation();
+                }}
+                corner="BOTTOM_START"
+                fixed
+              >
+                <ha-icon-button
+                  slot="trigger"
+                  label="Additional Actions"
+                  .path=${mdiDotsVertical}
+                ></ha-icon-button>
+                <mwc-list-item> Delete Preset </mwc-list-item>
+                <mwc-list-item disabled> edit_yaml </mwc-list-item>
+                <mwc-list-item> duplicate </mwc-list-item>
+                <mwc-list-item class="warning"> delete </mwc-list-item>
+              </ha-button-menu>
+            </span>
+          </ha-header-bar>
+        </div>
+        <div class="wrapper">${this._renderTab()}</div>
+        <mwc-button slot="primaryAction" @click=${this._save}>Save</mwc-button>
+      </ha-dialog>
+    `;
+  }
+
+  private _renderTab() {
+    return html`
+      <ha-card outlined>
         <div class="content">
           <ha-settings-row>
             <span slot="heading" data-for="number"> Number </span>
@@ -88,10 +133,7 @@ export class DynaliteEditPresetDialog extends LitElement {
             ></ha-textfield>
           </ha-settings-row>
         </div>
-        <div class="buttons">
-          <mwc-button @click=${this._save}>Save</mwc-button>
-        </div>
-      </ha-dialog>
+      </ha-card>
     `;
   }
 
@@ -146,12 +188,58 @@ export class DynaliteEditPresetDialog extends LitElement {
 
   private _close(): void {
     this._params = undefined;
+    fireEvent(this, "dialog-closed", { dialog: this.localName });
   }
 
   private _save(): void {
     console.log("saving");
     console.dir(this._params);
     this._params?.onSave(this._params);
+    this._close();
+  }
+
+  static get styles(): CSSResultGroup {
+    return [
+      haStyle,
+      css`
+        .disabled {
+          opacity: 0.5;
+          pointer-events: none;
+        }
+        .card-content {
+          padding-top: 16px;
+          margin-top: 0;
+        }
+        .card-menu {
+          float: var(--float-end, right);
+          z-index: 3;
+          margin: 4px;
+          --mdc-theme-text-primary-on-background: var(--primary-text-color);
+          display: flex;
+          align-items: center;
+        }
+        ha-header-bar {
+          --mdc-theme-on-primary: var(--primary-text-color);
+          --mdc-theme-primary: var(--mdc-theme-surface);
+          flex-shrink: 0;
+        }
+
+        mwc-tab-bar {
+          border-bottom: 1px solid var(--mdc-dialog-scroll-divider-color, rgba(0, 0, 0, 0.12));
+        }
+
+        ha-dialog {
+          --dialog-content-position: static;
+          --dialog-content-padding: 0;
+          --dialog-z-index: 6;
+        }
+
+        .content {
+          display: block;
+          padding: 20px 24px;
+        }
+      `,
+    ];
   }
 }
 
