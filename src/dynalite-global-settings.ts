@@ -25,22 +25,33 @@ export class DynaliteGlobalSettings extends LitElement {
 
   @property({ type: Boolean }) public narrow = false;
 
-  @state() private _name;
+  @state() private _name = "";
 
-  @state() private _autodiscover;
+  @state() private _autodiscover = false;
 
-  @state() private _fade;
+  @state() private _fade = 0.0;
 
-  @state() private _active;
+  @state() private _active = "";
 
-  public firstUpdated(changedProperties: Map<string | number | symbol, unknown>): void {
-    super.firstUpdated(changedProperties);
+  @state() private _overridePresets = false;
+
+  @state() private _preset;
+
+  @state() private _hasInitialized = false;
+
+  protected willUpdate(_changedProperties: Map<string | number | symbol, unknown>): void {
+    super.willUpdate(_changedProperties);
     console.log("XXX conn");
     console.dir(this.dynalite);
-    this._name = this.dynalite.config.name;
-    this._autodiscover = this.dynalite.config.autodiscover;
-    this._fade = this.dynalite.config.default?.fade;
-    this._active = this.dynalite.config.active;
+    if (!this.dynalite) return;
+    if (this._hasInitialized) return;
+    this._name = this.dynalite.config.name || "";
+    this._autodiscover = this.dynalite.config.autodiscover!;
+    this._fade = this.dynalite.config.default!.fade!;
+    this._active = this.dynalite.config.active!;
+    this._overridePresets = "preset" in this.dynalite.config;
+    this._preset = JSON.parse(JSON.stringify(this.dynalite.config.preset || {}));
+    this._hasInitialized = true;
   }
 
   protected render(): TemplateResult | void {
@@ -56,8 +67,6 @@ export class DynaliteGlobalSettings extends LitElement {
         .narrow=${this.narrow}
         .tabs=${panelTabs}
         .route=${this.route}
-        searchLabel="abcde1"
-        )}
         clickable
       >
         <div class="content">
@@ -130,16 +139,14 @@ export class DynaliteGlobalSettings extends LitElement {
                 .hass=${this.hass}
                 .narrow=${this.narrow}
                 .route=${this.route}
-                .presets=${this.dynalite.config.preset || {}}
-                >
-              </dynalite-preset-table>
+                .presets=${this._preset || {}}
+              >
               </dynalite-preset-table>
             </div>
             <div class="card-actions">
               <mwc-button @click=${this._save}> Save </mwc-button>
             </div>
           </ha-card>
-          <div class="footer">Learn more</div>
         </div>
       </hass-tabs-subpage>
     `;

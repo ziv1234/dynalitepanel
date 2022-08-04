@@ -30,11 +30,6 @@ export class DynalitePresetTable extends LitElement {
 
   @property({ attribute: false }) public presets!: { [key: string]: DynalitePresetData };
 
-  protected firstUpdated(_changedProperties: Map<string | number | symbol, unknown>): void {
-    console.log("XXX dynalite-preset-table firstUpdated");
-    super.firstUpdated(_changedProperties);
-  }
-
   protected render(): TemplateResult | void {
     console.log("XXX preset table render");
     console.dir(this.hass);

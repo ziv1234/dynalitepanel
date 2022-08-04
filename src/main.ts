@@ -5,13 +5,7 @@ import "../homeassistant-frontend/src/resources/ha-style";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { ProvideHassLitMixin } from "../homeassistant-frontend/src/mixins/provide-hass-lit-mixin";
 import "./dynalite-router";
-import {
-  Dynalite,
-  DynaliteConfigResponse,
-  DynaliteEntryIdentifier,
-  LocationChangedEvent,
-} from "./common";
-import { navigate } from "../homeassistant-frontend/src/common/navigate";
+import { Dynalite, DynaliteConfigResponse, DynaliteEntryIdentifier } from "./common";
 
 @customElement("dynalite-panel")
 class DynalitePanel extends ProvideHassLitMixin(LitElement) {
@@ -29,18 +23,13 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
     console.log("XXX addEventListener");
     super.connectedCallback();
     this.addEventListener("value-changed", this._updateDynalite);
+    makeDialogManager(this, this.shadowRoot!);
   }
 
   public disconnectedCallback() {
     console.log("XXX removeEventListener");
     this.removeEventListener("value-changed", this._updateDynalite);
     super.disconnectedCallback();
-  }
-
-  protected firstUpdated(_changedProperties: Map<string | number | symbol, unknown>): void {
-    console.log("XXX dynalite-panel firstUpdated");
-    super.firstUpdated(_changedProperties);
-    makeDialogManager(this, this.shadowRoot!);
   }
 
   protected willUpdate(_changedProperties: Map<string | number | symbol, unknown>): void {
