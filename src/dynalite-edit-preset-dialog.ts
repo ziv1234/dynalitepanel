@@ -77,6 +77,7 @@ export class DynaliteEditPresetDialog extends LitElement {
                 <ha-textfield
                   name="number"
                   .value=${this._params.number || ""}
+                  .disabled=${!this._isNew}
                   required
                   min="1"
                   max="255"
@@ -201,38 +202,16 @@ export class DynaliteEditPresetDialog extends LitElement {
     return [
       haStyle,
       css`
-        .disabled {
-          opacity: 0.5;
-          pointer-events: none;
-        }
-        .card-content {
-          padding-top: 16px;
-          margin-top: 0;
-        }
-        .card-menu {
-          float: var(--float-end, right);
-          z-index: 3;
-          margin: 4px;
-          --mdc-theme-text-primary-on-background: var(--primary-text-color);
-          display: flex;
-          align-items: center;
-        }
         ha-header-bar {
           --mdc-theme-on-primary: var(--primary-text-color);
           --mdc-theme-primary: var(--mdc-theme-surface);
           flex-shrink: 0;
         }
-
-        mwc-tab-bar {
-          border-bottom: 1px solid var(--mdc-dialog-scroll-divider-color, rgba(0, 0, 0, 0.12));
-        }
-
         ha-dialog {
           --dialog-content-position: static;
           --dialog-content-padding: 0;
           --dialog-z-index: 6;
         }
-
         .content {
           display: block;
           padding: 20px 24px;
