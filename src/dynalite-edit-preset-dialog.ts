@@ -33,7 +33,7 @@ export class DynaliteEditPresetDialog extends LitElement {
   public async showDialog(params: DynaliteEditPresetDialogParams): Promise<void> {
     this.hass = params.hass;
     this._params = Object.assign({}, params); // XXX TBD check if needed
-    this._isNew = "number" in this._params;
+    this._isNew = !("number" in this._params);
     console.log("show %s", this._isNew);
   }
 
@@ -43,7 +43,9 @@ export class DynaliteEditPresetDialog extends LitElement {
       <ha-dialog open .heading=${"abcde"} @closed=${this._close}>
         <div slot="heading">
           <ha-header-bar>
-            <span slot="title"> XXX correct title </span>
+            <span slot="title">
+              ${this._isNew ? "New Preset" : "Edit Preset " + this._params.number}
+            </span>
             <span slot="actionItems">
               <ha-button-menu
                 @action=${console.log}
@@ -58,7 +60,7 @@ export class DynaliteEditPresetDialog extends LitElement {
                   label="Additional Actions"
                   .path=${mdiDotsVertical}
                 ></ha-icon-button>
-                <mwc-list-item> Delete Preset </mwc-list-item>
+                <mwc-list-item class="warning"> Delete Preset </mwc-list-item>
                 <mwc-list-item disabled> edit_yaml </mwc-list-item>
                 <mwc-list-item> duplicate </mwc-list-item>
                 <mwc-list-item class="warning"> delete </mwc-list-item>
@@ -66,74 +68,71 @@ export class DynaliteEditPresetDialog extends LitElement {
             </span>
           </ha-header-bar>
         </div>
-        <div class="wrapper">${this._renderTab()}</div>
-        <mwc-button slot="primaryAction" @click=${this._save}>Save</mwc-button>
-      </ha-dialog>
-    `;
-  }
-
-  private _renderTab() {
-    return html`
-      <ha-card outlined>
-        <div class="content">
-          <ha-settings-row>
-            <span slot="heading" data-for="number"> Number </span>
-            <span slot="description" data-for="number"> Dynalite preset number (1-255) </span>
-            <ha-textfield
-              name="number"
-              .value=${this._params.number || ""}
-              required
-              min="1"
-              max="255"
-              step="1"
-              type="number"
-              autovalidate
-              @change=${this._handleChange}
-              .validityTransform=${this._validityTransform.bind(this)}
-              id="number-text-field"
-            ></ha-textfield>
-          </ha-settings-row>
-          <ha-settings-row>
-            <span slot="heading" data-for="name"> Name </span>
-            <span slot="description" data-for="name"> Name for this preset </span>
-            <ha-textfield
-              name="name"
-              .value=${this._params.name || ""}
-              @change=${this._handleChange}
-            ></ha-textfield>
-          </ha-settings-row>
-          <ha-settings-row>
-            <span slot="heading" data-for="level"> Level </span>
-            <span slot="description" data-for="level"> Channel levels for this preset </span>
-            <ha-textfield
-              name="level"
-              .value=${this._params.level ? Math.round(Number(this._params.level) * 100) : ""}
-              min="0"
-              max="100"
-              type="number"
-              autovalidate
-              @change=${this._handleChange}
-              validationMessage="Illegal value"
-              suffix="%"
-            ></ha-textfield>
-          </ha-settings-row>
-          <ha-settings-row>
-            <span slot="heading" data-for="fade"> Fade Time </span>
-            <span slot="description" data-for="fade"> Preset fade time (seconds) </span>
-            <ha-textfield
-              name="fade"
-              label="Fade"
-              .value=${this._params.fade || ""}
-              min="0"
-              step="0.1"
-              autoValidate
-              type="number"
-              @change=${this._handleChange}
-              validationMessage="Invalid Fade"
-            ></ha-textfield>
-          </ha-settings-row>
+        <div class="wrapper">
+          <ha-card outlined>
+            <div class="content">
+              <ha-settings-row>
+                <span slot="heading" data-for="number"> Number </span>
+                <span slot="description" data-for="number"> Dynalite preset number (1-255) </span>
+                <ha-textfield
+                  name="number"
+                  .value=${this._params.number || ""}
+                  required
+                  min="1"
+                  max="255"
+                  step="1"
+                  type="number"
+                  autovalidate
+                  @change=${this._handleChange}
+                  .validityTransform=${this._validityTransform.bind(this)}
+                  id="number-text-field"
+                ></ha-textfield>
+              </ha-settings-row>
+              <ha-settings-row>
+                <span slot="heading" data-for="name"> Name </span>
+                <span slot="description" data-for="name"> Name for this preset </span>
+                <ha-textfield
+                  name="name"
+                  .value=${this._params.name || ""}
+                  @change=${this._handleChange}
+                ></ha-textfield>
+              </ha-settings-row>
+              <ha-settings-row>
+                <span slot="heading" data-for="level"> Level </span>
+                <span slot="description" data-for="level"> Channel levels for this preset </span>
+                <ha-textfield
+                  name="level"
+                  .value=${this._params.level ? Math.round(Number(this._params.level) * 100) : ""}
+                  min="0"
+                  max="100"
+                  type="number"
+                  autovalidate
+                  @change=${this._handleChange}
+                  validationMessage="Illegal value"
+                  suffix="%"
+                ></ha-textfield>
+              </ha-settings-row>
+              <ha-settings-row>
+                <span slot="heading" data-for="fade"> Fade Time </span>
+                <span slot="description" data-for="fade"> Preset fade time (seconds) </span>
+                <ha-textfield
+                  name="fade"
+                  label="Fade"
+                  .value=${this._params.fade || ""}
+                  min="0"
+                  step="0.1"
+                  autoValidate
+                  type="number"
+                  @change=${this._handleChange}
+                  validationMessage="Invalid Fade"
+                ></ha-textfield>
+              </ha-settings-row>
+            </div>
+          </ha-card>
         </div>
-      </ha-card>
+        <mwc-button slot="primaryAction" @click=${this._save}>Save</mwc-button>
+        <mwc-button slot="secondaryAction" @click=${this._close}>Cancel</mwc-button>
+      </ha-dialog>
     `;
   }
 
