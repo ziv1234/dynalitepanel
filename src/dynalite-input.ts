@@ -171,6 +171,12 @@ export class DynaliteInput extends LitElement {
     `;
   }
 
+  public isValid(): boolean {
+    console.log("XXXXX YYYYY XXXXX isValid called!!!");
+    console.dir(this.myTextField);
+    return this.myTextField && this.myTextField.validity.valid;
+  }
+
   private _updateParent(name: string, value: any) {
     this.dispatchEvent(
       new CustomEvent("dynalite-input", { detail: { target: name, value: value } })

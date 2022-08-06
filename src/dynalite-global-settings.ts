@@ -1,5 +1,5 @@
 import { css, CSSResultGroup, html, LitElement, TemplateResult } from "lit";
-import { customElement, property, state } from "lit/decorators";
+import { customElement, property, query, state } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
 import "../homeassistant-frontend/src/components/ha-card";
@@ -12,7 +12,7 @@ import "@material/mwc-button/mwc-button";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
 import "./dynalite-preset-table";
-import { DynaliteInputSettings } from "./dynalite-input";
+import { DynaliteInput, DynaliteInputSettings } from "./dynalite-input";
 import "./dynalite-input";
 
 @customElement("dynalite-global-settings")
@@ -39,19 +39,24 @@ export class DynaliteGlobalSettings extends LitElement {
 
   @state() private _hasInitialized = false;
 
+  @state() private _hasChanged = false;
+
+  @query("#dynalite-global-settings-element") _inputElement?: DynaliteInput;
+
   protected willUpdate(_changedProperties: Map<string | number | symbol, unknown>): void {
     super.willUpdate(_changedProperties);
     console.log("XXX conn");
     console.dir(this.dynalite);
     if (!this.dynalite) return;
-    if (this._hasInitialized) return;
-    this._name = this.dynalite.config.name || "";
-    this._autodiscover = this.dynalite.config.autodiscover!;
-    this._fade = this.dynalite.config.default!.fade!;
-    this._active = this.dynalite.config.active!;
-    this._overridePresets = "preset" in this.dynalite.config;
-    this._preset = JSON.parse(JSON.stringify(this.dynalite.config.preset || {}));
-    this._hasInitialized = true;
+    if (!this._hasInitialized) {
+      this._name = this.dynalite.config.name || "";
+      this._autodiscover = this.dynalite.config.autodiscover!;
+      this._fade = this.dynalite.config.default!.fade!;
+      this._active = this.dynalite.config.active!;
+      this._overridePresets = "preset" in this.dynalite.config;
+      this._preset = JSON.parse(JSON.stringify(this.dynalite.config.preset || {}));
+      this._hasInitialized = true;
+    }
   }
 
   _nameInput = new DynaliteInputSettings("name")
@@ -87,7 +92,7 @@ export class DynaliteGlobalSettings extends LitElement {
       return html``;
     }
     console.log("XXX render global settings");
-    console.dir(this._nameInput);
+    console.dir(this._inputElement);
     return html`
       <hass-tabs-subpage
         .hass=${this.hass}
@@ -113,6 +118,7 @@ export class DynaliteGlobalSettings extends LitElement {
                 .value=${this._autodiscover}
               ></dynalite-input>
               <dynalite-input
+                id="dynalite-global-settings-element"
                 .settings=${this._fadeInput}
                 @dynalite-input=${this._handleChange}
                 .value=${this._fade}
@@ -132,7 +138,12 @@ export class DynaliteGlobalSettings extends LitElement {
               </dynalite-preset-table>
             </div>
             <div class="card-actions">
-              <mwc-button @click=${this._save}> Save </mwc-button>
+              <mwc-button
+                @click=${this._save}
+                ?disabled=${!this._inputElement?.isValid() || !this._hasChanged}
+              >
+                Save
+              </mwc-button>
             </div>
           </ha-card>
         </div>
@@ -153,6 +164,7 @@ export class DynaliteGlobalSettings extends LitElement {
     this.dynalite.config.active = this._active;
     console.dir(this.dynalite.config);
     console.log("XXX dispatching");
+    this._hasChanged = false;
     fireEvent(this, "value-changed");
   }
 
@@ -163,6 +175,7 @@ export class DynaliteGlobalSettings extends LitElement {
     const value = detail.value;
     console.log("XXX TBD handle change name=%s value=%s", target, value);
     this["_" + target] = value;
+    this._hasChanged = true;
   }
 
   static get styles(): CSSResultGroup {
