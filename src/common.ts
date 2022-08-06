@@ -12,7 +12,7 @@ export interface DynaliteConfigData {
   port: string;
   name?: string;
   autodiscover?: boolean;
-  default?: { fade?: number };
+  default?: { fade?: string };
   active?: string;
   area: {
     [key: string]: any;

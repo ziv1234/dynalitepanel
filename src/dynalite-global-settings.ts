@@ -11,9 +11,9 @@ import { Dynalite, panelTabs } from "./common";
 import "@material/mwc-button/mwc-button";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
-import { HaSwitch } from "../homeassistant-frontend/src/components/ha-switch";
-import { mdiPlus } from "@mdi/js";
 import "./dynalite-preset-table";
+import { DynaliteInputSettings } from "./dynalite-input";
+import "./dynalite-input";
 
 @customElement("dynalite-global-settings")
 export class DynaliteGlobalSettings extends LitElement {
@@ -29,7 +29,7 @@ export class DynaliteGlobalSettings extends LitElement {
 
   @state() private _autodiscover = false;
 
-  @state() private _fade = 0.0;
+  @state() private _fade = "0.0";
 
   @state() private _active = "";
 
@@ -54,6 +54,32 @@ export class DynaliteGlobalSettings extends LitElement {
     this._hasInitialized = true;
   }
 
+  _nameInput = new DynaliteInputSettings("name")
+    .heading("System Name")
+    .desc("User-defined name for this Dynalite system");
+
+  _autodiscoverInput = new DynaliteInputSettings("autodiscover")
+    .heading("Auto Discover")
+    .desc("Discover devices dynamically (useful for initial setup)")
+    .type("boolean");
+
+  _fadeInput = new DynaliteInputSettings("fade")
+    .heading("Fade Time")
+    .desc("Default fade for device actions (seconds)")
+    .min(0)
+    .step(0.01)
+    .validationMessage("Invalid Fade");
+
+  _activeInput = new DynaliteInputSettings("active")
+    .heading("Active Mode")
+    .desc("Actively poll system - may increase load")
+    .type("select")
+    .selection([
+      ["off", "Not Active (default)"],
+      ["init", "Initial Init"],
+      ["on", "Always Active"],
+    ]);
+
   protected render(): TemplateResult | void {
     console.log("XXX global settings render");
     console.dir(this.hass);
@@ -61,6 +87,7 @@ export class DynaliteGlobalSettings extends LitElement {
       return html``;
     }
     console.log("XXX render global settings");
+    console.dir(this._nameInput);
     return html`
       <hass-tabs-subpage
         .hass=${this.hass}
@@ -75,65 +102,26 @@ export class DynaliteGlobalSettings extends LitElement {
               <h1>Configure Global Dynalite Settings</h1>
               <p>Host: ${this.dynalite.config.host} Port: ${this.dynalite.config.port}</p>
               <h2>Global Settings</h2>
-              <ha-settings-row>
-                <span slot="heading" data-for="name"> System Name </span>
-                <span slot="description" data-for="name">
-                  User-defined name for this Dynalite system
-                </span>
-                <ha-textfield
-                  name="name"
-                  label="Name"
-                  .value=${this._name || this.dynalite.default.DEFAULT_NAME}
-                  @change=${this._handleChange}
-                ></ha-textfield>
-              </ha-settings-row>
-              <ha-settings-row>
-                <span slot="heading" data-for="autodiscover"> Auto Discover </span>
-                <span slot="description" data-for="autodiscover">
-                  Discover devices dynamically (useful for initial setup)
-                </span>
-                <ha-switch
-                  @change=${this._handleBoolChange}
-                  .checked=${this._autodiscover}
-                  .preference=${"autodiscover"}
-                >
-                </ha-switch>
-              </ha-settings-row>
-              <ha-settings-row>
-                <span slot="heading" data-for="fade"> Fade Time </span>
-                <span slot="description" data-for="fade">
-                  Default fade for device actions (seconds)
-                </span>
-                <ha-textfield
-                  name="fade"
-                  label="Fade"
-                  .value=${this._fade}
-                  min="0"
-                  step="0.1"
-                  autoValidate
-                  type="number"
-                  @change=${this._handleChange}
-                  validationMessage="Invalid Fade"
-                ></ha-textfield>
-              </ha-settings-row>
-              <ha-settings-row>
-                <span slot="heading" data-for="active"> Active Mode </span>
-                <span slot="description" data-for="fade">
-                  Actively poll system - may increase load
-                </span>
-                <ha-select
-                  label="Active"
-                  name="active"
-                  fixedMenuPosition
-                  naturalMenuWidth
-                  .value=${this._active}
-                  @change=${this._handleChange}
-                >
-                  <mwc-list-item value="off">Not Active (default)</mwc-list-item>
-                  <mwc-list-item value="init">Initial Init</mwc-list-item>
-                  <mwc-list-item value="on">Always Active</mwc-list-item>
-                </ha-select>
-              </ha-settings-row>
+              <dynalite-input
+                .settings=${this._nameInput}
+                @dynalite-input=${this._handleChange}
+                .value=${this._name}
+              ></dynalite-input>
+              <dynalite-input
+                .settings=${this._autodiscoverInput}
+                @dynalite-input=${this._handleChange}
+                .value=${this._autodiscover}
+              ></dynalite-input>
+              <dynalite-input
+                .settings=${this._fadeInput}
+                @dynalite-input=${this._handleChange}
+                .value=${this._fade}
+              ></dynalite-input>
+              <dynalite-input
+                .settings=${this._activeInput}
+                @dynalite-input=${this._handleChange}
+                .value=${this._active}
+              ></dynalite-input>
               <h2>Default Presets</h2>
               <dynalite-preset-table
                 .hass=${this.hass}
@@ -169,45 +157,12 @@ export class DynaliteGlobalSettings extends LitElement {
   }
 
   private _handleChange(ev) {
-    const target = ev.currentTarget;
-    console.log("XXX TBD handle change name=%s value=%s", target.name, target.value);
     console.dir(ev);
-    switch (target.name) {
-      case "name": {
-        console.log("updating name");
-        this._name = target.value;
-        break;
-      }
-      case "fade": {
-        console.log("updating fade");
-        this._fade = target.value;
-        break;
-      }
-      default: {
-        // exit without sending update signal
-        console.log("invalid update - existing function");
-        return;
-      }
-    }
-    return;
-  }
-
-  private _handleBoolChange(ev) {
-    const target = ev.currentTarget as HaSwitch;
-    const name = (target as any).preference;
-    console.log("XXX TBD handle change name=%s checked=%s", name, target.checked);
-    console.dir(ev);
-    switch (name) {
-      case "autodiscover": {
-        console.log("updating autodiscover");
-        this._autodiscover = target.checked;
-        break;
-      }
-      default: {
-        // exit without sending update signal
-        console.log("invalid update - existing function");
-      }
-    }
+    const detail = ev.detail;
+    const target = detail.target;
+    const value = detail.value;
+    console.log("XXX TBD handle change name=%s value=%s", target, value);
+    this["_" + target] = value;
   }
 
   static get styles(): CSSResultGroup {

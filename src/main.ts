@@ -84,10 +84,10 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
               if (!curConfig.area) curConfig.area = {};
               if (!curConfig.autodiscover) curConfig.autodiscover = false;
               if (!curConfig.default || !curConfig.default.fade) {
-                curConfig.default = { fade: 0 };
+                curConfig.default = { fade: "0" };
               }
               if (!curConfig.active) curConfig.active = "off";
-              curConfig.preset = { "5": { name: "abc", fade: 0.3 }, "78": { level: 1.3 } };
+              curConfig.preset = { "5": { name: "abc", fade: "0.3" }, "78": { level: "1.3" } };
               this.dynalite = {
                 config: curConfig,
                 default: (resp as DynaliteConfigResponse).default,
@@ -105,6 +105,7 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
   private _updateDynalite(e: Event) {
     console.log("XXX TBD _updateDynalite");
     console.dir(e);
+    console.dir(this.dynalite.config);
   }
 }
 
