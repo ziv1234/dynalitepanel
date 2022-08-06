@@ -7,6 +7,7 @@ export interface DynaliteEditPresetDialogParams extends DynalitePresetData {
   number?: string;
   excluded?: string[];
   onSave: (params: DynaliteEditPresetDialogParams) => void;
+  onDelete?: (params: DynaliteEditPresetDialogParams) => Promise<boolean>;
 }
 
 export const loadDynaliteEditPresetDialog = () =>

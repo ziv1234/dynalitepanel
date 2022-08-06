@@ -70,26 +70,25 @@ export class DynaliteEditPresetDialog extends LitElement {
             <span slot="title">
               ${this._isNew ? "New Preset" : "Edit Preset " + this._params.number}
             </span>
-            <span slot="actionItems">
-              <ha-button-menu
-                @action=${console.log}
-                @closed=${(ev) => {
-                  ev.stopPropagation();
-                }}
-                corner="BOTTOM_START"
-                fixed
-              >
-                <ha-icon-button
-                  slot="trigger"
-                  label="Additional Actions"
-                  .path=${mdiDotsVertical}
-                ></ha-icon-button>
-                <mwc-list-item class="warning"> Delete Preset </mwc-list-item>
-                <mwc-list-item disabled> edit_yaml </mwc-list-item>
-                <mwc-list-item> duplicate </mwc-list-item>
-                <mwc-list-item class="warning"> delete </mwc-list-item>
-              </ha-button-menu>
-            </span>
+            ${this._params.onDelete
+              ? html` <span slot="actionItems">
+                  <ha-button-menu
+                    @action=${this._handleAction}
+                    @closed=${(ev) => {
+                      ev.stopPropagation();
+                    }}
+                    corner="BOTTOM_START"
+                    fixed
+                  >
+                    <ha-icon-button
+                      slot="trigger"
+                      label="Additional Actions"
+                      .path=${mdiDotsVertical}
+                    ></ha-icon-button>
+                    <mwc-list-item class="warning"> Delete Preset </mwc-list-item>
+                  </ha-button-menu>
+                </span>`
+              : html``}
           </ha-header-bar>
         </div>
         <div class="wrapper">
@@ -138,6 +137,21 @@ export class DynaliteEditPresetDialog extends LitElement {
     }
     console.log("XXX TBD handle change name=%s value=%s", target, value);
     this._params![target] = value;
+  }
+
+  private async _handleAction(ev) {
+    console.log("handleAction");
+    console.dir(ev);
+    const index = ev.detail.index;
+    switch (index) {
+      case 0: {
+        if (await this._params!.onDelete!(this._params!)) this._close();
+        break;
+      }
+      default: {
+        console.error("invalid index %s", index);
+      }
+    }
   }
 
   private _close(): void {

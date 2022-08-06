@@ -44,18 +44,25 @@ export class DynalitePresetTable extends LitElement {
         sortable: false,
         hidden: false,
         filterable: false,
-        width: "25%",
+        width: "15%",
       },
       name: {
         title: "Name",
-        sortable: true,
+        sortable: false,
         hidden: false,
         filterable: false,
         width: "35%",
       },
       level: {
         title: "Level",
-        sortable: true,
+        sortable: false,
+        hidden: false,
+        filterable: false,
+        width: "15%",
+      },
+      fade: {
+        title: "Fade",
+        sortable: false,
         hidden: false,
         filterable: false,
         width: "15%",
@@ -90,14 +97,17 @@ export class DynalitePresetTable extends LitElement {
   }
 
   private _handleRowClicked(ev) {
-    const target = ev.detail.id;
-    console.log("XXX TBD preset table row-click id=%s", target);
+    const preset = ev.detail.id;
+    console.log("XXX TBD preset table row-click preset=%s", preset);
     console.dir(ev);
     showDynaliteEditPresetDialog(this, {
       hass: this.hass,
-      onSave: this._saveRow,
-      excluded: Object.keys(this.presets),
-      level: "0.333333333333",
+      onSave: this._saveRow.bind(this),
+      onDelete: this._deleteRow.bind(this),
+      number: preset,
+      name: this.presets[preset].name,
+      level: this.presets[preset].level,
+      fade: this.presets[preset].fade,
     });
     return;
   }
@@ -105,23 +115,42 @@ export class DynalitePresetTable extends LitElement {
   private _saveRow(params: DynaliteEditPresetDialogParams): void {
     console.log("saving row");
     console.dir(params);
+    console.dir(this.presets);
+    const newPreset: DynalitePresetData = {};
+    if (params.name) newPreset.name = params.name;
+    if (params.level) newPreset.level = params.level;
+    if (params.fade) newPreset.fade = params.fade;
+    this.presets[params.number!] = newPreset;
+    console.dir(this.presets);
+    this.requestUpdate();
   }
 
   private async _addRow(ev) {
-    const target = ev.detail.id;
-    console.log("XXX TBD preset table row-click id=%s", target);
+    console.log("XXX TBD preset table addRow");
     console.dir(ev);
+    showDynaliteEditPresetDialog(this, {
+      hass: this.hass,
+      onSave: this._saveRow.bind(this),
+      excluded: Object.keys(this.presets),
+    });
+  }
+
+  private async _deleteRow(params: DynaliteEditPresetDialogParams): Promise<boolean> {
+    const preset = params.number!;
     if (
       !(await showConfirmationDialog(this, {
-        title: "abcde",
-        text: "deletetext",
-        confirmText: "confirmtext",
+        title: `Delete Preset ${preset}`,
+        text: `Are you sure you want to delete preset ${preset}`,
+        confirmText: "Confirm",
       }))
     ) {
       console.log("received no");
-      return;
+      return false;
     }
     console.log("received yes");
+    delete this.presets[preset];
+    this.requestUpdate();
+    return true;
   }
 
   static get styles(): CSSResultGroup {

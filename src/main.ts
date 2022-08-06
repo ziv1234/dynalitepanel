@@ -87,7 +87,7 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
                 curConfig.default = { fade: "0" };
               }
               if (!curConfig.active) curConfig.active = "off";
-              curConfig.preset = { "5": { name: "abc", fade: "0.3" }, "78": { level: "1.3" } };
+              curConfig.preset = { "5": { name: "abc", fade: "0.3" }, "78": { level: "0.85" } };
               this.dynalite = {
                 config: curConfig,
                 default: (resp as DynaliteConfigResponse).default,
