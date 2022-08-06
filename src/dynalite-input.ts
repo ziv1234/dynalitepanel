@@ -93,7 +93,7 @@ export class DynaliteInput extends LitElement {
 
   @property() public value?: string | boolean;
 
-  @property({ type: Boolean }) public disabled = false;
+  @property({ type: Boolean }) public disabled?;
 
   @query("#my-textfield") myTextField;
 
@@ -109,7 +109,7 @@ export class DynaliteInput extends LitElement {
               <ha-textfield
                 id="my-textfield"
                 name=${this.settings.nameVal}
-                .value=${this.value || ""}
+                value=${ifDefined(this.value)}
                 type=${this.settings.type}
                 required=${ifDefined(this.settings.requiredVal)}
                 disabled=${ifDefined(this.disabled)}
@@ -122,7 +122,7 @@ export class DynaliteInput extends LitElement {
           ? html`
               <ha-switch
                 .preference=${this.settings.nameVal}
-                .checked=${this.value}
+                checked=${ifDefined(this.value)}
                 .disabled=${this.disabled}
                 @change=${this._handleBoolChange}
               >
@@ -133,7 +133,7 @@ export class DynaliteInput extends LitElement {
               <ha-textfield
                 id="my-textfield"
                 name=${this.settings.nameVal}
-                .value=${this.value || ""}
+                value=${ifDefined(this.value)}
                 min=${ifDefined(this.settings.minVal)}
                 max=${ifDefined(this.settings.maxVal)}
                 step=${ifDefined(this.settings.stepVal)}
@@ -152,7 +152,7 @@ export class DynaliteInput extends LitElement {
                 name=${this.settings.nameVal}
                 fixedMenuPosition
                 naturalMenuWidth
-                .value=${this.value}
+                value=${ifDefined(this.value)}
                 .disabled=${this.disabled}
                 @change=${this._handleTextChange}
               >
