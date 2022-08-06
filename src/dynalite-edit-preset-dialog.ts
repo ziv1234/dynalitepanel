@@ -98,7 +98,8 @@ export class DynaliteEditPresetDialog extends LitElement {
               <dynalite-input
                 .settings=${this._numberInput}
                 .value=${this._params.number}
-                .disabled=${!this._isNew}
+                ?disabled=${!this._isNew}
+                .excluded=${this._params.excluded}
                 @dynalite-input=${this._handleChange}
               ></dynalite-input>
               <dynalite-input

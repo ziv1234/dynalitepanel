@@ -5,6 +5,7 @@ import { DynalitePresetData } from "./common";
 export interface DynaliteEditPresetDialogParams extends DynalitePresetData {
   hass: HomeAssistant;
   number?: string;
+  excluded?: string[];
   onSave: (params: DynaliteEditPresetDialogParams) => void;
 }
 

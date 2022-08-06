@@ -95,6 +95,8 @@ export class DynaliteInput extends LitElement {
 
   @property({ type: Boolean }) public disabled?;
 
+  @property({ attribute: false }) public excluded?: string[];
+
   @query("#my-textfield") myTextField;
 
   protected render(): TemplateResult | void {
@@ -111,8 +113,8 @@ export class DynaliteInput extends LitElement {
                 name=${this.settings.nameVal}
                 value=${ifDefined(this.value)}
                 type=${this.settings.type}
-                required=${ifDefined(this.settings.requiredVal)}
-                disabled=${ifDefined(this.disabled)}
+                ?required=${this.settings.requiredVal}
+                ?disabled=${this.disabled}
                 @change=${this._handleTextChange}
                 .validityTransform=${this._validityTransform.bind(this)}
                 suffix=${ifDefined(this.settings.suffixVal)}
@@ -123,7 +125,7 @@ export class DynaliteInput extends LitElement {
               <ha-switch
                 .preference=${this.settings.nameVal}
                 checked=${ifDefined(this.value)}
-                .disabled=${this.disabled}
+                ?disabled=${this.disabled}
                 @change=${this._handleBoolChange}
               >
               </ha-switch>
@@ -139,8 +141,8 @@ export class DynaliteInput extends LitElement {
                 step=${ifDefined(this.settings.stepVal)}
                 autoValidate
                 type="number"
-                required=${ifDefined(this.settings.requiredVal)}
-                disabled=${ifDefined(this.disabled)}
+                ?required=${this.settings.requiredVal}
+                ?disabled=${this.disabled}
                 @change=${this._handleTextChange}
                 .validityTransform=${this._validityTransform.bind(this)}
                 suffix=${ifDefined(this.settings.suffixVal)}
@@ -153,7 +155,7 @@ export class DynaliteInput extends LitElement {
                 fixedMenuPosition
                 naturalMenuWidth
                 value=${ifDefined(this.value)}
-                .disabled=${this.disabled}
+                disabled=${ifDefined(this.disabled)}
                 @change=${this._handleTextChange}
               >
                 ${this.settings.selectionVal?.map(
@@ -214,7 +216,7 @@ export class DynaliteInput extends LitElement {
       this.myTextField.setCustomValidity("Required");
       return { valid: false, valueMissing: true };
     }
-    if (value == "12") {
+    if (this.excluded && this.excluded.includes(value)) {
       this.myTextField.setCustomValidity("Already exists");
       return { valid: false, customError: true };
     }

@@ -96,7 +96,7 @@ export class DynalitePresetTable extends LitElement {
     showDynaliteEditPresetDialog(this, {
       hass: this.hass,
       onSave: this._saveRow,
-      number: "7",
+      excluded: Object.keys(this.presets),
       level: "0.333333333333",
     });
     return;
