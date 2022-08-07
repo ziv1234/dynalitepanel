@@ -7,6 +7,7 @@ export interface DynaliteRowData {
 
 export interface DynaliteEditDialogParams {
   hass: HomeAssistant;
+  name: string;
   value: DynaliteRowData;
   inputs: DynaliteInputSettings[];
   excluded?: string[];

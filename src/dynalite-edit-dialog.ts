@@ -56,7 +56,9 @@ export class DynaliteEditDialog extends LitElement {
         <div slot="heading">
           <ha-header-bar>
             <span slot="title">
-              ${this._isNew ? "New Preset" : "Edit Preset " + this._params.value.number}
+              ${this._isNew
+                ? `New ${this._params.name}`
+                : `Edit ${this._params.name} ` + this._params.value.number}
             </span>
             ${this._params.onDelete
               ? html` <span slot="actionItems">
@@ -73,7 +75,7 @@ export class DynaliteEditDialog extends LitElement {
                       label="Additional Actions"
                       .path=${mdiDotsVertical}
                     ></ha-icon-button>
-                    <mwc-list-item class="warning"> Delete Preset </mwc-list-item>
+                    <mwc-list-item class="warning"> Delete ${this._params.name} </mwc-list-item>
                   </ha-button-menu>
                 </span>`
               : html``}

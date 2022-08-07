@@ -87,6 +87,7 @@ export class DynaliteTable extends LitElement {
     value.number = number;
     showDynaliteEditDialog(this, {
       hass: this.hass,
+      name: this.settings.name,
       value: value,
       inputs: this.settings.inputs,
       excluded: undefined,
@@ -116,6 +117,7 @@ export class DynaliteTable extends LitElement {
     console.dir(ev);
     showDynaliteEditDialog(this, {
       hass: this.hass,
+      name: this.settings.name,
       value: {},
       inputs: this.settings.inputs,
       excluded: Object.keys(this.data),
