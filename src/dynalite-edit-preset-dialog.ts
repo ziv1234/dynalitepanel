@@ -15,6 +15,7 @@ import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import "@material/mwc-list";
 import "@material/mwc-button";
 import { DynaliteInput, DynaliteInputSettings } from "./dynalite-input";
+import { ifDefined } from "lit/directives/if-defined";
 
 @customElement("dynalite-edit-preset-dialog")
 export class DynaliteEditPresetDialog extends LitElement {
@@ -30,12 +31,15 @@ export class DynaliteEditPresetDialog extends LitElement {
 
   @state() private _hasChanged = false;
 
+  @state() private _helpers: { [key: string]: string } = {};
+
   @queryAll("dynalite-input") _inputElements?: DynaliteInput[];
 
   public async showDialog(params: DynaliteEditPresetDialogParams): Promise<void> {
     this.hass = params.hass;
     this._params = Object.assign({}, params); // XXX TBD check if needed
     this._isNew = !("number" in this._params);
+    this._genHelpers();
     console.log("show %s", this._isNew);
   }
 
@@ -114,6 +118,7 @@ export class DynaliteEditPresetDialog extends LitElement {
               <dynalite-input
                 .settings=${this._nameInput}
                 .value=${this._params.name}
+                helper=${ifDefined(this._helpers.name)}
                 @dynalite-input=${this._handleChange}
               ></dynalite-input>
               <dynalite-input
@@ -126,6 +131,7 @@ export class DynaliteEditPresetDialog extends LitElement {
               <dynalite-input
                 .settings=${this._fadeInput}
                 .value=${this._params.fade}
+                helper=${ifDefined(this._helpers.fade)}
                 @dynalite-input=${this._handleChange}
               ></dynalite-input>
             </div>
@@ -151,6 +157,7 @@ export class DynaliteEditPresetDialog extends LitElement {
     this._params![target] = value;
     this._hasChanged = true;
     this.requestUpdate();
+    if (target == "number") this._genHelpers();
   }
 
   private async _handleAction(ev) {
@@ -178,6 +185,24 @@ export class DynaliteEditPresetDialog extends LitElement {
     console.dir(this._params);
     this._params?.onSave(this._params);
     this._close();
+  }
+
+  private _genHelpers(): void {
+    const res: { [key: string]: string } = {};
+    if (this._params?.number) {
+      for (const key in this._params?.helpers) {
+        res[key] = this._params.helpers[key].replace("NUMBER", this._params.number);
+      }
+    } else {
+      for (const key in this._params?.helpers) {
+        if (!this._params?.helpers[key].includes("NUMBER")) {
+          res[key] = this._params!.helpers[key];
+        }
+      }
+    }
+    console.log("gen helpers");
+    console.dir(res);
+    this._helpers = res;
   }
 
   static get styles(): CSSResultGroup {

@@ -6,6 +6,7 @@ export interface DynaliteEditPresetDialogParams extends DynalitePresetData {
   hass: HomeAssistant;
   number?: string;
   excluded?: string[];
+  helpers?: { [key: string]: string };
   onSave: (params: DynaliteEditPresetDialogParams) => void;
   onDelete?: (params: DynaliteEditPresetDialogParams) => Promise<boolean>;
 }

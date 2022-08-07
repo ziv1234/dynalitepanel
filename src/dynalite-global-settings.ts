@@ -1,5 +1,5 @@
 import { css, CSSResultGroup, html, LitElement, TemplateResult } from "lit";
-import { customElement, property, query, queryAll, state } from "lit/decorators";
+import { customElement, property, queryAll, state } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
 import "../homeassistant-frontend/src/components/ha-card";
@@ -14,6 +14,7 @@ import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
 import "./dynalite-preset-table";
 import { DynaliteInput, DynaliteInputSettings } from "./dynalite-input";
 import "./dynalite-input";
+import { ifDefined } from "lit/directives/if-defined";
 
 @customElement("dynalite-global-settings")
 export class DynaliteGlobalSettings extends LitElement {
@@ -41,6 +42,10 @@ export class DynaliteGlobalSettings extends LitElement {
 
   @state() private _hasChanged = false;
 
+  @state() private _nameHelper?: string;
+
+  @state() private _fadeHelper?: string;
+
   @queryAll("dynalite-input") _inputElements?: DynaliteInput[];
 
   protected willUpdate(_changedProperties: Map<string | number | symbol, unknown>): void {
@@ -50,8 +55,10 @@ export class DynaliteGlobalSettings extends LitElement {
     if (!this.dynalite) return;
     if (!this._hasInitialized) {
       this._name = this.dynalite.config.name || "";
+      this._nameHelper = "Default: " + this.dynalite.default.DEFAULT_NAME;
       this._autodiscover = this.dynalite.config.autodiscover!;
       this._fade = this.dynalite.config.default!.fade!;
+      this._fadeHelper = "0 For No fade";
       this._active = this.dynalite.config.active!;
       this._overridePresets = "preset" in this.dynalite.config;
       this._preset = JSON.parse(JSON.stringify(this.dynalite.config.preset || {}));
@@ -115,6 +122,7 @@ export class DynaliteGlobalSettings extends LitElement {
                 .settings=${this._nameInput}
                 @dynalite-input=${this._handleChange}
                 .value=${this._name}
+                helper=${ifDefined(this._nameHelper)}
               ></dynalite-input>
               <dynalite-input
                 .settings=${this._autodiscoverInput}
@@ -125,6 +133,7 @@ export class DynaliteGlobalSettings extends LitElement {
                 .settings=${this._fadeInput}
                 @dynalite-input=${this._handleChange}
                 .value=${this._fade}
+                helper=${ifDefined(this._fadeHelper)}
               ></dynalite-input>
               <dynalite-input
                 .settings=${this._activeInput}
@@ -137,7 +146,8 @@ export class DynaliteGlobalSettings extends LitElement {
                 .narrow=${this.narrow}
                 .route=${this.route}
                 .presets=${this._preset || {}}
-                @dynalite-table=${(ev) => {
+                defaultFade=${ifDefined(this.dynalite.config.default?.fade)}
+                @dynalite-table=${(_ev) => {
                   this._hasChanged = true;
                 }}
               >

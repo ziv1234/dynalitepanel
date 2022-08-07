@@ -97,6 +97,8 @@ export class DynaliteInput extends LitElement {
 
   @property({ attribute: false }) public excluded?: string[];
 
+  @property() public helper?: string;
+
   @query("#my-textfield") myTextField;
 
   protected render(): TemplateResult | void {
@@ -115,6 +117,7 @@ export class DynaliteInput extends LitElement {
                 type=${this.settings.type}
                 ?required=${this.settings.requiredVal}
                 ?disabled=${this.disabled}
+                helper=${ifDefined(this.helper)}
                 @change=${this._handleTextChange}
                 .validityTransform=${this._validityTransform.bind(this)}
                 suffix=${ifDefined(this.settings.suffixVal)}
@@ -143,6 +146,7 @@ export class DynaliteInput extends LitElement {
                 type="number"
                 ?required=${this.settings.requiredVal}
                 ?disabled=${this.disabled}
+                helper="${ifDefined(this.helper)}"
                 @change=${this._handleTextChange}
                 .validityTransform=${this._validityTransform.bind(this)}
                 suffix=${ifDefined(this.settings.suffixVal)}

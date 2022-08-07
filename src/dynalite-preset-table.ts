@@ -30,6 +30,8 @@ export class DynalitePresetTable extends LitElement {
 
   @property({ attribute: false }) public presets!: { [key: string]: DynalitePresetData };
 
+  @property({ type: String }) public defaultFade!: string;
+
   protected render(): TemplateResult | void {
     console.log("XXX preset table render");
     console.dir(this.hass);
@@ -108,6 +110,7 @@ export class DynalitePresetTable extends LitElement {
       name: this.presets[preset].name,
       level: this.presets[preset].level,
       fade: this.presets[preset].fade,
+      helpers: { name: `Default: Preset NUMBER`, fade: `Default: ${this.defaultFade}` },
     });
     return;
   }
@@ -133,6 +136,7 @@ export class DynalitePresetTable extends LitElement {
       hass: this.hass,
       onSave: this._saveRow.bind(this),
       excluded: Object.keys(this.presets),
+      helpers: { name: `Default: Preset NUMBER`, fade: `Default: ${this.defaultFade}` },
     });
   }
 
@@ -150,6 +154,7 @@ export class DynalitePresetTable extends LitElement {
     }
     console.log("received yes");
     delete this.presets[preset];
+    this.dispatchEvent(new CustomEvent("dynalite-table", { detail: params }));
     this.requestUpdate();
     return true;
   }
