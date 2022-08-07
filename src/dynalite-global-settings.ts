@@ -1,5 +1,5 @@
 import { css, CSSResultGroup, html, LitElement, TemplateResult } from "lit";
-import { customElement, property, query, state } from "lit/decorators";
+import { customElement, property, query, queryAll, state } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
 import "../homeassistant-frontend/src/components/ha-card";
@@ -41,7 +41,7 @@ export class DynaliteGlobalSettings extends LitElement {
 
   @state() private _hasChanged = false;
 
-  @query("#dynalite-global-settings-element") _inputElement?: DynaliteInput;
+  @queryAll("dynalite-input") _inputElements?: DynaliteInput[];
 
   protected willUpdate(_changedProperties: Map<string | number | symbol, unknown>): void {
     super.willUpdate(_changedProperties);
@@ -91,8 +91,12 @@ export class DynaliteGlobalSettings extends LitElement {
     if (!this.hass || !this.dynalite) {
       return html``;
     }
-    console.log("XXX render global settings");
-    console.dir(this._inputElement);
+    console.log("XXX render global settings len=%s", this._inputElements?.length);
+    console.dir(this._inputElements);
+    const canSave =
+      this._hasChanged &&
+      this._inputElements?.length == 4 &&
+      Array.from(this._inputElements).every((elem) => elem.isValid());
     return html`
       <hass-tabs-subpage
         .hass=${this.hass}
@@ -118,7 +122,6 @@ export class DynaliteGlobalSettings extends LitElement {
                 .value=${this._autodiscover}
               ></dynalite-input>
               <dynalite-input
-                id="dynalite-global-settings-element"
                 .settings=${this._fadeInput}
                 @dynalite-input=${this._handleChange}
                 .value=${this._fade}
@@ -134,16 +137,14 @@ export class DynaliteGlobalSettings extends LitElement {
                 .narrow=${this.narrow}
                 .route=${this.route}
                 .presets=${this._preset || {}}
+                @dynalite-table=${(ev) => {
+                  this._hasChanged = true;
+                }}
               >
               </dynalite-preset-table>
             </div>
             <div class="card-actions">
-              <mwc-button
-                @click=${this._save}
-                ?disabled=${!this._inputElement?.isValid() || !this._hasChanged}
-              >
-                Save
-              </mwc-button>
+              <mwc-button @click=${this._save} ?disabled=${!canSave}> Save </mwc-button>
             </div>
           </ha-card>
         </div>

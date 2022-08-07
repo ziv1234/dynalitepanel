@@ -122,6 +122,7 @@ export class DynalitePresetTable extends LitElement {
     if (params.fade) newPreset.fade = params.fade;
     this.presets[params.number!] = newPreset;
     console.dir(this.presets);
+    this.dispatchEvent(new CustomEvent("dynalite-table", { detail: params }));
     this.requestUpdate();
   }
 

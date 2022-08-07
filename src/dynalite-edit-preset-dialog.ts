@@ -1,5 +1,5 @@
 import { css, CSSResultGroup, html, LitElement, TemplateResult } from "lit";
-import { customElement, property, state } from "lit/decorators";
+import { customElement, property, queryAll, state } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { DynaliteEditPresetDialogParams } from "./show-dialog-dynalite-edit-preset";
 import "../homeassistant-frontend/src/components/ha-dialog";
@@ -14,7 +14,7 @@ import { mdiDotsVertical } from "@mdi/js";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import "@material/mwc-list";
 import "@material/mwc-button";
-import { DynaliteInputSettings } from "./dynalite-input";
+import { DynaliteInput, DynaliteInputSettings } from "./dynalite-input";
 
 @customElement("dynalite-edit-preset-dialog")
 export class DynaliteEditPresetDialog extends LitElement {
@@ -27,6 +27,10 @@ export class DynaliteEditPresetDialog extends LitElement {
   @state() private _params?: DynaliteEditPresetDialogParams;
 
   @state() private _isNew = false;
+
+  @state() private _hasChanged = false;
+
+  @queryAll("dynalite-input") _inputElements?: DynaliteInput[];
 
   public async showDialog(params: DynaliteEditPresetDialogParams): Promise<void> {
     this.hass = params.hass;
@@ -63,6 +67,12 @@ export class DynaliteEditPresetDialog extends LitElement {
 
   protected render(): TemplateResult | void {
     if (!this._params) return html``;
+    console.log("XXX render global settings len=%s", this._inputElements?.length);
+    console.dir(this._inputElements);
+    const canSave =
+      this._hasChanged &&
+      this._inputElements?.length == 4 &&
+      Array.from(this._inputElements).every((elem) => elem.isValid());
     return html`
       <ha-dialog open .heading=${"abcde"} @closed=${this._close}>
         <div slot="heading">
@@ -121,7 +131,9 @@ export class DynaliteEditPresetDialog extends LitElement {
             </div>
           </ha-card>
         </div>
-        <mwc-button slot="primaryAction" @click=${this._save}>Save</mwc-button>
+        <mwc-button slot="primaryAction" @click=${this._save} ?disabled=${!canSave}
+          >Save</mwc-button
+        >
         <mwc-button slot="secondaryAction" @click=${this._close}>Cancel</mwc-button>
       </ha-dialog>
     `;
@@ -137,6 +149,8 @@ export class DynaliteEditPresetDialog extends LitElement {
     }
     console.log("XXX TBD handle change name=%s value=%s", target, value);
     this._params![target] = value;
+    this._hasChanged = true;
+    this.requestUpdate();
   }
 
   private async _handleAction(ev) {

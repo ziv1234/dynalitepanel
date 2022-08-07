@@ -174,6 +174,7 @@ export class DynaliteInput extends LitElement {
   public isValid(): boolean {
     console.log("XXXXX YYYYY XXXXX isValid called!!!");
     console.dir(this.myTextField);
+    if (["boolean", "select"].includes(this.settings.typeVal || "")) return true;
     return this.myTextField && this.myTextField.validity.valid;
   }
 
