@@ -1,7 +1,6 @@
 import { css, CSSResultGroup, html, LitElement, TemplateResult } from "lit";
 import { customElement, property, queryAll, state } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
-import { DynaliteEditPresetDialogParams } from "./show-dialog-dynalite-edit-preset";
 import "../homeassistant-frontend/src/components/ha-dialog";
 import "../homeassistant-frontend/src/components/ha-settings-row";
 import "../homeassistant-frontend/src/components/ha-textfield";
@@ -14,18 +13,19 @@ import { mdiDotsVertical } from "@mdi/js";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import "@material/mwc-list";
 import "@material/mwc-button";
-import { DynaliteInput, DynaliteInputSettings } from "./dynalite-input";
+import { DynaliteInput } from "./dynalite-input";
 import { ifDefined } from "lit/directives/if-defined";
+import { DynaliteEditDialogParams } from "./dynalite-edit-dialog-types";
 
-@customElement("dynalite-edit-preset-dialog")
-export class DynaliteEditPresetDialog extends LitElement {
+@customElement("dynalite-edit-dialog")
+export class DynaliteEditDialog extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
   @property({ type: Object }) public route!: Route;
 
   @property({ type: Boolean }) public narrow = false;
 
-  @state() private _params?: DynaliteEditPresetDialogParams;
+  @state() private _params?: DynaliteEditDialogParams;
 
   @state() private _isNew = false;
 
@@ -35,7 +35,7 @@ export class DynaliteEditPresetDialog extends LitElement {
 
   @queryAll("dynalite-input") _inputElements?: DynaliteInput[];
 
-  public async showDialog(params: DynaliteEditPresetDialogParams): Promise<void> {
+  public async showDialog(params: DynaliteEditDialogParams): Promise<void> {
     this.hass = params.hass;
     this._params = Object.assign({}, params); // XXX TBD check if needed
     this._isNew = !("number" in this._params);
@@ -43,46 +43,20 @@ export class DynaliteEditPresetDialog extends LitElement {
     console.log("show %s", this._isNew);
   }
 
-  _numberInput = new DynaliteInputSettings("number")
-    .heading("Number")
-    .desc("Dynalite preset number (1-255)")
-    .min(1)
-    .max(255)
-    .step(1)
-    .required()
-    .validationMessage("Invalid preset");
-
-  _nameInput = new DynaliteInputSettings("name").heading("Name").desc("Name for this preset");
-
-  _levelInput = new DynaliteInputSettings("level")
-    .heading("Level")
-    .desc("Channel levels for this preset")
-    .min(0)
-    .max(100)
-    .validationMessage("Invalid value")
-    .suffix("%");
-
-  _fadeInput = new DynaliteInputSettings("fade")
-    .heading("Fade")
-    .desc("Preset fade time (seconds)")
-    .min(0)
-    .step(0.01)
-    .validationMessage("Invalid fade");
-
   protected render(): TemplateResult | void {
     if (!this._params) return html``;
     console.log("XXX render global settings len=%s", this._inputElements?.length);
     console.dir(this._inputElements);
     const canSave =
       this._hasChanged &&
-      this._inputElements?.length == 4 &&
+      this._inputElements?.length == this._params.inputs.length &&
       Array.from(this._inputElements).every((elem) => elem.isValid());
     return html`
       <ha-dialog open .heading=${"abcde"} @closed=${this._close}>
         <div slot="heading">
           <ha-header-bar>
             <span slot="title">
-              ${this._isNew ? "New Preset" : "Edit Preset " + this._params.number}
+              ${this._isNew ? "New Preset" : "Edit Preset " + this._params.value.number}
             </span>
             ${this._params.onDelete
               ? html` <span slot="actionItems">
@@ -108,32 +82,18 @@ export class DynaliteEditPresetDialog extends LitElement {
         <div class="wrapper">
           <ha-card outlined>
             <div class="content">
-              <dynalite-input
-                .settings=${this._numberInput}
-                .value=${this._params.number}
-                ?disabled=${!this._isNew}
-                .excluded=${this._params.excluded}
-                @dynalite-input=${this._handleChange}
-              ></dynalite-input>
-              <dynalite-input
-                .settings=${this._nameInput}
-                .value=${this._params.name}
-                helper=${ifDefined(this._helpers.name)}
-                @dynalite-input=${this._handleChange}
-              ></dynalite-input>
-              <dynalite-input
-                .settings=${this._levelInput}
-                .value=${this._params.level
-                  ? Math.round(Number(this._params.level) * 100) + ""
-                  : ""}
-                @dynalite-input=${this._handleChange}
-              ></dynalite-input>
-              <dynalite-input
-                .settings=${this._fadeInput}
-                .value=${this._params.fade}
-                helper=${ifDefined(this._helpers.fade)}
-                @dynalite-input=${this._handleChange}
-              ></dynalite-input>
+              ${this._params.inputs.map(
+                (inp) => html`
+                  <dynalite-input
+                    .settings=${inp}
+                    .value=${this._params?.value[inp.nameVal]}
+                    ?disabled=${this._params?.disabled?.includes(inp.nameVal)}
+                    .excluded=${inp.nameVal == "number" ? this._params?.excluded : undefined}
+                    helper=${ifDefined(this._helpers[inp.nameVal])}
+                    @dynalite-input=${this._handleChange}
+                  ></dynalite-input>
+                `
+              )}
             </div>
           </ha-card>
         </div>
@@ -148,13 +108,14 @@ export class DynaliteEditPresetDialog extends LitElement {
   private _handleChange(ev) {
     console.dir(ev);
     const detail = ev.detail;
-    const target = detail.target;
+    const target = detail.target as string;
     let value = detail.value;
     if (target == "level" && value != "") {
       value = value / 100;
     }
     console.log("XXX TBD handle change name=%s value=%s", target, value);
-    this._params![target] = value;
+    if (!this._params?.value) return;
+    this._params.value[target] = value;
     this._hasChanged = true;
     this.requestUpdate();
     if (target == "number") this._genHelpers();
@@ -189,9 +150,9 @@ export class DynaliteEditPresetDialog extends LitElement {
 
   private _genHelpers(): void {
     const res: { [key: string]: string } = {};
-    if (this._params?.number) {
+    if (this._params?.value.number) {
       for (const key in this._params?.helpers) {
-        res[key] = this._params.helpers[key].replace("NUMBER", this._params.number);
+        res[key] = this._params.helpers[key].replace("NUMBER", this._params.value.number);
       }
     } else {
       for (const key in this._params?.helpers) {
@@ -230,6 +191,6 @@ export class DynaliteEditPresetDialog extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "dynalite-edit-preset-dialog": DynaliteEditPresetDialog;
+    "dynalite-edit-dialog": DynaliteEditDialog;
   }
 }
