@@ -7,6 +7,7 @@ import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { DynalitePresetData } from "./common";
 import "./dynalite-table";
 import { DynaliteInputSettings } from "./dynalite-input";
+import { DynaliteTableSettings } from "./dynalite-table";
 
 @customElement("dynalite-preset-table")
 export class DynalitePresetTable extends LitElement {
@@ -27,13 +28,21 @@ export class DynalitePresetTable extends LitElement {
       return html``;
     }
     console.log("XXX preset table render2");
+    const settings: DynaliteTableSettings = {
+      name: "Preset",
+      columns: this._columns,
+      inputs: this._inputs,
+    };
+    const helpers = { name: `Default: Preset NUMBER`, fade: `Default: ${this.defaultFade}` };
     return html`
       <dynalite-table
         .hass=${this.hass}
         .narrow=${this.narrow}
         .route=${this.route}
-        .settings=${{ columns: this._columns, inputs: this._inputs }}
+        .settings=${settings}
         .data=${this.presets}
+        .helpers=${helpers}
+        }
       >
       </dynalite-table>
     `;

@@ -14,7 +14,8 @@ import { showDynaliteEditDialog } from "./show-dialog-dynalite-edit";
 import { DynaliteEditDialogParams, DynaliteRowData } from "./dynalite-edit-dialog-types";
 import { DynaliteInputSettings } from "./dynalite-input";
 
-interface DynaliteTableSettings {
+export interface DynaliteTableSettings {
+  name: string;
   columns: DataTableColumnContainer;
   inputs: DynaliteInputSettings[];
 }
@@ -30,6 +31,8 @@ export class DynaliteTable extends LitElement {
   @property({ attribute: false }) public settings!: DynaliteTableSettings;
 
   @property({ attribute: false }) public data!: { [key: string]: DynaliteRowData };
+
+  @property({ attribute: false }) public helpers?: { [key: string]: string };
 
   @state() private _processedData: DataTableRowData[] = [];
 
@@ -63,7 +66,13 @@ export class DynaliteTable extends LitElement {
           @row-click=${this._handleRowClicked}
         >
         </ha-data-table>
-        <ha-fab slot="fab" class="dynalite-fab" label="Add Preset" extended @click=${this._addRow}>
+        <ha-fab
+          slot="fab"
+          class="dynalite-fab"
+          label="Add ${this.settings.name}"
+          extended
+          @click=${this._addRow}
+        >
           <ha-svg-icon slot="icon" .path=${mdiPlus}></ha-svg-icon>
         </ha-fab>
       </div>
@@ -81,8 +90,8 @@ export class DynaliteTable extends LitElement {
       value: value,
       inputs: this.settings.inputs,
       excluded: undefined,
-      disabled: undefined,
-      helpers: undefined,
+      disabled: ["number"],
+      helpers: this.helpers,
       onSave: this._saveRow.bind(this),
       onDelete: this._deleteRow.bind(this),
     });
@@ -103,15 +112,15 @@ export class DynaliteTable extends LitElement {
   }
 
   private async _addRow(ev) {
-    console.log("XXX TBD preset table addRow");
+    console.log("XXX TBD table addRow");
     console.dir(ev);
     showDynaliteEditDialog(this, {
       hass: this.hass,
       value: {},
       inputs: this.settings.inputs,
-      excluded: undefined,
+      excluded: Object.keys(this.data),
       disabled: undefined,
-      helpers: undefined,
+      helpers: this.helpers,
       onSave: this._saveRow.bind(this),
     });
   }
@@ -120,8 +129,8 @@ export class DynaliteTable extends LitElement {
     const number = params.value.number!;
     if (
       !(await showConfirmationDialog(this, {
-        title: `Delete Preset ${number}`,
-        text: `Are you sure you want to delete preset ${number}`,
+        title: `Delete ${this.settings.name} ${number}`,
+        text: `Are you sure you want to delete ${this.settings.name.toLowerCase()} ${number}`,
         confirmText: "Confirm",
       }))
     ) {

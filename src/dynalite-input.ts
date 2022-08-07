@@ -119,6 +119,8 @@ export class DynaliteInput extends LitElement {
                 ?disabled=${this.disabled}
                 helper=${ifDefined(this.helper)}
                 @change=${this._handleTextChange}
+                autoValidate
+                validateOnInitialRender
                 .validityTransform=${this._validityTransform.bind(this)}
                 suffix=${ifDefined(this.settings.suffixVal)}
               ></ha-textfield>
@@ -143,6 +145,7 @@ export class DynaliteInput extends LitElement {
                 max=${ifDefined(this.settings.maxVal)}
                 step=${ifDefined(this.settings.stepVal)}
                 autoValidate
+                validateOnInitialRender
                 type="number"
                 ?required=${this.settings.requiredVal}
                 ?disabled=${this.disabled}

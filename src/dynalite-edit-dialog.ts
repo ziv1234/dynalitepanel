@@ -38,7 +38,7 @@ export class DynaliteEditDialog extends LitElement {
   public async showDialog(params: DynaliteEditDialogParams): Promise<void> {
     this.hass = params.hass;
     this._params = Object.assign({}, params); // XXX TBD check if needed
-    this._isNew = !("number" in this._params);
+    this._isNew = !("number" in this._params.value);
     this._genHelpers();
     console.log("show %s", this._isNew);
   }
