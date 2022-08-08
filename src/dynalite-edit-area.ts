@@ -27,6 +27,10 @@ export class DynaliteEditArea extends LitElement {
 
   @state() private _hasChanged = false;
 
+  @state() private _isNew = false;
+
+  @state() private _number = "";
+
   @state() private _name = "";
 
   @state() private _template = "";
@@ -61,6 +65,8 @@ export class DynaliteEditArea extends LitElement {
       this._presets = JSON.parse(
         JSON.stringify(this.dynalite.config.area[this.areaNumber]?.preset || {})
       );
+      this._number = this.areaNumber || "";
+      this._isNew = this._number == "";
       this._hasInitialized = true;
     }
   }
@@ -94,6 +100,13 @@ export class DynaliteEditArea extends LitElement {
               <h1>Configure Global Dynalite Settings</h1>
               <p>Host: ${this.dynalite.config.host} Port: ${this.dynalite.config.port}</p>
               <h2>Global Settings</h2>
+              <dynalite-input
+                    .settings=${this._numberInput}
+                    .value=${this._number}
+                    ?disabled=${!this._isNew}
+                    .excluded=${this._isNew ? Object.keys(this.dynalite.config?.area || {}) : []}
+                    @dynalite-input=${this._handleChange}
+                  ></dynalite-input>
               <dynalite-input
                 .settings=${this._nameInput}
                 @dynalite-input=${this._handleChange}
@@ -167,6 +180,15 @@ export class DynaliteEditArea extends LitElement {
     this._hasChanged = true;
     this.requestUpdate();
   }
+
+  _numberInput = new DynaliteInputSettings("number")
+    .heading("Number")
+    .desc("Dynalite area number (1-255)")
+    .min(1)
+    .max(255)
+    .step(1)
+    .required()
+    .validationMessage("Invalid area");
 
   _nameInput = new DynaliteInputSettings("name")
     .heading("Area Name")

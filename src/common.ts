@@ -29,7 +29,7 @@ export interface DynaliteConfigData {
   autodiscover?: boolean;
   default?: { fade?: string };
   active?: string;
-  area: {
+  area?: {
     [key: string]: DynaliteAreaData;
   };
   preset?: { [key: string]: DynalitePresetData };
