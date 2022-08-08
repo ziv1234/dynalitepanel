@@ -20,11 +20,11 @@ import { ifDefined } from "lit/directives/if-defined";
 export class DynaliteGlobalSettings extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
-  @property({ type: Object }) public dynalite!: Dynalite;
+  @property({ attribute: false }) public dynalite!: Dynalite;
 
-  @property({ type: Object }) public route!: Route;
+  @property({ attribute: false }) public route!: Route;
 
-  @property({ type: Boolean }) public narrow = false;
+  @property({ attribute: false }) public narrow = false;
 
   @state() private _name = "";
 

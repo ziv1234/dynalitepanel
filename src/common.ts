@@ -62,10 +62,11 @@ export interface LocationChangedEvent {
 export interface DynaliteAreaRowInfo {
   // XXX TBD move to area?
   number: string;
-  name: string;
-  template: string;
-  channel: string;
-  preset: string;
+  name?: string;
+  template?: string;
+  fade?: string;
+  channel?: string;
+  preset?: string;
 }
 
 export const ROUTE_AREAS = "areas";
@@ -93,3 +94,7 @@ export const panelTabs = [
     core: true,
   },
 ];
+
+export function dynaliteCopy<T>(src: T): T {
+  return JSON.parse(JSON.stringify(src));
+}

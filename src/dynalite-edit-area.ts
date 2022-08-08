@@ -2,7 +2,14 @@ import { css, CSSResultGroup, html, LitElement, TemplateResult } from "lit";
 import { customElement, property, queryAll, state } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
-import { Dynalite, DynaliteChannelData, DynalitePresetData, panelTabs } from "./common";
+import {
+  Dynalite,
+  DynaliteAreaData,
+  DynaliteChannelData,
+  dynaliteCopy,
+  DynalitePresetData,
+  panelTabs,
+} from "./common";
 import "../homeassistant-frontend/src/components/ha-card";
 import "./dynalite-input";
 import "@material/mwc-button/mwc-button";
@@ -10,16 +17,19 @@ import { DynaliteInput, DynaliteInputSettings } from "./dynalite-input";
 import { ifDefined } from "lit/directives/if-defined";
 import "./dynalite-preset-table";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
+import "./dynalite-channel-table";
+import { ht } from "date-fns/locale";
+import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
 
 @customElement("dynalite-edit-area")
 export class DynaliteEditArea extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
-  @property({ type: Object }) public dynalite!: Dynalite;
+  @property({ attribute: false }) public dynalite!: Dynalite;
 
-  @property({ type: Object }) public route!: Route;
+  @property({ attribute: false }) public route!: Route;
 
-  @property({ type: Boolean }) public narrow = false;
+  @property({ attribute: false }) public narrow = false;
 
   @property({ attribute: false }) public areaNumber!: string;
 
@@ -54,17 +64,16 @@ export class DynaliteEditArea extends LitElement {
     if (!this.dynalite) return;
     if (!this._hasInitialized) {
       console.log("initizlizing global settings");
-      this._name = this.dynalite.config.area[this.areaNumber]?.name || "";
-      this._template = this.dynalite.config.area[this.areaNumber]?.template || "";
-      this._fade = this.dynalite.config.area[this.areaNumber]?.fade || "";
-      this._fadeHelper = `Default: ${this.dynalite.config.default?.fade}`;
-      this._nodefault = this.dynalite.config.area[this.areaNumber]?.nodefault || false;
-      this._channels = JSON.parse(
-        JSON.stringify(this.dynalite.config.area[this.areaNumber]?.channel || {})
-      );
-      this._presets = JSON.parse(
-        JSON.stringify(this.dynalite.config.area[this.areaNumber]?.preset || {})
-      );
+      if (this.areaNumber && this.areaNumber in (this.dynalite.config.area || {})) {
+        const areaData: DynaliteAreaData = this.dynalite.config.area![this.areaNumber];
+        this._name = areaData.name || "";
+        this._template = areaData.template || "";
+        this._fade = areaData.fade || "";
+        this._fadeHelper = `Default: ${this.dynalite.config.default?.fade}`;
+        this._nodefault = areaData.nodefault || false;
+        this._channels = JSON.parse(JSON.stringify(areaData.channel || {}));
+        this._presets = JSON.parse(JSON.stringify(areaData.preset || {}));
+      }
       this._number = this.areaNumber || "";
       this._isNew = this._number == "";
       this._hasInitialized = true;
@@ -80,7 +89,7 @@ export class DynaliteEditArea extends LitElement {
     console.log("XXX render edit area");
     const canSave =
       this._hasChanged &&
-      this._inputElements?.length == 4 &&
+      this._inputElements?.length == 5 &&
       Array.from(this._inputElements).every((elem) => elem.isValid());
     console.log("canSave=%s", canSave);
 
@@ -97,16 +106,15 @@ export class DynaliteEditArea extends LitElement {
         <div class="content">
           <ha-card outlined>
             <div class="card-content">
-              <h1>Configure Global Dynalite Settings</h1>
-              <p>Host: ${this.dynalite.config.host} Port: ${this.dynalite.config.port}</p>
-              <h2>Global Settings</h2>
+              <h1>${this._isNew ? html`New Area` : html`Edit Area ${this.areaNumber}`}</h1>
+              <h2>Area Settings</h2>
               <dynalite-input
-                    .settings=${this._numberInput}
-                    .value=${this._number}
-                    ?disabled=${!this._isNew}
-                    .excluded=${this._isNew ? Object.keys(this.dynalite.config?.area || {}) : []}
-                    @dynalite-input=${this._handleChange}
-                  ></dynalite-input>
+                .settings=${this._numberInput}
+                .value=${this._number}
+                ?disabled=${!this._isNew}
+                .excluded=${this._isNew ? Object.keys(this.dynalite.config?.area || {}) : []}
+                @dynalite-input=${this._handleChange}
+              ></dynalite-input>
               <dynalite-input
                 .settings=${this._nameInput}
                 @dynalite-input=${this._handleChange}
@@ -129,18 +137,29 @@ export class DynaliteEditArea extends LitElement {
                 .value=${this._nodefault}
               ></dynalite-input>
               <h2>Area Specific Presets</h2>
-                <dynalite-preset-table
-                      .hass=${this.hass}
-                      .narrow=${this.narrow}
-                      .route=${this.route}
-                      .presets=${this._presets || {}}
-                      defaultFade=${ifDefined(this.dynalite.config.default?.fade)}
-                      @dynalite-table=${(_ev) => {
-                        console.log("global settings - dynalite-table event");
-                        this._hasChanged = true;
-                      }}
-                    ></dynalite-preset-table>
-              </dynalite-preset-table>
+              <dynalite-preset-table
+                .hass=${this.hass}
+                .narrow=${this.narrow}
+                .route=${this.route}
+                .presets=${this._presets || {}}
+                defaultFade=${this._fade != "" ? this._fade : this.dynalite.config.default!.fade!}
+                @dynalite-table=${(_ev) => {
+                  console.log("global settings - dynalite-table event");
+                  this._hasChanged = true;
+                }}
+              ></dynalite-preset-table>
+              <h2>Area Specific Channels</h2>
+              <dynalite-channel-table
+                .hass=${this.hass}
+                .narrow=${this.narrow}
+                .route=${this.route}
+                .channels=${this._channels || {}}
+                defaultFade=${this._fade != "" ? this._fade : this.dynalite.config.default!.fade!}
+                @dynalite-table=${(_ev) => {
+                  console.log("global settings - dynalite-table event");
+                  this._hasChanged = true;
+                }}
+              ></dynalite-channel-table>
             </div>
             <div class="card-actions">
               <mwc-button @click=${this._save} ?disabled=${!canSave}> Save </mwc-button>
@@ -155,19 +174,23 @@ export class DynaliteEditArea extends LitElement {
 
   private _save() {
     // fill complete and send update signal
+    function undefinedIfEmpty(src?: string) {
+      return src ? src : undefined;
+    }
+
     console.log("XXX save");
-    // if (this._name) this.dynalite.config.name = this._name;
-    // else delete this.dynalite.config.name;
-    // this.dynalite.config.autodiscover = this._autodiscover;
-    // this.dynalite.config.default!.fade = this._fade;
-    // this.dynalite.config.active = this._active;
-    // if (this._overridePresets)
-    //   this.dynalite.config.preset = JSON.parse(JSON.stringify(this._presets));
-    // else delete this.dynalite.config.preset;
-    // console.dir(this.dynalite.config);
-    // console.log("XXX dispatching");
-    // this._hasChanged = false;
-    // fireEvent(this, "value-changed");
+    const res: DynaliteAreaData = {
+      name: undefinedIfEmpty(this._name),
+      template: undefinedIfEmpty(this._template),
+      fade: undefinedIfEmpty(this._fade),
+      nodefault: this._nodefault,
+      channel: dynaliteCopy(this._channels),
+      preset: dynaliteCopy(this._presets),
+    };
+    console.dir(res);
+    this.dynalite.config.area![this._number] = res;
+    this._hasChanged = false;
+    fireEvent(this, "value-changed");
   }
 
   private _handleChange(ev) {

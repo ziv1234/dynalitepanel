@@ -18,11 +18,11 @@ import { navigate } from "../homeassistant-frontend/src/common/navigate";
 export class DynaliteAreas extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
-  @property({ type: Object }) public dynalite!: Dynalite;
+  @property({ attribute: false }) public dynalite!: Dynalite;
 
-  @property({ type: Object }) public route!: Route;
+  @property({ attribute: false }) public route!: Route;
 
-  @property({ type: Boolean }) public narrow = false;
+  @property({ attribute: false }) public narrow = false;
 
   protected render(): TemplateResult | void {
     console.log("XXX areas render");
@@ -86,6 +86,13 @@ export class DynaliteAreas extends LitElement {
         filterable: true,
         width: "10%",
       },
+      fade: {
+        title: "Fade",
+        sortable: true,
+        hidden: narrow,
+        filterable: true,
+        width: "10%",
+      },
       preset: {
         title: "Presets",
         sortable: true,
@@ -111,13 +118,14 @@ export class DynaliteAreas extends LitElement {
         name: areaConfig.name,
         number: areaNum,
         template: areaConfig.template ? templateNames[areaConfig.template] : "Manual",
+        fade: areaConfig.fade,
         preset: areaConfig.preset ? Object.keys(areaConfig.preset).join(", ") : "-",
         channel: areaConfig.channel ? Object.keys(areaConfig.channel).join(", ") : "-",
       };
     }
     console.log("XXX calculateData");
     console.dir(this.dynalite.config.area);
-    const areas = this.dynalite.config.area;
+    const areas = this.dynalite.config.area!;
     const areaNumbers = Object.keys(areas);
     const data = areaNumbers.map((area) => calcSingleArea(area, areas[area]));
     console.log("XXX areas=%s", Object.keys(areas));

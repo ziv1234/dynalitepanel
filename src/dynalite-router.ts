@@ -15,7 +15,7 @@ class DynaliteRouter extends HassRouterPage {
 
   @property({ attribute: false }) public route!: Route;
 
-  @property({ type: Boolean }) public narrow!: boolean;
+  @property({ attribute: false }) public narrow!: boolean;
 
   protected routerOptions: RouterOptions = {
     defaultPage: "areas",

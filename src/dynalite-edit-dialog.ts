@@ -21,9 +21,9 @@ import { DynaliteEditDialogParams } from "./dynalite-edit-dialog-types";
 export class DynaliteEditDialog extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
-  @property({ type: Object }) public route!: Route;
+  @property({ attribute: false }) public route!: Route;
 
-  @property({ type: Boolean }) public narrow = false;
+  @property({ attribute: false }) public narrow = false;
 
   @state() private _params?: DynaliteEditDialogParams;
 

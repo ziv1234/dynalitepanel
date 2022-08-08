@@ -24,9 +24,9 @@ export interface DynaliteTableSettings {
 export class DynaliteTable extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
-  @property({ type: Object }) public route!: Route;
+  @property({ attribute: false }) public route!: Route;
 
-  @property({ type: Boolean }) public narrow = false;
+  @property({ attribute: false }) public narrow = false;
 
   @property({ attribute: false }) public settings!: DynaliteTableSettings;
 
