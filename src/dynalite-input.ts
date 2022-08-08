@@ -130,7 +130,7 @@ export class DynaliteInput extends LitElement {
                 validateOnInitialRender
                 .validityTransform=${this._validityTransform.bind(this)}
                 suffix=${ifDefined(this.settings.suffixVal)}
-                @change=${this._handleTextChange}
+                @input=${this._handleTextChange}
               ></ha-textfield>
             `
           : this.settings.typeVal == "boolean"
