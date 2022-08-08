@@ -137,9 +137,10 @@ export class DynaliteInput extends LitElement {
           ? html`
               <ha-switch
                 .preference=${this.settings.nameVal}
-                checked=${ifDefined(value)}
+                ?checked=${value}
                 ?disabled=${this.disabled}
                 @change=${this._handleBoolChange}
+                haptic
               >
               </ha-switch>
             `
@@ -150,7 +151,7 @@ export class DynaliteInput extends LitElement {
                 fixedMenuPosition
                 naturalMenuWidth
                 value=${ifDefined(value)}
-                disabled=${ifDefined(this.disabled)}
+                ?disabled=${this.disabled}
                 @change=${this._handleTextChange}
               >
                 ${this.settings.selectionVal?.map(

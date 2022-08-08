@@ -54,6 +54,7 @@ export class DynaliteGlobalSettings extends LitElement {
     console.dir(this.dynalite);
     if (!this.dynalite) return;
     if (!this._hasInitialized) {
+      console.log("initizlizing global settings");
       this._name = this.dynalite.config.name || "";
       this._nameHelper = "Default: " + this.dynalite.default.DEFAULT_NAME;
       this._autodiscover = this.dynalite.config.autodiscover!;
@@ -92,6 +93,11 @@ export class DynaliteGlobalSettings extends LitElement {
       ["on", "Always Active"],
     ]);
 
+  _overridePresetsInput = new DynaliteInputSettings("overridePresets")
+    .heading("Override Default Presets")
+    .desc("Advanced use only")
+    .type("boolean");
+
   protected render(): TemplateResult | void {
     console.log("XXX global settings render");
     console.dir(this.hass);
@@ -102,8 +108,9 @@ export class DynaliteGlobalSettings extends LitElement {
     console.dir(this._inputElements);
     const canSave =
       this._hasChanged &&
-      this._inputElements?.length == 4 &&
+      this._inputElements?.length == 5 &&
       Array.from(this._inputElements).every((elem) => elem.isValid());
+    console.log("canSave=%s", canSave);
     return html`
       <hass-tabs-subpage
         .hass=${this.hass}
@@ -141,16 +148,26 @@ export class DynaliteGlobalSettings extends LitElement {
                 .value=${this._active}
               ></dynalite-input>
               <h2>Default Presets</h2>
-              <dynalite-preset-table
-                .hass=${this.hass}
-                .narrow=${this.narrow}
-                .route=${this.route}
-                .presets=${this._preset || {}}
-                defaultFade=${ifDefined(this.dynalite.config.default?.fade)}
-                @dynalite-table=${(_ev) => {
-                  this._hasChanged = true;
-                }}
-              >
+              <dynalite-input
+                .settings=${this._overridePresetsInput}
+                @dynalite-input=${this._handleChange}
+                .value=${this._overridePresets}
+              ></dynalite-input>
+              ${
+                this._overridePresets
+                  ? html`<dynalite-preset-table
+                      .hass=${this.hass}
+                      .narrow=${this.narrow}
+                      .route=${this.route}
+                      .presets=${this._preset || {}}
+                      defaultFade=${ifDefined(this.dynalite.config.default?.fade)}
+                      @dynalite-table=${(_ev) => {
+                        console.log("global settings - dynalite-table event");
+                        this._hasChanged = true;
+                      }}
+                    ></dynalite-preset-table>`
+                  : html``
+              }
               </dynalite-preset-table>
             </div>
             <div class="card-actions">
@@ -165,14 +182,14 @@ export class DynaliteGlobalSettings extends LitElement {
   private _save() {
     // fill complete and send update signal
     console.log("XXX save");
-    if (this._name) {
-      this.dynalite.config.name = this._name;
-    } else {
-      delete this.dynalite.config.name;
-    }
+    if (this._name) this.dynalite.config.name = this._name;
+    else delete this.dynalite.config.name;
     this.dynalite.config.autodiscover = this._autodiscover;
     this.dynalite.config.default!.fade = this._fade;
     this.dynalite.config.active = this._active;
+    if (this._overridePresets)
+      this.dynalite.config.preset = JSON.parse(JSON.stringify(this._preset));
+    else delete this.dynalite.config.preset;
     console.dir(this.dynalite.config);
     console.log("XXX dispatching");
     this._hasChanged = false;
@@ -187,6 +204,7 @@ export class DynaliteGlobalSettings extends LitElement {
     console.log("XXX TBD handle change name=%s value=%s", target, value);
     this["_" + target] = value;
     this._hasChanged = true;
+    this.requestUpdate();
   }
 
   static get styles(): CSSResultGroup {

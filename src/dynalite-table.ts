@@ -122,7 +122,7 @@ export class DynaliteTable extends LitElement {
     delete newRow.number;
     this.data[number] = newRow;
     console.dir(this.data);
-    this.dispatchEvent(new CustomEvent("dynalite-table", { detail: params }));
+    this.dispatchEvent(new CustomEvent("dynalite-table"));
     this.requestUpdate();
   }
 
@@ -155,7 +155,7 @@ export class DynaliteTable extends LitElement {
     }
     console.log("received yes");
     delete this.data[number];
-    this.dispatchEvent(new CustomEvent("dynalite-table", { detail: params }));
+    this.dispatchEvent(new CustomEvent("dynalite-table"));
     this.requestUpdate();
     return true;
   }
