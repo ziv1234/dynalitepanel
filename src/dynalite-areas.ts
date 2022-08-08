@@ -1,5 +1,5 @@
 import { html, LitElement, TemplateResult } from "lit";
-import { customElement, property, state } from "lit/decorators";
+import { customElement, property } from "lit/decorators";
 import "../homeassistant-frontend/src/components/ha-card";
 import "../homeassistant-frontend/src/layouts/hass-subpage";
 import "../homeassistant-frontend/src/components/ha-fab";

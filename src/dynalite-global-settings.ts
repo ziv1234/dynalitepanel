@@ -7,7 +7,7 @@ import "../homeassistant-frontend/src/components/ha-settings-row";
 import "../homeassistant-frontend/src/components/ha-switch";
 import "../homeassistant-frontend/src/components/ha-textfield";
 import "../homeassistant-frontend/src/components/ha-select";
-import { Dynalite, panelTabs } from "./common";
+import { Dynalite, DynalitePresetData, panelTabs } from "./common";
 import "@material/mwc-button/mwc-button";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
@@ -36,7 +36,7 @@ export class DynaliteGlobalSettings extends LitElement {
 
   @state() private _overridePresets = false;
 
-  @state() private _preset;
+  @state() private _presets: { [key: string]: DynalitePresetData } = {};
 
   @state() private _hasInitialized = false;
 
@@ -62,7 +62,7 @@ export class DynaliteGlobalSettings extends LitElement {
       this._fadeHelper = "0 For No fade";
       this._active = this.dynalite.config.active!;
       this._overridePresets = "preset" in this.dynalite.config;
-      this._preset = JSON.parse(JSON.stringify(this.dynalite.config.preset || {}));
+      this._presets = JSON.parse(JSON.stringify(this.dynalite.config.preset || {}));
       this._hasInitialized = true;
     }
   }
@@ -159,7 +159,7 @@ export class DynaliteGlobalSettings extends LitElement {
                       .hass=${this.hass}
                       .narrow=${this.narrow}
                       .route=${this.route}
-                      .presets=${this._preset || {}}
+                      .presets=${this._presets || {}}
                       defaultFade=${ifDefined(this.dynalite.config.default?.fade)}
                       @dynalite-table=${(_ev) => {
                         console.log("global settings - dynalite-table event");
@@ -188,7 +188,7 @@ export class DynaliteGlobalSettings extends LitElement {
     this.dynalite.config.default!.fade = this._fade;
     this.dynalite.config.active = this._active;
     if (this._overridePresets)
-      this.dynalite.config.preset = JSON.parse(JSON.stringify(this._preset));
+      this.dynalite.config.preset = JSON.parse(JSON.stringify(this._presets));
     else delete this.dynalite.config.preset;
     console.dir(this.dynalite.config);
     console.log("XXX dispatching");

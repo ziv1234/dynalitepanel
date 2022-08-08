@@ -42,7 +42,7 @@ export class DynalitePresetTable extends LitElement {
         .settings=${settings}
         .data=${this.presets}
         .helpers=${helpers}
-        @dynalite-table=${(ev) => {
+        @dynalite-table=${(_ev) => {
           this.dispatchEvent(new CustomEvent("dynalite-table"));
         }}
         }

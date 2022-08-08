@@ -1,10 +1,25 @@
 import { mdiDevices, mdiPuzzle } from "@mdi/js";
 import { Route } from "../homeassistant-frontend/src/types";
 
+export interface DynaliteChannelData {
+  name?: string;
+  fade?: string;
+  type?: string;
+}
+
 export interface DynalitePresetData {
   name?: string;
   fade?: string;
   level?: string;
+}
+
+export interface DynaliteAreaData {
+  name?: string;
+  template?: string;
+  fade?: string;
+  nodefault?: boolean;
+  channel?: { [key: string]: DynaliteChannelData };
+  preset?: { [key: string]: DynalitePresetData };
 }
 
 export interface DynaliteConfigData {
@@ -15,7 +30,7 @@ export interface DynaliteConfigData {
   default?: { fade?: string };
   active?: string;
   area: {
-    [key: string]: any;
+    [key: string]: DynaliteAreaData;
   };
   preset?: { [key: string]: DynalitePresetData };
 }
@@ -40,10 +55,12 @@ export interface DynaliteEntryIdentifier {
 }
 
 export interface LocationChangedEvent {
+  // XXX TBD
   detail?: { route: Route; force?: boolean };
 }
 
 export interface DynaliteAreaRowInfo {
+  // XXX TBD move to area?
   number: string;
   name: string;
   template: string;
