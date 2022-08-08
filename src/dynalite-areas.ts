@@ -40,13 +40,22 @@ export class DynaliteAreas extends LitElement {
         .route=${this.route}
         .columns=${this._columns(this.narrow)}
         .data=${data}
+        id="number"
         clickable
+        @row-click=${this._handleRowClicked}
       >
         <ha-fab slot="fab" label="Define New Area" extended @click=${this._createNew}>
           <ha-svg-icon slot="icon" .path=${mdiPlus}></ha-svg-icon>
         </ha-fab>
       </hass-tabs-subpage-data-table>
     `;
+  }
+
+  private _handleRowClicked(ev) {
+    const number = ev.detail.id;
+    console.log("XXX TBD table row-click number=%s", number);
+    console.dir(ev);
+    navigate(`/dynalite/edit/${number}`);
   }
 
   private _columns = memoizeOne((narrow: boolean): DataTableColumnContainer => {

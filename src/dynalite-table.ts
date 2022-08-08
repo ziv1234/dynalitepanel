@@ -110,7 +110,6 @@ export class DynaliteTable extends LitElement {
       onSave: this._saveRow.bind(this),
       onDelete: this._deleteRow.bind(this),
     });
-    return;
   }
 
   private _saveRow(params: DynaliteEditDialogParams): void {
