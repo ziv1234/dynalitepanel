@@ -39,7 +39,19 @@ export class DynaliteTable extends LitElement {
   protected willUpdate(_changedProperties: Map<string | number | symbol, unknown>): void {
     console.log("table willUpdate");
     this._processedData = Object.keys(this.data).map((num) => {
-      let temp: DynaliteRowData = this.data[num];
+      let temp: DynaliteRowData = {};
+      this.settings.inputs.forEach((inp) => {
+        const field = inp.nameVal;
+        if (field == "number") {
+          temp[field] = num;
+        } else {
+          if (!(field in this.data[num]) || inp.suffixVal != "%") {
+            temp[field] = this.data[num][field];
+          } else {
+            temp[field] = this.data[num][field] * 100 + "%";
+          }
+        }
+      });
       temp.number = num;
       return temp;
     });
@@ -85,6 +97,8 @@ export class DynaliteTable extends LitElement {
     console.dir(ev);
     const value: DynaliteRowData = this.data[number];
     value.number = number;
+    console.log("handle row click");
+    console.dir(value);
     showDynaliteEditDialog(this, {
       hass: this.hass,
       name: this.settings.name,

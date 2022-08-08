@@ -45,7 +45,7 @@ export class DynaliteEditDialog extends LitElement {
 
   protected render(): TemplateResult | void {
     if (!this._params) return html``;
-    console.log("XXX render global settings len=%s", this._inputElements?.length);
+    console.log("XXX render edit dialog len=%s", this._inputElements?.length);
     console.dir(this._inputElements);
     const canSave =
       this._hasChanged &&

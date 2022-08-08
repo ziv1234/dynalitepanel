@@ -104,56 +104,44 @@ export class DynaliteInput extends LitElement {
   protected render(): TemplateResult | void {
     console.log("dynalite-input render");
     console.dir(this.settings);
+    const value =
+      this.settings.suffixVal != "%" || !this.value
+        ? this.value
+        : Math.round(Number(this.value) * 100) + "";
+    console.log("orig=%s value=%s", this.value, value);
     return html`
       <ha-settings-row>
         <span slot="heading" data-for=${this.settings.nameVal}> ${this.settings.headingVal} </span>
         <span slot="description" data-for=${this.settings.nameVal}> ${this.settings.descVal} </span>
-        ${!this.settings.typeVal
+        ${!this.settings.typeVal || this.settings.typeVal == "number"
           ? html`
               <ha-textfield
                 id="my-textfield"
                 name=${this.settings.nameVal}
-                value=${ifDefined(this.value)}
-                type=${this.settings.type}
+                value=${ifDefined(value)}
+                type=${ifDefined(this.settings.typeVal)}
                 ?required=${this.settings.requiredVal}
                 ?disabled=${this.disabled}
+                min=${ifDefined(this.settings.minVal)}
+                max=${ifDefined(this.settings.maxVal)}
+                step=${ifDefined(this.settings.stepVal)}
                 helper=${ifDefined(this.helper)}
-                @change=${this._handleTextChange}
                 autoValidate
                 validateOnInitialRender
                 .validityTransform=${this._validityTransform.bind(this)}
                 suffix=${ifDefined(this.settings.suffixVal)}
+                @change=${this._handleTextChange}
               ></ha-textfield>
             `
           : this.settings.typeVal == "boolean"
           ? html`
               <ha-switch
                 .preference=${this.settings.nameVal}
-                checked=${ifDefined(this.value)}
+                checked=${ifDefined(value)}
                 ?disabled=${this.disabled}
                 @change=${this._handleBoolChange}
               >
               </ha-switch>
-            `
-          : this.settings.typeVal == "number"
-          ? html`
-              <ha-textfield
-                id="my-textfield"
-                name=${this.settings.nameVal}
-                value=${ifDefined(this.value)}
-                min=${ifDefined(this.settings.minVal)}
-                max=${ifDefined(this.settings.maxVal)}
-                step=${ifDefined(this.settings.stepVal)}
-                autoValidate
-                validateOnInitialRender
-                type="number"
-                ?required=${this.settings.requiredVal}
-                ?disabled=${this.disabled}
-                helper="${ifDefined(this.helper)}"
-                @change=${this._handleTextChange}
-                .validityTransform=${this._validityTransform.bind(this)}
-                suffix=${ifDefined(this.settings.suffixVal)}
-              ></ha-textfield>
             `
           : this.settings.typeVal == "select"
           ? html`
@@ -161,7 +149,7 @@ export class DynaliteInput extends LitElement {
                 name=${this.settings.nameVal}
                 fixedMenuPosition
                 naturalMenuWidth
-                value=${ifDefined(this.value)}
+                value=${ifDefined(value)}
                 disabled=${ifDefined(this.disabled)}
                 @change=${this._handleTextChange}
               >
@@ -195,9 +183,15 @@ export class DynaliteInput extends LitElement {
     console.log("XXX _handleChange");
     console.dir(ev.currentTarget);
     const target = ev.currentTarget;
-    console.log("XXX TBD handle change name=%s value=%s", target.name, target.value);
+    let value = target.value;
+    console.log(
+      "XXX TBD handle change name=%s value=%s target=%s",
+      target.name,
+      value,
+      target.value
+    );
     console.dir(ev);
-    this._updateParent(target.name, target.value);
+    this._updateParent(target.name, value);
   }
 
   private _handleBoolChange(ev) {
