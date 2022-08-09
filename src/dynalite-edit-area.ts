@@ -32,6 +32,7 @@ import {
   DynaliteSelectInput,
   DynaliteTextInput,
 } from "./dynalite-input-settings";
+import { navigate } from "../homeassistant-frontend/src/common/navigate";
 
 @customElement("dynalite-edit-area")
 export class DynaliteEditArea extends LitElement {
@@ -118,7 +119,7 @@ export class DynaliteEditArea extends LitElement {
         <ha-button-menu
           corner="BOTTOM_START"
           slot="toolbar-icon"
-          @action=${console.error}
+          @action=${this._deleteArea}
           activatable
         >
           <ha-icon-button
@@ -131,7 +132,6 @@ export class DynaliteEditArea extends LitElement {
             <ha-svg-icon slot="graphic" .path=${mdiDelete} class="warning"> </ha-svg-icon>
           </mwc-list-item>
         </ha-button-menu>
-
         <div class="content">
           <ha-card outlined>
             <div class="card-content">
@@ -226,6 +226,14 @@ export class DynaliteEditArea extends LitElement {
     this["_" + target] = value;
     this._hasChanged = true;
     this.requestUpdate();
+  }
+
+  private _deleteArea(ev) {
+    console.log("delete area %s", this.areaNumber);
+    console.dir(ev);
+    delete this.dynalite.config.area![this.areaNumber];
+    fireEvent(this, "value-changed");
+    navigate("/dynalite/areas");
   }
 
   _numberInput = DynaliteIdInput("number", "area")
