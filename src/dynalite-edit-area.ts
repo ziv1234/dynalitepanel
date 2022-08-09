@@ -9,17 +9,22 @@ import {
   dynaliteCopy,
   DynalitePresetData,
   panelTabs,
+  undefinedIfEmpty,
 } from "./common";
 import "../homeassistant-frontend/src/components/ha-card";
+import "../homeassistant-frontend/src/components/ha-button-menu";
+import "../homeassistant-frontend/src/components/ha-icon-button";
+import "../homeassistant-frontend/src/components/ha-svg-icon";
 import "./dynalite-input";
 import "@material/mwc-button/mwc-button";
+import "@material/mwc-list";
 import { DynaliteInput, DynaliteInputSettings } from "./dynalite-input";
 import { ifDefined } from "lit/directives/if-defined";
 import "./dynalite-preset-table";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import "./dynalite-channel-table";
-import { ht } from "date-fns/locale";
 import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
+import { mdiDelete, mdiDotsVertical } from "@mdi/js";
 
 @customElement("dynalite-edit-area")
 export class DynaliteEditArea extends LitElement {
@@ -103,6 +108,23 @@ export class DynaliteEditArea extends LitElement {
         )}
         clickable
       >
+        <ha-button-menu
+          corner="BOTTOM_START"
+          slot="toolbar-icon"
+          @action=${console.error}
+          activatable
+        >
+          <ha-icon-button
+            slot="trigger"
+            label="Additional Actions"
+            .path=${mdiDotsVertical}
+          ></ha-icon-button>
+          <mwc-list-item graphic="icon" class="warning">
+            Delete Area
+            <ha-svg-icon slot="graphic" .path=${mdiDelete} class="warning"> </ha-svg-icon>
+          </mwc-list-item>
+        </ha-button-menu>
+
         <div class="content">
           <ha-card outlined>
             <div class="card-content">
@@ -166,18 +188,12 @@ export class DynaliteEditArea extends LitElement {
             </div>
           </ha-card>
         </div>
-
-        HELLO WORLD edit-area ${this.areaNumber}
       </hass-tabs-subpage>
     `;
   }
 
   private _save() {
     // fill complete and send update signal
-    function undefinedIfEmpty(src?: string) {
-      return src ? src : undefined;
-    }
-
     console.log("XXX save");
     const res: DynaliteAreaData = {
       name: undefinedIfEmpty(this._name),

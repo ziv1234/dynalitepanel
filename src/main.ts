@@ -87,7 +87,13 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
                 curConfig.default = { fade: "0" };
               }
               if (!curConfig.active) curConfig.active = "off";
-              curConfig.preset = { "5": { name: "abc", fade: "0.3" }, "78": { level: "0.85" } };
+              if (!curConfig.template) curConfig.template = {};
+              ["room", "time_cover"].forEach((template) => {
+                if (!curConfig.template![template]) curConfig.template![template] = {};
+              });
+              if (!curConfig.template.time_cover?.class)
+                curConfig.template.time_cover!.class = "blind";
+              curConfig.preset = { "5": { name: "abc", fade: "0.3" }, "78": { level: "0.85" } }; // XXX TBD
               this.dynalite = {
                 config: curConfig,
                 default: (resp as DynaliteConfigResponse).default,

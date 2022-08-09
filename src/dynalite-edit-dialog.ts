@@ -8,8 +8,9 @@ import "../homeassistant-frontend/src/components/ha-card";
 import "../homeassistant-frontend/src/components/ha-button-menu";
 import "../homeassistant-frontend/src/components/ha-icon-button";
 import "../homeassistant-frontend/src/components/ha-header-bar";
+import "../homeassistant-frontend/src/components/ha-svg-icon";
 import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
-import { mdiDotsVertical } from "@mdi/js";
+import { mdiDelete, mdiDotsVertical } from "@mdi/js";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import "@material/mwc-list";
 import "@material/mwc-button";
@@ -75,7 +76,10 @@ export class DynaliteEditDialog extends LitElement {
                       label="Additional Actions"
                       .path=${mdiDotsVertical}
                     ></ha-icon-button>
-                    <mwc-list-item class="warning"> Delete ${this._params.name} </mwc-list-item>
+                    <mwc-list-item class="warning" graphic="icon">
+                      Delete ${this._params.name}
+                      <ha-svg-icon slot="graphic" .path=${mdiDelete} class="warning"> </ha-svg-icon>
+                    </mwc-list-item>
                   </ha-button-menu>
                 </span>`
               : html``}

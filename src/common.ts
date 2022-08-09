@@ -22,6 +22,39 @@ export interface DynaliteAreaData {
   preset?: { [key: string]: DynalitePresetData };
 }
 
+export interface DynaliteRoomData {
+  room_on?: string;
+  room_off?: string;
+}
+
+export interface DynaliteCoverData {
+  open?: string;
+  close?: string;
+  stop?: string;
+  channel_cover?: string;
+  class?: string;
+  duration?: string;
+  tilt?: string;
+}
+
+export interface DynaliteTemplateData {
+  room?: DynaliteRoomData;
+  time_cover?: DynaliteCoverData;
+}
+
+export const DynaliteDefaultTemplates: DynaliteTemplateData = {
+  room: { room_on: "1", room_off: "4" },
+  time_cover: {
+    open: "1",
+    close: "2",
+    stop: "4",
+    channel_cover: "2",
+    class: "blind",
+    duration: "60",
+    tilt: "3",
+  },
+};
+
 export interface DynaliteConfigData {
   host: string;
   port: string;
@@ -33,6 +66,7 @@ export interface DynaliteConfigData {
     [key: string]: DynaliteAreaData;
   };
   preset?: { [key: string]: DynalitePresetData };
+  template?: DynaliteTemplateData;
 }
 
 export interface DynaliteDefaultData {
@@ -60,7 +94,7 @@ export interface LocationChangedEvent {
 }
 
 export interface DynaliteAreaRowInfo {
-  // XXX TBD move to area?
+  // some things are modified (e.g. presets and channels presented as strings)
   number: string;
   name?: string;
   template?: string;
@@ -97,4 +131,12 @@ export const panelTabs = [
 
 export function dynaliteCopy<T>(src: T): T {
   return JSON.parse(JSON.stringify(src));
+}
+
+export function undefinedIfEmpty(src?: string) {
+  return src ? src : undefined;
+}
+
+export function underscore(src: string): string {
+  return "_" + src;
 }
