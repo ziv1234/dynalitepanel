@@ -60,6 +60,8 @@ export class DynaliteGlobalSettings extends LitElement {
 
   @state() private _presets: { [key: string]: DynalitePresetData } = {};
 
+  @state() private _configureTemplates = false;
+
   // @ts-ignore:
   @state() private _room_on = "";
 
@@ -168,7 +170,8 @@ export class DynaliteGlobalSettings extends LitElement {
                   ></dynalite-input>
                 `
               )}
-              <h2>Default Presets</h2>
+              <h1>Advanced Settings</h1>
+              ${this._overridePresets ? html` <h2>Default Presets</h2>` : html``}
               <dynalite-input
                 .settings=${this._overridePresetsInput}
                 @dynalite-input=${this._handleChange}
@@ -190,30 +193,45 @@ export class DynaliteGlobalSettings extends LitElement {
                   : html``
               }
               </dynalite-preset-table>
-              <h2>Area Behavior Default Settings</h2>
-              <p>Advanced only - recommended to leave empty</p>
-              <b>On/Off Switch</b>
-              ${["room_on", "room_off"].map(
-                (param) => html`
-                  <dynalite-input
-                    .settings=${this[underscore(param) + "Input"]}
-                    @dynalite-input=${this._handleChange}
-                    .value=${this[underscore(param)]}
-                    helper=${ifDefined(this._helpers[param])}
-                  ></dynalite-input>
-                `
-              )}
-              <b>Blind or Cover</b>
-              ${["open", "close", "stop", "channel_cover"].map(
-                (param) => html`
-                  <dynalite-input
-                    .settings=${this[underscore(param) + "Input"]}
-                    @dynalite-input=${this._handleChange}
-                    .value=${this[underscore(param)]}
-                    helper=${ifDefined(this._helpers[param])}
-                  ></dynalite-input>
-                `
-              )}
+              ${
+                this._configureTemplates
+                  ? html` <h2>Area Behavior Default Settings</h2>
+                      <p>Advanced only - recommended to leave empty</p>`
+                  : html``
+              }
+              <dynalite-input
+                .settings=${this._configureTemplatesInput}
+                @dynalite-input=${this._handleChange}
+                .value=${this._configureTemplates}
+              ></dynalite-input>
+              ${
+                this._configureTemplates
+                  ? html`
+                      <b>On/Off Switch</b>
+                      ${["room_on", "room_off"].map(
+                        (param) => html`
+                          <dynalite-input
+                            .settings=${this[underscore(param) + "Input"]}
+                            @dynalite-input=${this._handleChange}
+                            .value=${this[underscore(param)]}
+                            helper=${ifDefined(this._helpers[param])}
+                          ></dynalite-input>
+                        `
+                      )}
+                      <b>Blind or Cover</b>
+                      ${["open", "close", "stop", "channel_cover"].map(
+                        (param) => html`
+                          <dynalite-input
+                            .settings=${this[underscore(param) + "Input"]}
+                            @dynalite-input=${this._handleChange}
+                            .value=${this[underscore(param)]}
+                            helper=${ifDefined(this._helpers[param])}
+                          ></dynalite-input>
+                        `
+                      )}
+                    `
+                  : html``
+              }
             </div>
             <div class="card-actions">
               <mwc-button @click=${this._save} ?disabled=${!canSave}> Save </mwc-button>
@@ -282,7 +300,7 @@ export class DynaliteGlobalSettings extends LitElement {
 
   _overridePresetsInput = DynaliteBooleanInput("overridePresets")
     .heading("Override Default Presets")
-    .desc("Advanced use only");
+    .desc("Not recommended");
 
   _room_onInput = DynaliteIdInput("room_on", "preset")
     .heading("Turn On")
@@ -322,6 +340,10 @@ export class DynaliteGlobalSettings extends LitElement {
     .desc("Time in seconds to open the tilt (0 for no tilt)")
     .min(1)
     .validationMessage("Invalid Time");
+
+  _configureTemplatesInput = DynaliteBooleanInput("configureTemplates")
+    .heading("Configure Behaviors")
+    .desc("Not recommended");
 
   static get styles(): CSSResultGroup {
     return [

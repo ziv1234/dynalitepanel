@@ -152,7 +152,7 @@ export class DynaliteEditArea extends LitElement {
               <dynalite-input
                 .settings=${this._templateInput}
                 @dynalite-input=${this._handleChange}
-                .value=${this._template || ""}
+                .value=${this._template}
               ></dynalite-input>
               <dynalite-input
                 .settings=${this._fadeInput}
