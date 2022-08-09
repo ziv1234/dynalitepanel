@@ -25,9 +25,9 @@ import "./dynalite-input";
 import { ifDefined } from "lit/directives/if-defined";
 import {
   DynaliteBooleanInput,
+  DynaliteDurationInput,
   DynaliteFadeInput,
   DynaliteIdInput,
-  DynaliteNumberInput,
   DynaliteSelectInput,
   DynaliteTextInput,
 } from "./dynalite-input-settings";
@@ -87,6 +87,9 @@ export class DynaliteGlobalSettings extends LitElement {
   @state() private _duration = "";
 
   // @ts-ignore:
+  @state() private _tiltEnabled = false;
+
+  // @ts-ignore:
   @state() private _tilt = "";
 
   @queryAll("dynalite-input") _inputElements?: DynaliteInput[];
@@ -118,6 +121,18 @@ export class DynaliteGlobalSettings extends LitElement {
           this._helpers[param] = "Default: " + DynaliteDefaultTemplates[template][param];
         }
       }
+      if ("tilt" in this.dynalite.config.template?.time_cover!) {
+        this._tilt = this.dynalite.config.template?.time_cover.tilt!;
+        if (this._tilt == "0") {
+          this._tiltEnabled = false;
+          this._tilt = DynaliteDefaultTemplates.time_cover!.tilt!;
+        } else {
+          this._tiltEnabled = true;
+        }
+      } else {
+        this._tilt = DynaliteDefaultTemplates.time_cover!.tilt!;
+        this._tiltEnabled = true;
+      }
       this._hasInitialized = true;
     }
   }
@@ -133,7 +148,9 @@ export class DynaliteGlobalSettings extends LitElement {
     const canSave =
       this._hasChanged &&
       this._inputElements?.length &&
-      Array.from(this._inputElements).every((elem) => elem.isValid());
+      Array.from(this._inputElements).every(
+        (elem) => elem.isValid() || (elem.settings.nameVal == "tilt" && !this._tiltEnabled)
+      );
     console.log("canSave=%s", canSave);
     return html`
       <hass-tabs-subpage
@@ -149,34 +166,18 @@ export class DynaliteGlobalSettings extends LitElement {
               <h1>Configure Global Dynalite Settings</h1>
               <p>Host: ${this.dynalite.config.host} Port: ${this.dynalite.config.port}</p>
               <h2>Global Settings</h2>
-              ${["name", "autodiscover", "fade", "active"].map(
-                (param) => html`
-                  <dynalite-input
-                    .settings=${this[underscore(param) + "Input"]}
-                    @dynalite-input=${this._handleChange}
-                    .value=${this[underscore(param)]}
-                    helper=${ifDefined(this._helpers[param])}
-                  ></dynalite-input>
-                `
-              )}
+              ${this._genInputElement("name")}
+              ${this._genInputElement("autodiscover")}
+              ${this._genInputElement("fade")}
+              ${this._genInputElement("active")}
               <h2>Settings for Blinds and Covers</h2>
-              ${["class", "duration", "tilt"].map(
-                (param) => html`
-                  <dynalite-input
-                    .settings=${this[underscore(param) + "Input"]}
-                    @dynalite-input=${this._handleChange}
-                    .value=${this[underscore(param)]}
-                    helper=${ifDefined(this._helpers[param])}
-                  ></dynalite-input>
-                `
-              )}
+              ${this._genInputElement("class")}
+              ${this._genInputElement("duration")}
+              ${this._genInputElement("tiltEnabled")}
+              ${this._tiltEnabled ? this._genInputElement("tilt") : html``}
               <h1>Advanced Settings</h1>
               ${this._overridePresets ? html` <h2>Default Presets</h2>` : html``}
-              <dynalite-input
-                .settings=${this._overridePresetsInput}
-                @dynalite-input=${this._handleChange}
-                .value=${this._overridePresets}
-              ></dynalite-input>
+              ${this._genInputElement("overridePresets")}
               ${
                 this._overridePresets
                   ? html`<dynalite-preset-table
@@ -199,36 +200,16 @@ export class DynaliteGlobalSettings extends LitElement {
                       <p>Advanced only - recommended to leave empty</p>`
                   : html``
               }
-              <dynalite-input
-                .settings=${this._configureTemplatesInput}
-                @dynalite-input=${this._handleChange}
-                .value=${this._configureTemplates}
-              ></dynalite-input>
+              ${this._genInputElement("configureTemplates")}
               ${
                 this._configureTemplates
                   ? html`
                       <b>On/Off Switch</b>
-                      ${["room_on", "room_off"].map(
-                        (param) => html`
-                          <dynalite-input
-                            .settings=${this[underscore(param) + "Input"]}
-                            @dynalite-input=${this._handleChange}
-                            .value=${this[underscore(param)]}
-                            helper=${ifDefined(this._helpers[param])}
-                          ></dynalite-input>
-                        `
-                      )}
+                      ${this._genInputElement("room_on")} ${this._genInputElement("room_off")}
+                      ${this._genInputElement("room_on")}
                       <b>Blind or Cover</b>
-                      ${["open", "close", "stop", "channel_cover"].map(
-                        (param) => html`
-                          <dynalite-input
-                            .settings=${this[underscore(param) + "Input"]}
-                            @dynalite-input=${this._handleChange}
-                            .value=${this[underscore(param)]}
-                            helper=${ifDefined(this._helpers[param])}
-                          ></dynalite-input>
-                        `
-                      )}
+                      ${this._genInputElement("open")} ${this._genInputElement("close")}
+                      ${this._genInputElement("stop")} ${this._genInputElement("channel_cover")}
                     `
                   : html``
               }
@@ -259,6 +240,7 @@ export class DynaliteGlobalSettings extends LitElement {
         if (this[underscore(param)] != "") templates[template][param] = this[underscore(param)];
       }
     }
+    if (!this._tiltEnabled) templates.time_cover!.tilt = "0";
     this.dynalite.config.template = templates;
     console.dir(this.dynalite.config);
     console.log("XXX dispatching");
@@ -273,8 +255,21 @@ export class DynaliteGlobalSettings extends LitElement {
     const value = detail.value;
     console.log("XXX TBD handle change name=%s value=%s", target, value);
     this["_" + target] = value;
+    if (target == "tiltEnabled" && !value && this._tilt == "")
+      this._tilt = DynaliteDefaultTemplates.time_cover?.tilt!;
     this._hasChanged = true;
     this.requestUpdate();
+  }
+
+  private _genInputElement(param: string): TemplateResult {
+    return html`
+      <dynalite-input
+        .settings=${this[underscore(param) + "Input"]}
+        @dynalite-input=${this._handleChange}
+        .value=${this[underscore(param)]}
+        helper=${ifDefined(this._helpers[param])}
+      ></dynalite-input>
+    `;
   }
 
   _nameInput = DynaliteTextInput("name")
@@ -300,6 +295,10 @@ export class DynaliteGlobalSettings extends LitElement {
 
   _overridePresetsInput = DynaliteBooleanInput("overridePresets")
     .heading("Override Default Presets")
+    .desc("Not recommended");
+
+  _configureTemplatesInput = DynaliteBooleanInput("configureTemplates")
+    .heading("Configure Behaviors")
     .desc("Not recommended");
 
   _room_onInput = DynaliteIdInput("room_on", "preset")
@@ -329,21 +328,18 @@ export class DynaliteGlobalSettings extends LitElement {
       ["cover", "Cover"],
     ]);
 
-  _durationInput = DynaliteNumberInput("duration")
+  _durationInput = DynaliteDurationInput("duration")
     .heading("Default Open/Close Duration")
-    .desc("Time in seconds to open a blind")
-    .min(1)
-    .validationMessage("Invalid Time");
+    .desc("Time in seconds to open a blind");
 
-  _tiltInput = DynaliteNumberInput("tilt")
+  _tiltEnabledInput = DynaliteBooleanInput("tiltEnabled")
+    .heading("Enable Tilt")
+    .desc("Enable tilt by default in blinds");
+
+  _tiltInput = DynaliteDurationInput("tilt")
     .heading("Default Tilt Duration")
     .desc("Time in seconds to open the tilt (0 for no tilt)")
-    .min(1)
-    .validationMessage("Invalid Time");
-
-  _configureTemplatesInput = DynaliteBooleanInput("configureTemplates")
-    .heading("Configure Behaviors")
-    .desc("Not recommended");
+    .required();
 
   static get styles(): CSSResultGroup {
     return [

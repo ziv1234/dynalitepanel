@@ -12,7 +12,7 @@ import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import { showConfirmationDialog } from "../homeassistant-frontend/src/dialogs/generic/show-dialog-box";
 import { showDynaliteEditDialog } from "./show-dialog-dynalite-edit";
 import { DynaliteEditDialogParams, DynaliteRowData } from "./dynalite-edit-dialog-types";
-import { DynaliteInputSettings } from "./dynalite-input";
+import { DynaliteInputSettings } from "./dynalite-input-settings";
 
 export interface DynaliteTableSettings {
   name: string;

@@ -24,13 +24,10 @@ export class DynaliteInput extends LitElement {
   @query("#my-textfield") myTextField;
 
   protected render(): TemplateResult | void {
-    console.log("dynalite-input render");
-    console.dir(this.settings);
     const value =
       this.settings.suffixVal != "%" || !this.value
         ? this.value
         : Math.round(Number(this.value) * 100) + "";
-    console.log("orig=%s value=%s", this.value, value);
     return html`
       <ha-settings-row>
         <span slot="heading" data-for=${this.settings.nameVal}> ${this.settings.headingVal} </span>
@@ -90,8 +87,6 @@ export class DynaliteInput extends LitElement {
   }
 
   public isValid(): boolean {
-    console.log("XXXXX YYYYY XXXXX isValid called!!!");
-    console.dir(this.myTextField);
     if (["boolean", "select"].includes(this.settings.typeVal || "")) return true;
     return this.myTextField && this.myTextField.validity.valid;
   }
@@ -126,9 +121,6 @@ export class DynaliteInput extends LitElement {
   }
 
   private _validityTransform(value: string, nativeValidity: ValidityState): Partial<ValidityState> {
-    console.log("validitytransform value=%s", value);
-    console.dir(this);
-    console.dir(nativeValidity);
     if (!this.myTextField) return nativeValidity;
     if (
       nativeValidity.rangeOverflow ||
