@@ -9,7 +9,7 @@ import {
   dynaliteCopy,
   DynalitePresetData,
   panelTabs,
-  undefinedIfEmpty,
+  underscore,
 } from "./common";
 import "../homeassistant-frontend/src/components/ha-card";
 import "../homeassistant-frontend/src/components/ha-button-menu";
@@ -18,13 +18,20 @@ import "../homeassistant-frontend/src/components/ha-svg-icon";
 import "./dynalite-input";
 import "@material/mwc-button/mwc-button";
 import "@material/mwc-list";
-import { DynaliteInput, DynaliteInputSettings } from "./dynalite-input";
+import { DynaliteInput } from "./dynalite-input";
 import { ifDefined } from "lit/directives/if-defined";
 import "./dynalite-preset-table";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import "./dynalite-channel-table";
 import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
 import { mdiDelete, mdiDotsVertical } from "@mdi/js";
+import {
+  DynaliteBooleanInput,
+  DynaliteFadeInput,
+  DynaliteIdInput,
+  DynaliteSelectInput,
+  DynaliteTextInput,
+} from "./dynalite-input-settings";
 
 @customElement("dynalite-edit-area")
 export class DynaliteEditArea extends LitElement {
@@ -196,13 +203,14 @@ export class DynaliteEditArea extends LitElement {
     // fill complete and send update signal
     console.log("XXX save");
     const res: DynaliteAreaData = {
-      name: undefinedIfEmpty(this._name),
-      template: undefinedIfEmpty(this._template),
-      fade: undefinedIfEmpty(this._fade),
+      name: this._name,
       nodefault: this._nodefault,
       channel: dynaliteCopy(this._channels),
       preset: dynaliteCopy(this._presets),
     };
+    ["name", "template", "fade"].forEach((param) => {
+      if (this[underscore(param)]) res[param] = this[underscore(param)];
+    });
     console.dir(res);
     this.dynalite.config.area![this._number] = res;
     this._hasChanged = false;
@@ -220,41 +228,32 @@ export class DynaliteEditArea extends LitElement {
     this.requestUpdate();
   }
 
-  _numberInput = new DynaliteInputSettings("number")
+  _numberInput = DynaliteIdInput("number", "area")
     .heading("Number")
     .desc("Dynalite area number (1-255)")
-    .min(1)
-    .max(255)
-    .step(1)
-    .required()
-    .validationMessage("Invalid area");
+    .required();
 
-  _nameInput = new DynaliteInputSettings("name")
+  _nameInput = DynaliteTextInput("name")
     .heading("Area Name")
     .desc("Usually a room of a function")
     .required();
 
-  _templateInput = new DynaliteInputSettings("template")
+  _templateInput = DynaliteSelectInput("template")
     .heading("Area Behavior")
     .desc("Configure specific area behaviors")
-    .type("select")
     .selection([
       ["room", "On/Off Switch"],
       ["time_cover", "Blind or Cover"],
       ["", "Manual Setup"],
     ]);
 
-  _fadeInput = new DynaliteInputSettings("fade")
+  _fadeInput = DynaliteFadeInput("fade")
     .heading("Fade Time")
-    .desc("Default fade for area actions (seconds)")
-    .min(0)
-    .step(0.01)
-    .validationMessage("Invalid Fade");
+    .desc("Default fade for area actions (seconds)");
 
-  _nodefaultInput = new DynaliteInputSettings("nodefault")
+  _nodefaultInput = DynaliteBooleanInput("nodefault")
     .heading("Ignore Default Presets")
-    .desc("Do not use the globally configured presets")
-    .type("boolean");
+    .desc("Do not use the globally configured presets");
 
   static get styles(): CSSResultGroup {
     return [

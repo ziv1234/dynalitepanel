@@ -133,10 +133,6 @@ export function dynaliteCopy<T>(src: T): T {
   return JSON.parse(JSON.stringify(src));
 }
 
-export function undefinedIfEmpty(src?: string) {
-  return src ? src : undefined;
-}
-
 export function underscore(src: string): string {
   return "_" + src;
 }

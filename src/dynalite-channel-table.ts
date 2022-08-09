@@ -6,8 +6,13 @@ import "../homeassistant-frontend/src/components/ha-fab";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { DynaliteChannelData } from "./common";
 import "./dynalite-table";
-import { DynaliteInputSettings } from "./dynalite-input";
 import { DynaliteTableSettings } from "./dynalite-table";
+import {
+  DynaliteFadeInput,
+  DynaliteIdInput,
+  DynaliteSelectInput,
+  DynaliteTextInput,
+} from "./dynalite-input-settings";
 
 @customElement("dynalite-channel-table")
 export class DynaliteChannelTable extends LitElement {
@@ -84,22 +89,13 @@ export class DynaliteChannelTable extends LitElement {
   };
 
   private _inputs = [
-    new DynaliteInputSettings("number")
+    DynaliteIdInput("number", "channel")
       .heading("Number")
       .desc("Dynalite channel number (1-255)")
-      .min(1)
-      .max(255)
-      .step(1)
-      .required()
-      .validationMessage("Invalid channel"),
-    new DynaliteInputSettings("name").heading("Name").desc("Name for this channel"),
-    new DynaliteInputSettings("fade")
-      .heading("Fade")
-      .desc("Preset fade time (seconds)")
-      .min(0)
-      .step(0.01)
-      .validationMessage("Invalid fade"),
-    new DynaliteInputSettings("type").type("select").selection([
+      .required(),
+    DynaliteTextInput("name").heading("Name").desc("Name for this channel"),
+    DynaliteFadeInput("fade").heading("Fade").desc("Preset fade time (seconds)"),
+    DynaliteSelectInput("type").selection([
       ["light", "Light (default)"],
       ["switch", "Switch"],
     ]),

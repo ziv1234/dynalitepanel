@@ -1,5 +1,4 @@
 import { HomeAssistant } from "../homeassistant-frontend/src/types";
-import { DynaliteInputSettings } from "./dynalite-input";
 
 export interface DynaliteRowData {
   number?: string;

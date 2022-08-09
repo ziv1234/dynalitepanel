@@ -14,16 +14,23 @@ import {
   DynalitePresetData,
   DynaliteTemplateData,
   panelTabs,
-  undefinedIfEmpty,
   underscore,
 } from "./common";
 import "@material/mwc-button/mwc-button";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
 import "./dynalite-preset-table";
-import { DynaliteInput, DynaliteInputSettings } from "./dynalite-input";
+import { DynaliteInput } from "./dynalite-input";
 import "./dynalite-input";
 import { ifDefined } from "lit/directives/if-defined";
+import {
+  DynaliteBooleanInput,
+  DynaliteFadeInput,
+  DynaliteIdInput,
+  DynaliteNumberInput,
+  DynaliteSelectInput,
+  DynaliteTextInput,
+} from "./dynalite-input-settings";
 
 @customElement("dynalite-global-settings")
 export class DynaliteGlobalSettings extends LitElement {
@@ -53,22 +60,31 @@ export class DynaliteGlobalSettings extends LitElement {
 
   @state() private _presets: { [key: string]: DynalitePresetData } = {};
 
+  // @ts-ignore:
   @state() private _room_on = "";
 
+  // @ts-ignore:
   @state() private _room_off = "";
 
+  // @ts-ignore:
   @state() private _open = "";
 
+  // @ts-ignore:
   @state() private _close = "";
 
+  // @ts-ignore:
   @state() private _stop = "";
 
+  // @ts-ignore:
   @state() private _channel_cover = "";
 
+  // @ts-ignore:
   @state() private _class = "";
 
+  // @ts-ignore:
   @state() private _duration = "";
 
+  // @ts-ignore:
   @state() private _tilt = "";
 
   @queryAll("dynalite-input") _inputElements?: DynaliteInput[];
@@ -175,7 +191,7 @@ export class DynaliteGlobalSettings extends LitElement {
               }
               </dynalite-preset-table>
               <h2>Area Behavior Default Settings</h2>
-              <p>Advanced only - recommended not to change</p>
+              <p>Advanced only - recommended to leave empty</p>
               <b>On/Off Switch</b>
               ${["room_on", "room_off"].map(
                 (param) => html`
@@ -243,96 +259,65 @@ export class DynaliteGlobalSettings extends LitElement {
     this.requestUpdate();
   }
 
-  _nameInput = new DynaliteInputSettings("name")
+  _nameInput = DynaliteTextInput("name")
     .heading("System Name")
     .desc("User-defined name for this Dynalite system");
 
-  _autodiscoverInput = new DynaliteInputSettings("autodiscover")
+  _autodiscoverInput = DynaliteBooleanInput("autodiscover")
     .heading("Auto Discover")
-    .desc("Discover devices dynamically (useful for initial setup)")
-    .type("boolean");
+    .desc("Discover devices dynamically (useful for initial setup)");
 
-  _fadeInput = new DynaliteInputSettings("fade")
+  _fadeInput = DynaliteFadeInput("fade")
     .heading("Fade Time")
-    .desc("Default fade for device actions (seconds)")
-    .min(0)
-    .step(0.01)
-    .validationMessage("Invalid Fade");
+    .desc("Default fade for device actions (seconds)");
 
-  _activeInput = new DynaliteInputSettings("active")
+  _activeInput = DynaliteSelectInput("active")
     .heading("Active Mode")
     .desc("Actively poll system - may increase load")
-    .type("select")
     .selection([
       ["off", "Not Active (default)"],
       ["init", "Initial Init"],
       ["on", "Always Active"],
     ]);
 
-  _overridePresetsInput = new DynaliteInputSettings("overridePresets")
+  _overridePresetsInput = DynaliteBooleanInput("overridePresets")
     .heading("Override Default Presets")
-    .desc("Advanced use only")
-    .type("boolean");
+    .desc("Advanced use only");
 
-  _room_onInput = new DynaliteInputSettings("room_on")
+  _room_onInput = DynaliteIdInput("room_on", "preset")
     .heading("Turn On")
-    .desc("Preset that turns an area on")
-    .min(1)
-    .max(255)
-    .validationMessage("Invalid Preset");
+    .desc("Preset that turns an area on");
 
-  _room_offInput = new DynaliteInputSettings("room_off")
+  _room_offInput = DynaliteIdInput("room_off", "preset")
     .heading("Turn Off")
-    .desc("Preset that turns an area off")
-    .min(1)
-    .max(255)
-    .validationMessage("Invalid Preset");
+    .desc("Preset that turns an area off");
 
-  _openInput = new DynaliteInputSettings("open")
-    .heading("Open")
-    .desc("Preset to open a blind")
-    .min(1)
-    .max(255)
-    .validationMessage("Invalid Preset");
+  _openInput = DynaliteIdInput("open", "preset").heading("Open").desc("Preset to open a blind");
 
-  _closeInput = new DynaliteInputSettings("close")
-    .heading("Close")
-    .desc("Preset to close a blind")
-    .min(1)
-    .max(255)
-    .validationMessage("Invalid Preset");
+  _closeInput = DynaliteIdInput("close", "preset").heading("Close").desc("Preset to close a blind");
 
-  _stopInput = new DynaliteInputSettings("stop")
-    .heading("Open")
-    .desc("Preset to open a blind")
-    .min(1)
-    .max(255)
-    .validationMessage("Invalid Preset");
+  _stopInput = DynaliteIdInput("stop", "preset").heading("Open").desc("Preset to open a blind");
 
-  _channel_coverInput = new DynaliteInputSettings("channel_cover")
+  _channel_coverInput = DynaliteIdInput("channel_cover", "channel")
     .heading("Controlling channel")
-    .desc("Channel number to control a blind")
-    .min(1)
-    .max(255)
-    .validationMessage("Invalid Channel");
+    .desc("Channel number to control a blind");
 
-  _classInput = new DynaliteInputSettings("class")
+  _classInput = DynaliteSelectInput("class")
     .heading("Type")
     .desc("Default type for new blinds")
-    .type("select")
     .selection([
-      // XXX addd
+      // XXX add
       ["blind", "Blind"],
       ["cover", "Cover"],
     ]);
 
-  _durationInput = new DynaliteInputSettings("duration")
+  _durationInput = DynaliteNumberInput("duration")
     .heading("Default Open/Close Duration")
     .desc("Time in seconds to open a blind")
     .min(1)
     .validationMessage("Invalid Time");
 
-  _tiltInput = new DynaliteInputSettings("tilt")
+  _tiltInput = DynaliteNumberInput("tilt")
     .heading("Default Tilt Duration")
     .desc("Time in seconds to open the tilt (0 for no tilt)")
     .min(1)

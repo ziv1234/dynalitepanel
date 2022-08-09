@@ -6,8 +6,13 @@ import "../homeassistant-frontend/src/components/ha-fab";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { DynalitePresetData } from "./common";
 import "./dynalite-table";
-import { DynaliteInputSettings } from "./dynalite-input";
 import { DynaliteTableSettings } from "./dynalite-table";
+import {
+  DynaliteFadeInput,
+  DynaliteIdInput,
+  DynalitePercentageInput,
+  DynaliteTextInput,
+} from "./dynalite-input-settings";
 
 @customElement("dynalite-preset-table")
 export class DynalitePresetTable extends LitElement {
@@ -84,28 +89,13 @@ export class DynalitePresetTable extends LitElement {
   };
 
   private _inputs = [
-    new DynaliteInputSettings("number")
+    DynaliteIdInput("number", "preset")
       .heading("Number")
       .desc("Dynalite preset number (1-255)")
-      .min(1)
-      .max(255)
-      .step(1)
-      .required()
-      .validationMessage("Invalid preset"),
-    new DynaliteInputSettings("name").heading("Name").desc("Name for this preset"),
-    new DynaliteInputSettings("level")
-      .heading("Level")
-      .desc("Channel levels for this preset")
-      .min(0)
-      .max(100)
-      .validationMessage("Invalid value")
-      .suffix("%"),
-    new DynaliteInputSettings("fade")
-      .heading("Fade")
-      .desc("Preset fade time (seconds)")
-      .min(0)
-      .step(0.01)
-      .validationMessage("Invalid fade"),
+      .required(),
+    DynaliteTextInput("name").heading("Name").desc("Name for this preset"),
+    DynalitePercentageInput("level").heading("Level").desc("Channel levels for this preset"),
+    DynaliteFadeInput("fade").heading("Fade").desc("Preset fade time (seconds)"),
   ];
 }
 
