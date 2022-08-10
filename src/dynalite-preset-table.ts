@@ -88,15 +88,15 @@ export class DynalitePresetTable extends LitElement {
     },
   };
 
-  private _inputs = [
-    DynaliteIdInput("number", "preset")
+  private _inputs = {
+    number: DynaliteIdInput("number", "preset")
       .heading("Number")
       .desc("Dynalite preset number (1-255)")
       .required(),
-    DynaliteTextInput("name").heading("Name").desc("Name for this preset"),
-    DynalitePercentageInput("level").heading("Level").desc("Channel levels for this preset"),
-    DynaliteFadeInput("fade").heading("Fade").desc("Preset fade time (seconds)"),
-  ];
+    name: DynaliteTextInput("name").heading("Name").desc("Name for this preset"),
+    level: DynalitePercentageInput("level").heading("Level").desc("Channel levels for this preset"),
+    fade: DynaliteFadeInput("fade").heading("Fade").desc("Preset fade time (seconds)"),
+  };
 }
 
 declare global {

@@ -1,4 +1,4 @@
-import { css, CSSResultGroup, html, LitElement, TemplateResult } from "lit";
+import { css, CSSResultGroup, html, TemplateResult } from "lit";
 import { customElement, property, queryAll, state } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import "../homeassistant-frontend/src/components/ha-dialog";
@@ -15,11 +15,11 @@ import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import "@material/mwc-list";
 import "@material/mwc-button";
 import { DynaliteInput } from "./dynalite-input";
-import { ifDefined } from "lit/directives/if-defined";
-import { DynaliteEditDialogParams } from "./dynalite-edit-dialog-types";
+import { DynaliteEditDialogParams, DynaliteRowData } from "./dynalite-edit-dialog-types";
+import { DynaliteInputElement } from "./dynalite-input-element";
 
 @customElement("dynalite-edit-dialog")
-export class DynaliteEditDialog extends LitElement {
+export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
   @property({ attribute: false }) public route!: Route;
@@ -28,17 +28,23 @@ export class DynaliteEditDialog extends LitElement {
 
   @state() private _params?: DynaliteEditDialogParams;
 
+  protected result = {};
+
+  protected settings = {};
+
   @state() private _isNew = false;
 
   @state() private _hasChanged = false;
-
-  @state() private _helpers: { [key: string]: string } = {};
 
   @queryAll("dynalite-input") _inputElements?: DynaliteInput[];
 
   public async showDialog(params: DynaliteEditDialogParams): Promise<void> {
     this.hass = params.hass;
-    this._params = Object.assign({}, params); // XXX TBD check if needed
+    this._params = params;
+    this.result = params.value;
+    this.settings = params.inputs;
+    this.excluded = { number: params.excluded };
+    this.disabled = (params.disabled as any) || [];
     this._isNew = !("number" in this._params.value);
     this._genHelpers();
     console.log("show %s", this._isNew);
@@ -50,7 +56,7 @@ export class DynaliteEditDialog extends LitElement {
     console.dir(this._inputElements);
     const canSave =
       this._hasChanged &&
-      this._inputElements?.length == this._params.inputs.length &&
+      this._inputElements?.length == Object.keys(this._params.inputs).length &&
       Array.from(this._inputElements).every((elem) => elem.isValid());
     return html`
       <ha-dialog open .heading=${"abcde"} @closed=${this._close}>
@@ -88,18 +94,7 @@ export class DynaliteEditDialog extends LitElement {
         <div class="wrapper">
           <ha-card outlined>
             <div class="content">
-              ${this._params.inputs.map(
-                (inp) => html`
-                  <dynalite-input
-                    .settings=${inp}
-                    .value=${this._params?.value[inp.nameVal]}
-                    ?disabled=${this._params?.disabled?.includes(inp.nameVal)}
-                    .excluded=${inp.nameVal == "number" ? this._params?.excluded : undefined}
-                    helper=${ifDefined(this._helpers[inp.nameVal])}
-                    @dynalite-input=${this._handleChange}
-                  ></dynalite-input>
-                `
-              )}
+              ${Object.keys(this._params.inputs).map((field) => this.genInputElement(field as any))}
             </div>
           </ha-card>
         </div>
@@ -109,22 +104,6 @@ export class DynaliteEditDialog extends LitElement {
         <mwc-button slot="secondaryAction" @click=${this._close}>Cancel</mwc-button>
       </ha-dialog>
     `;
-  }
-
-  private _handleChange(ev) {
-    console.dir(ev);
-    const detail = ev.detail;
-    const target = detail.target as string;
-    let value = detail.value;
-    if (target == "level" && value != "") {
-      value = value / 100;
-    }
-    console.log("XXX TBD handle change name=%s value=%s", target, value);
-    if (!this._params?.value) return;
-    this._params.value[target] = value;
-    this._hasChanged = true;
-    this.requestUpdate();
-    if (target == "number") this._genHelpers();
   }
 
   private async _handleAction(ev) {
@@ -169,7 +148,7 @@ export class DynaliteEditDialog extends LitElement {
     }
     console.log("gen helpers");
     console.dir(res);
-    this._helpers = res;
+    this.helpers = res;
   }
 
   static get styles(): CSSResultGroup {

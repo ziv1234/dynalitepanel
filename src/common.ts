@@ -17,9 +17,9 @@ export interface DynaliteAreaData {
   name?: string;
   template?: string;
   fade?: string;
-  class: string;
-  duration: string;
-  tilt: string;
+  class?: string;
+  duration?: string;
+  tilt?: string;
   nodefault?: boolean;
   channel?: { [key: string]: DynaliteChannelData };
   preset?: { [key: string]: DynalitePresetData };

@@ -1,4 +1,4 @@
-import { css, CSSResultGroup, html, LitElement, TemplateResult } from "lit";
+import { css, CSSResultGroup, html, TemplateResult } from "lit";
 import { customElement, property, queryAll, state } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
@@ -10,7 +10,6 @@ import {
   DynaliteDefaultTemplates,
   DynalitePresetData,
   panelTabs,
-  underscore,
 } from "./common";
 import "../homeassistant-frontend/src/components/ha-card";
 import "../homeassistant-frontend/src/components/ha-button-menu";
@@ -20,7 +19,6 @@ import "./dynalite-input";
 import "@material/mwc-button/mwc-button";
 import "@material/mwc-list";
 import { DynaliteInput } from "./dynalite-input";
-import { ifDefined } from "lit/directives/if-defined";
 import "./dynalite-preset-table";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import "./dynalite-channel-table";
@@ -35,9 +33,22 @@ import {
   DynaliteTextInput,
 } from "./dynalite-input-settings";
 import { navigate } from "../homeassistant-frontend/src/common/navigate";
+import { DynaliteInputElement } from "./dynalite-input-element";
+
+interface DynaliteEditAreaInputs {
+  number: string;
+  name: string;
+  template: string;
+  class: string;
+  duration: string;
+  tiltEnabled: boolean;
+  tilt: string;
+  fade: string;
+  nodefault: boolean;
+}
 
 @customElement("dynalite-edit-area")
-export class DynaliteEditArea extends LitElement {
+export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInputs> {
   @property({ attribute: false }) public hass!: HomeAssistant;
 
   @property({ attribute: false }) public dynalite!: Dynalite;
@@ -50,33 +61,7 @@ export class DynaliteEditArea extends LitElement {
 
   @state() private _hasInitialized = false;
 
-  @state() private _hasChanged = false;
-
-  @state() private _helpers: { [key: string]: string } = {};
-
-  @state() private _disabled: string[] = [];
-
-  @state() private _excluded: { [key: string]: string[] } = {};
-
   @state() private _isNew = false;
-
-  @state() private _number = "";
-
-  @state() private _name = "";
-
-  @state() private _template = "";
-
-  @state() private _class = "";
-
-  @state() private _duration = "";
-
-  @state() private _tiltEnabled = false;
-
-  @state() private _tilt = "";
-
-  @state() private _fade = "";
-
-  @state() private _nodefault = false;
 
   @state() private _channels: { [key: string]: DynaliteChannelData } = {};
 
@@ -91,29 +76,31 @@ export class DynaliteEditArea extends LitElement {
     if (!this.dynalite) return;
     if (!this._hasInitialized) {
       console.log("initizlizing global settings");
+      this.helpers = { fade: `Default: ${this.dynalite.config.default?.fade}` };
       if (this.areaNumber && this.areaNumber in (this.dynalite.config.area || {})) {
+        this._isNew = false;
         const areaData: DynaliteAreaData = this.dynalite.config.area![this.areaNumber];
-        this._name = areaData.name || "";
-        this._template = areaData.template || "";
-        this._fade = areaData.fade || "";
-        this._class = areaData.class || DynaliteDefaultTemplates.time_cover?.class!;
-        this._duration = areaData.duration || "";
-        this._tiltEnabled = !(
-          areaData.tilt == "0" ||
-          (!("tilt" in areaData) && this.dynalite.config.template?.time_cover?.tilt == "0")
-        );
-        this._tilt = areaData.tilt || DynaliteDefaultTemplates.time_cover?.tilt!;
-        this._helpers.fade = `Default: ${this.dynalite.config.default?.fade}`;
-        this._nodefault = areaData.nodefault || false;
+        this.result = {
+          number: this.areaNumber || "",
+          name: areaData.name || "",
+          template: areaData.template || "",
+          class: areaData.class || DynaliteDefaultTemplates.time_cover?.class!,
+          duration: areaData.duration || "",
+          tiltEnabled: !(
+            areaData.tilt == "0" ||
+            (!("tilt" in areaData) && this.dynalite.config.template?.time_cover?.tilt == "0")
+          ),
+          tilt: areaData.tilt || DynaliteDefaultTemplates.time_cover?.tilt!,
+          fade: areaData.fade || "",
+          nodefault: areaData.nodefault || false,
+        };
         this._channels = JSON.parse(JSON.stringify(areaData.channel || {}));
         this._presets = JSON.parse(JSON.stringify(areaData.preset || {}));
-        this._disabled = ["number"];
-        this._isNew = false;
+        this.disabled = ["number"];
       } else {
-        this._excluded.number = Object.keys(this.dynalite.config?.area!);
         this._isNew = true;
+        this.excluded = { number: Object.keys(this.dynalite.config?.area!) };
       }
-      this._number = this.areaNumber || "";
       this._hasInitialized = true;
     }
   }
@@ -126,8 +113,8 @@ export class DynaliteEditArea extends LitElement {
     }
     console.log("XXX render edit area");
     const canSave =
-      this._hasChanged &&
-      this._inputElements?.length == 5 &&
+      this.hasChanged &&
+      this._inputElements?.length &&
       Array.from(this._inputElements).every((elem) => elem.isValid());
     console.log("canSave=%s", canSave);
 
@@ -162,26 +149,28 @@ export class DynaliteEditArea extends LitElement {
             <div class="card-content">
               <h1>${this._isNew ? html`New Area` : html`Edit Area ${this.areaNumber}`}</h1>
               <h2>Area Settings</h2>
-              ${this._genInputElement("number")} ${this._genInputElement("name")}
-              ${this._genInputElement("template")}
-              ${this._template == "time_cover"
+              ${this.genInputElement("number")} ${this.genInputElement("name")}
+              ${this.genInputElement("template")}
+              ${this.result.template == "time_cover"
                 ? html`
-                    ${this._genInputElement("class")} ${this._genInputElement("duration")}
-                    ${this._genInputElement("tiltEnabled")}
-                    ${this._tiltEnabled ? this._genInputElement("tilt") : html``}
+                    ${this.genInputElement("class")} ${this.genInputElement("duration")}
+                    ${this.genInputElement("tiltEnabled")}
+                    ${this.result.tiltEnabled ? this.genInputElement("tilt") : html``}
                   `
                 : html``}
-              ${this._genInputElement("fade")} ${this._genInputElement("nodefault")}
+              ${this.genInputElement("fade")} ${this.genInputElement("nodefault")}
               <h2>Area Specific Presets</h2>
               <dynalite-preset-table
                 .hass=${this.hass}
                 .narrow=${this.narrow}
                 .route=${this.route}
                 .presets=${this._presets || {}}
-                defaultFade=${this._fade != "" ? this._fade : this.dynalite.config.default!.fade!}
+                defaultFade=${this.result.fade != ""
+                  ? this.result.fade
+                  : this.dynalite.config.default!.fade!}
                 @dynalite-table=${(_ev) => {
                   console.log("global settings - dynalite-table event");
-                  this._hasChanged = true;
+                  this.hasChanged = true;
                 }}
               ></dynalite-preset-table>
               <h2>Area Specific Channels</h2>
@@ -190,10 +179,12 @@ export class DynaliteEditArea extends LitElement {
                 .narrow=${this.narrow}
                 .route=${this.route}
                 .channels=${this._channels || {}}
-                defaultFade=${this._fade != "" ? this._fade : this.dynalite.config.default!.fade!}
+                defaultFade=${this.result.fade != ""
+                  ? this.result.fade
+                  : this.dynalite.config.default!.fade!}
                 @dynalite-table=${(_ev) => {
                   console.log("global settings - dynalite-table event");
-                  this._hasChanged = true;
+                  this.hasChanged = true;
                 }}
               ></dynalite-channel-table>
             </div>
@@ -206,46 +197,22 @@ export class DynaliteEditArea extends LitElement {
     `;
   }
 
-  private _genInputElement(param: string): TemplateResult {
-    return html`
-      <dynalite-input
-        .settings=${this[underscore(param) + "Input"]}
-        @dynalite-input=${this._handleChange}
-        .value=${this[underscore(param)]}
-        helper=${ifDefined(this._helpers[param])}
-        ?disabled=${this._disabled.includes(param)}
-        .excluded=${this._excluded[param]}
-      ></dynalite-input>
-    `;
-  }
-
   private _save() {
     // fill complete and send update signal
     console.log("XXX save");
     const res: DynaliteAreaData = {
-      name: this._name,
-      nodefault: this._nodefault,
+      name: this.result.name,
+      nodefault: this.result.nodefault,
       channel: dynaliteCopy(this._channels),
       preset: dynaliteCopy(this._presets),
     };
     ["name", "template", "fade"].forEach((param) => {
-      if (this[underscore(param)]) res[param] = this[underscore(param)];
+      if (this.result[param]) res[param] = this.result[param];
     });
     console.dir(res);
-    this.dynalite.config.area![this._number] = res;
-    this._hasChanged = false;
+    this.dynalite.config.area![this.result.number] = res;
+    this.hasChanged = false;
     fireEvent(this, "value-changed");
-  }
-
-  private _handleChange(ev) {
-    console.dir(ev);
-    const detail = ev.detail;
-    const target = detail.target;
-    const value = detail.value;
-    console.log("XXX TBD handle change name=%s value=%s", target, value);
-    this["_" + target] = value;
-    this._hasChanged = true;
-    this.requestUpdate();
   }
 
   private _deleteArea(ev) {
@@ -256,53 +223,59 @@ export class DynaliteEditArea extends LitElement {
     navigate("/dynalite/areas");
   }
 
-  _numberInput = DynaliteIdInput("number", "area")
-    .heading("Number")
-    .desc("Dynalite area number (1-255)")
-    .required();
+  protected result = {
+    number: "",
+    name: "",
+    template: "",
+    class: "",
+    duration: "",
+    tiltEnabled: false,
+    tilt: "",
+    fade: "",
+    nodefault: false,
+  };
 
-  _nameInput = DynaliteTextInput("name")
-    .heading("Area Name")
-    .desc("Usually a room of a function")
-    .required();
-
-  _templateInput = DynaliteSelectInput("template")
-    .heading("Area Behavior")
-    .desc("Configure specific area behaviors")
-    .selection([
-      ["room", "On/Off Switch"],
-      ["time_cover", "Blind or Cover"],
-      ["", "Manual Setup"],
-    ]);
-
-  _classInput = DynaliteSelectInput("class")
-    .heading("Type")
-    .desc("Default type for new blinds")
-    .selection([
-      // XXX add
-      ["blind", "Blind"],
-      ["cover", "Cover"],
-    ]);
-
-  _durationInput = DynaliteDurationInput("duration")
-    .heading("Open/Close Duration")
-    .desc("Time in seconds to open this blind");
-
-  _tiltEnabledInput = DynaliteBooleanInput("tiltEnabled")
-    .heading("Enable Tilt")
-    .desc("Enable tilt for this blind");
-
-  _tiltInput = DynaliteDurationInput("tilt")
-    .heading("Default Tilt Duration")
-    .desc("Time in seconds to open this tilt");
-
-  _fadeInput = DynaliteFadeInput("fade")
-    .heading("Fade Time")
-    .desc("Default fade for area actions (seconds)");
-
-  _nodefaultInput = DynaliteBooleanInput("nodefault")
-    .heading("Ignore Default Presets")
-    .desc("Do not use the globally configured presets");
+  protected settings = {
+    number: DynaliteIdInput("number", "area")
+      .heading("Number")
+      .desc("Dynalite area number (1-255)")
+      .required(),
+    name: DynaliteTextInput("name")
+      .heading("Area Name")
+      .desc("Usually a room of a function")
+      .required(),
+    template: DynaliteSelectInput("template")
+      .heading("Area Behavior")
+      .desc("Configure specific area behaviors")
+      .selection([
+        ["room", "On/Off Switch"],
+        ["time_cover", "Blind or Cover"],
+        ["", "Manual Setup"],
+      ]),
+    class: DynaliteSelectInput("class")
+      .heading("Type")
+      .desc("Default type for new blinds")
+      .selection([
+        // XXX add
+        ["blind", "Blind"],
+        ["cover", "Cover"],
+      ]),
+    duration: DynaliteDurationInput("duration")
+      .heading("Open/Close Duration")
+      .desc("Time in seconds to open this blind"),
+    tiltEnabled: DynaliteBooleanInput("tiltEnabled")
+      .heading("Enable Tilt")
+      .desc("Enable tilt for this blind"),
+    tilt: DynaliteDurationInput("tilt")
+      .heading("Tilt Duration")
+      .desc("Time in seconds to open this tilt"),
+    fade: DynaliteFadeInput("fade")
+      .heading("Fade Time")
+      .desc("Default fade for this area (seconds)"),
+    nodefault: DynaliteBooleanInput("nodefault")
+      .heading("Ignore Default Presets")
+      .desc("Do not use the globally configured presets"),
+  };
 
   static get styles(): CSSResultGroup {
     return [

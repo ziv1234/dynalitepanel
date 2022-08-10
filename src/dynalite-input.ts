@@ -101,7 +101,10 @@ export class DynaliteInput extends LitElement {
     console.log("XXX _handleChange");
     console.dir(ev.currentTarget);
     const target = ev.currentTarget;
-    let value = target.value;
+    const value =
+      this.settings.suffixVal != "%" || !target.value
+        ? target.value
+        : Number(target.value) / 100 + "";
     console.log(
       "XXX TBD handle change name=%s value=%s target=%s",
       target.name,

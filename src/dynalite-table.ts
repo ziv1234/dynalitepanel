@@ -17,7 +17,7 @@ import { DynaliteInputSettings } from "./dynalite-input-settings";
 export interface DynaliteTableSettings {
   name: string;
   columns: DataTableColumnContainer;
-  inputs: DynaliteInputSettings[];
+  inputs: { [key: string]: DynaliteInputSettings };
 }
 
 @customElement("dynalite-table")
@@ -40,19 +40,17 @@ export class DynaliteTable extends LitElement {
     console.log("table willUpdate");
     this._processedData = Object.keys(this.data).map((num) => {
       let temp: DynaliteRowData = {};
-      this.settings.inputs.forEach((inp) => {
-        const field = inp.nameVal;
+      for (const field in this.settings.inputs) {
         if (field == "number") {
           temp[field] = num;
         } else {
-          if (!(field in this.data[num]) || inp.suffixVal != "%") {
+          if (!(field in this.data[num]) || this.settings.inputs[field].suffixVal != "%") {
             temp[field] = this.data[num][field];
           } else {
             temp[field] = this.data[num][field] * 100 + "%";
           }
         }
-      });
-      temp.number = num;
+      }
       return temp;
     });
   }
