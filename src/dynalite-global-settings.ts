@@ -293,6 +293,28 @@ export class DynaliteGlobalSettings extends LitElement {
       ["on", "Always Active"],
     ]);
 
+  _classInput = DynaliteSelectInput("class")
+    .heading("Type")
+    .desc("Default type for new blinds")
+    .selection([
+      // XXX add
+      ["blind", "Blind"],
+      ["cover", "Cover"],
+    ]);
+
+  _durationInput = DynaliteDurationInput("duration")
+    .heading("Default Open/Close Duration")
+    .desc("Time in seconds to open a blind");
+
+  _tiltEnabledInput = DynaliteBooleanInput("tiltEnabled")
+    .heading("Enable Tilt")
+    .desc("Enable tilt by default in blinds");
+
+  _tiltInput = DynaliteDurationInput("tilt")
+    .heading("Default Tilt Duration")
+    .desc("Time in seconds to open the tilt")
+    .required();
+
   _overridePresetsInput = DynaliteBooleanInput("overridePresets")
     .heading("Override Default Presets")
     .desc("Not recommended");
@@ -318,28 +340,6 @@ export class DynaliteGlobalSettings extends LitElement {
   _channel_coverInput = DynaliteIdInput("channel_cover", "channel")
     .heading("Controlling channel")
     .desc("Channel number to control a blind");
-
-  _classInput = DynaliteSelectInput("class")
-    .heading("Type")
-    .desc("Default type for new blinds")
-    .selection([
-      // XXX add
-      ["blind", "Blind"],
-      ["cover", "Cover"],
-    ]);
-
-  _durationInput = DynaliteDurationInput("duration")
-    .heading("Default Open/Close Duration")
-    .desc("Time in seconds to open a blind");
-
-  _tiltEnabledInput = DynaliteBooleanInput("tiltEnabled")
-    .heading("Enable Tilt")
-    .desc("Enable tilt by default in blinds");
-
-  _tiltInput = DynaliteDurationInput("tilt")
-    .heading("Default Tilt Duration")
-    .desc("Time in seconds to open the tilt (0 for no tilt)")
-    .required();
 
   static get styles(): CSSResultGroup {
     return [

@@ -7,6 +7,7 @@ import {
   DynaliteAreaData,
   DynaliteChannelData,
   dynaliteCopy,
+  DynaliteDefaultTemplates,
   DynalitePresetData,
   panelTabs,
   underscore,
@@ -27,6 +28,7 @@ import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
 import { mdiDelete, mdiDotsVertical } from "@mdi/js";
 import {
   DynaliteBooleanInput,
+  DynaliteDurationInput,
   DynaliteFadeInput,
   DynaliteIdInput,
   DynaliteSelectInput,
@@ -50,6 +52,12 @@ export class DynaliteEditArea extends LitElement {
 
   @state() private _hasChanged = false;
 
+  @state() private _helpers: { [key: string]: string } = {};
+
+  @state() private _disabled: string[] = [];
+
+  @state() private _excluded: { [key: string]: string[] } = {};
+
   @state() private _isNew = false;
 
   @state() private _number = "";
@@ -58,9 +66,15 @@ export class DynaliteEditArea extends LitElement {
 
   @state() private _template = "";
 
-  @state() private _fade = "";
+  @state() private _class = "";
 
-  @state() private _fadeHelper?;
+  @state() private _duration = "";
+
+  @state() private _tiltEnabled = false;
+
+  @state() private _tilt = "";
+
+  @state() private _fade = "";
 
   @state() private _nodefault = false;
 
@@ -82,13 +96,24 @@ export class DynaliteEditArea extends LitElement {
         this._name = areaData.name || "";
         this._template = areaData.template || "";
         this._fade = areaData.fade || "";
-        this._fadeHelper = `Default: ${this.dynalite.config.default?.fade}`;
+        this._class = areaData.class || DynaliteDefaultTemplates.time_cover?.class!;
+        this._duration = areaData.duration || "";
+        this._tiltEnabled = !(
+          areaData.tilt == "0" ||
+          (!("tilt" in areaData) && this.dynalite.config.template?.time_cover?.tilt == "0")
+        );
+        this._tilt = areaData.tilt || DynaliteDefaultTemplates.time_cover?.tilt!;
+        this._helpers.fade = `Default: ${this.dynalite.config.default?.fade}`;
         this._nodefault = areaData.nodefault || false;
         this._channels = JSON.parse(JSON.stringify(areaData.channel || {}));
         this._presets = JSON.parse(JSON.stringify(areaData.preset || {}));
+        this._disabled = ["number"];
+        this._isNew = false;
+      } else {
+        this._excluded.number = Object.keys(this.dynalite.config?.area!);
+        this._isNew = true;
       }
       this._number = this.areaNumber || "";
-      this._isNew = this._number == "";
       this._hasInitialized = true;
     }
   }
@@ -137,34 +162,16 @@ export class DynaliteEditArea extends LitElement {
             <div class="card-content">
               <h1>${this._isNew ? html`New Area` : html`Edit Area ${this.areaNumber}`}</h1>
               <h2>Area Settings</h2>
-              <dynalite-input
-                .settings=${this._numberInput}
-                .value=${this._number}
-                ?disabled=${!this._isNew}
-                .excluded=${this._isNew ? Object.keys(this.dynalite.config?.area || {}) : []}
-                @dynalite-input=${this._handleChange}
-              ></dynalite-input>
-              <dynalite-input
-                .settings=${this._nameInput}
-                @dynalite-input=${this._handleChange}
-                .value=${this._name}
-              ></dynalite-input>
-              <dynalite-input
-                .settings=${this._templateInput}
-                @dynalite-input=${this._handleChange}
-                .value=${this._template}
-              ></dynalite-input>
-              <dynalite-input
-                .settings=${this._fadeInput}
-                @dynalite-input=${this._handleChange}
-                .value=${this._fade}
-                helper=${ifDefined(this._fadeHelper)}
-              ></dynalite-input>
-              <dynalite-input
-                .settings=${this._nodefaultInput}
-                @dynalite-input=${this._handleChange}
-                .value=${this._nodefault}
-              ></dynalite-input>
+              ${this._genInputElement("number")} ${this._genInputElement("name")}
+              ${this._genInputElement("template")}
+              ${this._template == "time_cover"
+                ? html`
+                    ${this._genInputElement("class")} ${this._genInputElement("duration")}
+                    ${this._genInputElement("tiltEnabled")}
+                    ${this._tiltEnabled ? this._genInputElement("tilt") : html``}
+                  `
+                : html``}
+              ${this._genInputElement("fade")} ${this._genInputElement("nodefault")}
               <h2>Area Specific Presets</h2>
               <dynalite-preset-table
                 .hass=${this.hass}
@@ -196,6 +203,19 @@ export class DynaliteEditArea extends LitElement {
           </ha-card>
         </div>
       </hass-tabs-subpage>
+    `;
+  }
+
+  private _genInputElement(param: string): TemplateResult {
+    return html`
+      <dynalite-input
+        .settings=${this[underscore(param) + "Input"]}
+        @dynalite-input=${this._handleChange}
+        .value=${this[underscore(param)]}
+        helper=${ifDefined(this._helpers[param])}
+        ?disabled=${this._disabled.includes(param)}
+        .excluded=${this._excluded[param]}
+      ></dynalite-input>
     `;
   }
 
@@ -254,6 +274,27 @@ export class DynaliteEditArea extends LitElement {
       ["time_cover", "Blind or Cover"],
       ["", "Manual Setup"],
     ]);
+
+  _classInput = DynaliteSelectInput("class")
+    .heading("Type")
+    .desc("Default type for new blinds")
+    .selection([
+      // XXX add
+      ["blind", "Blind"],
+      ["cover", "Cover"],
+    ]);
+
+  _durationInput = DynaliteDurationInput("duration")
+    .heading("Open/Close Duration")
+    .desc("Time in seconds to open this blind");
+
+  _tiltEnabledInput = DynaliteBooleanInput("tiltEnabled")
+    .heading("Enable Tilt")
+    .desc("Enable tilt for this blind");
+
+  _tiltInput = DynaliteDurationInput("tilt")
+    .heading("Default Tilt Duration")
+    .desc("Time in seconds to open this tilt");
 
   _fadeInput = DynaliteFadeInput("fade")
     .heading("Fade Time")
