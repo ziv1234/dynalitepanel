@@ -5,14 +5,14 @@ import "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import "../homeassistant-frontend/src/components/ha-fab";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { DynalitePresetData } from "./common";
-import "./dynalite-table";
-import { DynaliteTableSettings } from "./dynalite-table";
 import {
   DynaliteFadeInput,
   DynaliteIdInput,
   DynalitePercentageInput,
   DynaliteTextInput,
 } from "./dynalite-input-settings";
+import { DynaliteTableSettings } from "./dynalite-table";
+import "./dynalite-table";
 
 @customElement("dynalite-preset-table")
 export class DynalitePresetTable extends LitElement {
@@ -47,13 +47,15 @@ export class DynalitePresetTable extends LitElement {
         .settings=${settings}
         .data=${this.presets}
         .helpers=${helpers}
-        @dynalite-table=${(_ev) => {
-          this.dispatchEvent(new CustomEvent("dynalite-table"));
-        }}
+        @dynalite-table=${this._redispatchEvent}
         }
       >
       </dynalite-table>
     `;
+  }
+
+  private _redispatchEvent(_ev: CustomEvent) {
+    this.dispatchEvent(new CustomEvent("dynalite-table"));
   }
 
   private _columns: DataTableColumnContainer = {

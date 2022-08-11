@@ -1,18 +1,16 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators";
 import { DataTableColumnContainer } from "../homeassistant-frontend/src/components/data-table/ha-data-table";
-import "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import "../homeassistant-frontend/src/components/ha-fab";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { DynaliteChannelData } from "./common";
-import "./dynalite-table";
-import { DynaliteTableSettings } from "./dynalite-table";
 import {
   DynaliteFadeInput,
   DynaliteIdInput,
   DynaliteSelectInput,
   DynaliteTextInput,
 } from "./dynalite-input-settings";
+import { DynaliteTableSettings } from "./dynalite-table";
 
 @customElement("dynalite-channel-table")
 export class DynaliteChannelTable extends LitElement {
@@ -47,13 +45,14 @@ export class DynaliteChannelTable extends LitElement {
         .settings=${settings}
         .data=${this.channels}
         .helpers=${helpers}
-        @dynalite-table=${(_ev) => {
-          this.dispatchEvent(new CustomEvent("dynalite-table"));
-        }}
-        }
+        @dynalite-table=${this._redispatchEvent}
       >
       </dynalite-table>
     `;
+  }
+
+  private _redispatchEvent(_ev: CustomEvent) {
+    this.dispatchEvent(new CustomEvent("dynalite-table"));
   }
 
   private _columns: DataTableColumnContainer = {
@@ -88,18 +87,18 @@ export class DynaliteChannelTable extends LitElement {
     },
   };
 
-  private _inputs = [
-    DynaliteIdInput("number", "channel")
+  private _inputs = {
+    number: DynaliteIdInput("number", "channel")
       .heading("Number")
       .desc("Dynalite channel number (1-255)")
       .required(),
-    DynaliteTextInput("name").heading("Name").desc("Name for this channel"),
-    DynaliteFadeInput("fade").heading("Fade").desc("Preset fade time (seconds)"),
-    DynaliteSelectInput("type").selection([
+    name: DynaliteTextInput("name").heading("Name").desc("Name for this channel"),
+    fade: DynaliteFadeInput("fade").heading("Fade").desc("Preset fade time (seconds)"),
+    type: DynaliteSelectInput("type").selection([
       ["light", "Light (default)"],
       ["switch", "Switch"],
     ]),
-  ];
+  };
 }
 
 declare global {

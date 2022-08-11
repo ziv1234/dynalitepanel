@@ -1,13 +1,12 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement, property, query } from "lit/decorators";
+import { ifDefined } from "lit/directives/if-defined";
 import "../homeassistant-frontend/src/components/ha-settings-row";
 import "../homeassistant-frontend/src/components/ha-textfield";
-import "../homeassistant-frontend/src/components/ha-switch";
-import { HaSwitch } from "../homeassistant-frontend/src/components/ha-switch";
 import "../homeassistant-frontend/src/components/ha-select";
 import "@material/mwc-list/mwc-list-item";
-import { ifDefined } from "lit/directives/if-defined";
 import { DynaliteInputSettings } from "./dynalite-input-settings";
+import { HaSwitch } from "../homeassistant-frontend/src/components/ha-switch";
 
 @customElement("dynalite-input")
 export class DynaliteInput extends LitElement {
@@ -25,14 +24,14 @@ export class DynaliteInput extends LitElement {
 
   protected render(): TemplateResult | void {
     const value =
-      this.settings.suffixVal != "%" || !this.value
+      this.settings.suffixVal !== "%" || !this.value
         ? this.value
         : Math.round(Number(this.value) * 100) + "";
     return html`
       <ha-settings-row>
         <span slot="heading" data-for=${this.settings.nameVal}> ${this.settings.headingVal} </span>
         <span slot="description" data-for=${this.settings.nameVal}> ${this.settings.descVal} </span>
-        ${!this.settings.typeVal || this.settings.typeVal == "number"
+        ${!this.settings.typeVal || this.settings.typeVal === "number"
           ? html`
               <ha-textfield
                 id="my-textfield"
@@ -52,7 +51,7 @@ export class DynaliteInput extends LitElement {
                 @input=${this._handleTextChange}
               ></ha-textfield>
             `
-          : this.settings.typeVal == "boolean"
+          : this.settings.typeVal === "boolean"
           ? html`
               <ha-switch
                 .preference=${this.settings.nameVal}
@@ -63,7 +62,7 @@ export class DynaliteInput extends LitElement {
               >
               </ha-switch>
             `
-          : this.settings.typeVal == "select"
+          : this.settings.typeVal === "select"
           ? html`
               <ha-select
                 name=${this.settings.nameVal}
@@ -75,7 +74,7 @@ export class DynaliteInput extends LitElement {
               >
                 ${this.settings.selectionVal?.map(
                   (entry) =>
-                    html` <mwc-list-item .value=${entry[0]} .selected=${entry[0] == this.value}>
+                    html` <mwc-list-item .value=${entry[0]} .selected=${entry[0] === this.value}>
                       ${entry[1]}
                     </mwc-list-item>`
                 )}
@@ -102,7 +101,7 @@ export class DynaliteInput extends LitElement {
     console.dir(ev.currentTarget);
     const target = ev.currentTarget;
     const value =
-      this.settings.suffixVal != "%" || !target.value
+      this.settings.suffixVal !== "%" || !target.value
         ? target.value
         : Number(target.value) / 100 + "";
     console.log(

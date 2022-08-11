@@ -1,3 +1,4 @@
+import { mdiDelete, mdiDotsVertical } from "@mdi/js";
 import { css, CSSResultGroup, html, TemplateResult } from "lit";
 import { customElement, property, queryAll, state } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
@@ -10,7 +11,6 @@ import "../homeassistant-frontend/src/components/ha-icon-button";
 import "../homeassistant-frontend/src/components/ha-header-bar";
 import "../homeassistant-frontend/src/components/ha-svg-icon";
 import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
-import { mdiDelete, mdiDotsVertical } from "@mdi/js";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import "@material/mwc-list";
 import "@material/mwc-button";
@@ -34,8 +34,6 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
 
   @state() private _isNew = false;
 
-  @state() private _hasChanged = false;
-
   @queryAll("dynalite-input") _inputElements?: DynaliteInput[];
 
   public async showDialog(params: DynaliteEditDialogParams): Promise<void> {
@@ -54,9 +52,12 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
     if (!this._params) return html``;
     console.log("XXX render edit dialog len=%s", this._inputElements?.length);
     console.dir(this._inputElements);
+    this._inputElements?.forEach((el) => {
+      console.log("aa %s", el.isValid());
+    });
     const canSave =
-      this._hasChanged &&
-      this._inputElements?.length == Object.keys(this._params.inputs).length &&
+      this.hasChanged &&
+      this._inputElements?.length &&
       Array.from(this._inputElements).every((elem) => elem.isValid());
     return html`
       <ha-dialog open .heading=${"abcde"} @closed=${this._close}>
@@ -71,9 +72,7 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
               ? html` <span slot="actionItems">
                   <ha-button-menu
                     @action=${this._handleAction}
-                    @closed=${(ev) => {
-                      ev.stopPropagation();
-                    }}
+                    @closed=${this._onButtonClose}
                     corner="BOTTOM_START"
                     fixed
                   >
@@ -121,6 +120,10 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
     }
   }
 
+  private _onButtonClose(ev) {
+    ev.stopPropagation();
+  }
+
   private _close(): void {
     this._params = undefined;
     fireEvent(this, "dialog-closed", { dialog: this.localName });
@@ -136,9 +139,9 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
   private _genHelpers(): void {
     const res: { [key: string]: string } = {};
     if (this._params?.value.number) {
-      for (const key in this._params?.helpers) {
-        res[key] = this._params.helpers[key].replace("NUMBER", this._params.value.number);
-      }
+      Object.keys(this._params.helpers!).forEach((key) => {
+        res[key] = this._params!.helpers![key].replace("NUMBER", this._params!.value.number!);
+      });
     } else {
       for (const key in this._params?.helpers) {
         if (!this._params?.helpers[key].includes("NUMBER")) {

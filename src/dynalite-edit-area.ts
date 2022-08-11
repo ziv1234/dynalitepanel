@@ -1,7 +1,14 @@
+import { mdiDelete, mdiDotsVertical } from "@mdi/js";
 import { css, CSSResultGroup, html, TemplateResult } from "lit";
 import { customElement, property, queryAll, state } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
+import "../homeassistant-frontend/src/components/ha-card";
+import "../homeassistant-frontend/src/components/ha-button-menu";
+import "../homeassistant-frontend/src/components/ha-icon-button";
+import "../homeassistant-frontend/src/components/ha-svg-icon";
+import "@material/mwc-button/mwc-button";
+import "@material/mwc-list";
 import {
   Dynalite,
   DynaliteAreaData,
@@ -11,19 +18,12 @@ import {
   DynalitePresetData,
   panelTabs,
 } from "./common";
-import "../homeassistant-frontend/src/components/ha-card";
-import "../homeassistant-frontend/src/components/ha-button-menu";
-import "../homeassistant-frontend/src/components/ha-icon-button";
-import "../homeassistant-frontend/src/components/ha-svg-icon";
 import "./dynalite-input";
-import "@material/mwc-button/mwc-button";
-import "@material/mwc-list";
 import { DynaliteInput } from "./dynalite-input";
 import "./dynalite-preset-table";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import "./dynalite-channel-table";
 import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
-import { mdiDelete, mdiDotsVertical } from "@mdi/js";
 import {
   DynaliteBooleanInput,
   DynaliteDurationInput,
@@ -84,13 +84,13 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
           number: this.areaNumber || "",
           name: areaData.name || "",
           template: areaData.template || "",
-          class: areaData.class || DynaliteDefaultTemplates.time_cover?.class!,
+          class: areaData.class || DynaliteDefaultTemplates.time_cover!.class!,
           duration: areaData.duration || "",
           tiltEnabled: !(
             areaData.tilt == "0" ||
             (!("tilt" in areaData) && this.dynalite.config.template?.time_cover?.tilt == "0")
           ),
-          tilt: areaData.tilt || DynaliteDefaultTemplates.time_cover?.tilt!,
+          tilt: areaData.tilt || DynaliteDefaultTemplates.time_cover!.tilt!,
           fade: areaData.fade || "",
           nodefault: areaData.nodefault || false,
         };
@@ -99,7 +99,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
         this.disabled = ["number"];
       } else {
         this._isNew = true;
-        this.excluded = { number: Object.keys(this.dynalite.config?.area!) };
+        this.excluded = { number: Object.keys(this.dynalite.config!.area!) };
       }
       this._hasInitialized = true;
     }
@@ -168,10 +168,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
                 defaultFade=${this.result.fade != ""
                   ? this.result.fade
                   : this.dynalite.config.default!.fade!}
-                @dynalite-table=${(_ev) => {
-                  console.log("global settings - dynalite-table event");
-                  this.hasChanged = true;
-                }}
+                @dynalite-table=${this._onDynaliteTableEvent}
               ></dynalite-preset-table>
               <h2>Area Specific Channels</h2>
               <dynalite-channel-table
@@ -182,10 +179,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
                 defaultFade=${this.result.fade != ""
                   ? this.result.fade
                   : this.dynalite.config.default!.fade!}
-                @dynalite-table=${(_ev) => {
-                  console.log("global settings - dynalite-table event");
-                  this.hasChanged = true;
-                }}
+                @dynalite-table=${this._onDynaliteTableEvent}
               ></dynalite-channel-table>
             </div>
             <div class="card-actions">
@@ -195,6 +189,10 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
         </div>
       </hass-tabs-subpage>
     `;
+  }
+
+  private _onDynaliteTableEvent(_ev: CustomEvent) {
+    this.hasChanged = true;
   }
 
   private _save() {

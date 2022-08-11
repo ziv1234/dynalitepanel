@@ -1,3 +1,5 @@
+import memoizeOne from "memoize-one";
+import { mdiPlus } from "@mdi/js";
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators";
 import "../homeassistant-frontend/src/components/ha-card";
@@ -10,8 +12,6 @@ import {
   DataTableColumnContainer,
   DataTableRowData,
 } from "../homeassistant-frontend/src/components/data-table/ha-data-table";
-import memoizeOne from "memoize-one";
-import { mdiPlus } from "@mdi/js";
 import { navigate } from "../homeassistant-frontend/src/common/navigate";
 
 @customElement("dynalite-areas")

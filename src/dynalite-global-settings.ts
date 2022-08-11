@@ -1,3 +1,4 @@
+import { ifDefined } from "lit/directives/if-defined";
 import { css, CSSResultGroup, html, TemplateResult } from "lit";
 import { customElement, property, queryAll, state } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
@@ -22,7 +23,6 @@ import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
 import "./dynalite-preset-table";
 import { DynaliteInput } from "./dynalite-input";
 import "./dynalite-input";
-import { ifDefined } from "lit/directives/if-defined";
 import {
   DynaliteBooleanInput,
   DynaliteDurationInput,
@@ -91,7 +91,7 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
         class: "",
         duration: "",
         tiltEnabled: false,
-        tilt: DynaliteDefaultTemplates.time_cover?.tilt!,
+        tilt: DynaliteDefaultTemplates.time_cover!.tilt!,
       };
       this.helpers = {
         name: "Default: " + this.dynalite.default.DEFAULT_NAME,
@@ -173,10 +173,7 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
                       .route=${this.route}
                       .presets=${this._presets || {}}
                       defaultFade=${ifDefined(this.dynalite.config.default?.fade)}
-                      @dynalite-table=${(_ev) => {
-                        console.log("global settings - dynalite-table event");
-                        this.hasChanged = true;
-                      }}
+                      @dynalite-table=${this._onDynaliteTableEvent}
                     ></dynalite-preset-table>`
                   : html``
               }
@@ -208,6 +205,10 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
         </div>
       </hass-tabs-subpage>
     `;
+  }
+
+  private _onDynaliteTableEvent(_ev: CustomEvent) {
+    this.hasChanged = true;
   }
 
   private _save() {
