@@ -1,7 +1,7 @@
 import { mdiPlus } from "@mdi/js";
 import { css, CSSResultGroup, html, LitElement, TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators";
-import {
+import type {
   DataTableColumnContainer,
   DataTableRowData,
 } from "../homeassistant-frontend/src/components/data-table/ha-data-table";

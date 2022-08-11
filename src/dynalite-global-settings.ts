@@ -20,7 +20,7 @@ import "@material/mwc-button/mwc-button";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
 import "./dynalite-preset-table";
-import { DynaliteInput } from "./dynalite-input";
+import type { DynaliteInput } from "./dynalite-input";
 import "./dynalite-input";
 import {
   DynaliteBooleanInput,
@@ -113,16 +113,6 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
           this.helpers![param] = "Default: " + DynaliteDefaultTemplates[template][param];
         });
       });
-      // for (const template in this.dynalite.config.template) {
-      //   for (const param in this.dynalite.config.template[template]) {
-      //     this.result[param] = this.dynalite.config.template[template][param];
-      //   }
-      // }
-      // for (const template in DynaliteDefaultTemplates) {
-      //   for (const param in DynaliteDefaultTemplates[template]) {
-      //     this.helpers[param] = "Default: " + DynaliteDefaultTemplates[template][param];
-      //   }
-      // }
       if ("tilt" in this.dynalite.config.template!.time_cover!) {
         this.result.tilt = this.dynalite.config.template!.time_cover.tilt!;
         if (this.result.tilt === "0") {

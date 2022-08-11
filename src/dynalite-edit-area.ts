@@ -19,7 +19,7 @@ import {
   panelTabs,
 } from "./common";
 import "./dynalite-input";
-import { DynaliteInput } from "./dynalite-input";
+import type { DynaliteInput } from "./dynalite-input";
 import "./dynalite-preset-table";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import "./dynalite-channel-table";

@@ -1,12 +1,12 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators";
-import { DataTableColumnContainer } from "../homeassistant-frontend/src/components/data-table/ha-data-table";
+import type { DataTableColumnContainer } from "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import "../homeassistant-frontend/src/components/ha-fab";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { DynaliteChannelData } from "./common";
 import "./dynalite-table";
-import { DynaliteTableSettings } from "./dynalite-table";
+import type { DynaliteTableSettings } from "./dynalite-table";
 import {
   DynaliteFadeInput,
   DynaliteIdInput,

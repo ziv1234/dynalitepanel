@@ -1,9 +1,9 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators";
-import { DataTableColumnContainer } from "../homeassistant-frontend/src/components/data-table/ha-data-table";
+import type { DataTableColumnContainer } from "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import "../homeassistant-frontend/src/components/ha-fab";
-import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
+import type { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { DynalitePresetData } from "./common";
 import {
   DynaliteFadeInput,
@@ -11,7 +11,7 @@ import {
   DynalitePercentageInput,
   DynaliteTextInput,
 } from "./dynalite-input-settings";
-import { DynaliteTableSettings } from "./dynalite-table";
+import type { DynaliteTableSettings } from "./dynalite-table";
 import "./dynalite-table";
 
 @customElement("dynalite-preset-table")

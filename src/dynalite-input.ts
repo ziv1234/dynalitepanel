@@ -4,7 +4,7 @@ import { ifDefined } from "lit/directives/if-defined";
 import "../homeassistant-frontend/src/components/ha-settings-row";
 import "../homeassistant-frontend/src/components/ha-textfield";
 import "../homeassistant-frontend/src/components/ha-switch";
-import { HaSwitch } from "../homeassistant-frontend/src/components/ha-switch";
+import type { HaSwitch } from "../homeassistant-frontend/src/components/ha-switch";
 import "../homeassistant-frontend/src/components/ha-select";
 import "@material/mwc-list/mwc-list-item";
 import { DynaliteInputSettings } from "./dynalite-input-settings";
@@ -22,6 +22,8 @@ export class DynaliteInput extends LitElement {
   @property() public helper?: string;
 
   @query("#my-textfield") myTextField;
+
+  boundValidityTransform = this._validityTransform.bind(this);
 
   protected render(): TemplateResult | void {
     const value =
@@ -47,7 +49,7 @@ export class DynaliteInput extends LitElement {
                 helper=${ifDefined(this.helper)}
                 autoValidate
                 validateOnInitialRender
-                .validityTransform=${this._validityTransform.bind(this)}
+                .validityTransform=${this.boundValidityTransform}
                 suffix=${ifDefined(this.settings.suffixVal)}
                 @input=${this._handleTextChange}
               ></ha-textfield>

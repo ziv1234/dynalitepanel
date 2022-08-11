@@ -1,15 +1,26 @@
 export class DynaliteInputSettings {
   public nameVal: string;
+
   public headingVal?: string;
+
   public descVal?: string;
+
   public typeVal?: string;
+
   public requiredVal?: boolean;
+
   public minVal?: number;
+
   public maxVal?: number;
+
   public stepVal?: number;
+
   public selectionVal?: string[][];
+
   public excludedVal?: string[];
+
   public validationMessageVal?: string;
+
   public suffixVal?: string;
 
   public constructor(name: string) {
