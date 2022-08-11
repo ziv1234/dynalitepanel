@@ -103,8 +103,12 @@ export class DynaliteInput extends LitElement {
 
   private _handleTextChange(ev) {
     console.log("XXX _handleChange");
-    console.dir(ev.currentTarget);
+    console.dir(ev);
     const target = ev.currentTarget;
+    if (!target) {
+      console.log("invalid event - no target");
+      return;
+    }
     const value =
       this.settings.suffixVal !== "%" || !target.value
         ? target.value
