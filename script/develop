@@ -13,4 +13,3 @@ if [ ! -d "./node_modules" ]; then
 fi
 
 ./node_modules/.bin/gulp develop-dynalite
-cp ./src/__init__.py ./dynalite_panel/

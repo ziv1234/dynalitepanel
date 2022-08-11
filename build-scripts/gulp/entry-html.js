@@ -11,10 +11,6 @@ gulp.task("gen-index-dynalite-dev", async () => {
     `${paths.dynalite_publicPath}/frontend_es5/entrypoint-dev.js`,
     "True"
   );
-  fs.copyFileSync(
-    path.resolve(paths.src_dir, `__init__.py`),
-    path.resolve(paths.dynalite_output_root, `__init__.py`)
-  );
 });
 
 gulp.task("gen-index-dynalite-prod", async () => {
@@ -54,5 +50,9 @@ if (/.*Version\\/(?:11|12)(?:\\.\\d+)*.*Safari\\//.test(navigator.userAgent)) {
 DEV = ${isDev}
 `,
     { encoding: "utf-8" }
+  );
+  fs.copyFileSync(
+    path.resolve(paths.src_dir, `__init__.py`),
+    path.resolve(paths.dynalite_output_root, `__init__.py`)
   );
 }

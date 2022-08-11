@@ -1,5 +1,7 @@
 // Tasks to run Rollup
+/* eslint @typescript-eslint/no-var-requires: "off", prefer-arrow-callback: "off" */
 const path = require("path");
+const open = require("open");
 const gulp = require("gulp");
 const rollup = require("rollup");
 const handler = require("serve-handler");
@@ -7,7 +9,6 @@ const http = require("http");
 const log = require("fancy-log");
 const rollupConfig = require("../rollup");
 const paths = require("../paths");
-const open = require("open");
 
 const bothBuilds = (createConfigFunc, params) =>
   gulp.series(
@@ -30,20 +31,16 @@ const bothBuilds = (createConfigFunc, params) =>
   );
 
 function createServer(serveOptions) {
-  const server = http.createServer((request, response) => {
-    return handler(request, response, {
+  const server = http.createServer((request, response) =>
+    handler(request, response, {
       public: serveOptions.root,
-    });
-  });
-
-  server.listen(
-    serveOptions.port,
-    serveOptions.networkAccess ? "0.0.0.0" : undefined,
-    () => {
-      log.info(`Available at http://localhost:${serveOptions.port}`);
-      open(`http://localhost:${serveOptions.port}`);
-    }
+    })
   );
+
+  server.listen(serveOptions.port, serveOptions.networkAccess ? "0.0.0.0" : undefined, () => {
+    log.info(`Available at http://localhost:${serveOptions.port}`);
+    open(`http://localhost:${serveOptions.port}`);
+  });
 }
 
 function watchRollup(createConfig, extraWatchSrc = [], serveOptions) {
@@ -117,20 +114,11 @@ gulp.task("rollup-dev-server-gallery", () => {
   });
 });
 
-gulp.task(
-  "rollup-prod-app",
-  bothBuilds(rollupConfig.createAppConfig, { isProdBuild: true })
-);
+gulp.task("rollup-prod-app", bothBuilds(rollupConfig.createAppConfig, { isProdBuild: true }));
 
-gulp.task(
-  "rollup-prod-demo",
-  bothBuilds(rollupConfig.createDemoConfig, { isProdBuild: true })
-);
+gulp.task("rollup-prod-demo", bothBuilds(rollupConfig.createDemoConfig, { isProdBuild: true }));
 
-gulp.task(
-  "rollup-prod-cast",
-  bothBuilds(rollupConfig.createCastConfig, { isProdBuild: true })
-);
+gulp.task("rollup-prod-cast", bothBuilds(rollupConfig.createCastConfig, { isProdBuild: true }));
 
 gulp.task("rollup-prod-hassio", () =>
   bothBuilds(rollupConfig.createHassioConfig, { isProdBuild: true })
