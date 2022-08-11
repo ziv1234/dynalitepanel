@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-var-requires: "off", import/extensions: "off" */
 const gulp = require("gulp");
 
 const env = require("../env");
@@ -10,7 +11,7 @@ require("./entry-html.js");
 gulp.task(
   "develop-dynalite",
   gulp.series(
-    async function setEnv() {
+    async () => {
       process.env.NODE_ENV = "development";
     },
     "clean-dynalite",
@@ -22,7 +23,7 @@ gulp.task(
 gulp.task(
   "build-dynalite",
   gulp.series(
-    async function setEnv() {
+    async () => {
       process.env.NODE_ENV = "production";
     },
     "clean-dynalite",
