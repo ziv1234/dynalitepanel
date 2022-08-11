@@ -74,6 +74,7 @@ export class DynaliteInput extends LitElement {
                 value=${ifDefined(value)}
                 ?disabled=${this.disabled}
                 @change=${this._handleTextChange}
+                @closed=${this._onSelectClose}
               >
                 ${this.settings.selectionVal?.map(
                   (entry) =>
@@ -124,6 +125,10 @@ export class DynaliteInput extends LitElement {
     console.log("XXX TBD handle change name=%s checked=%s", name, target.checked);
     console.dir(ev);
     this._updateParent(name, target.checked);
+  }
+
+  private _onSelectClose(ev) {
+    ev.stopPropagation();
   }
 
   private _validityTransform(value: string, nativeValidity: ValidityState): Partial<ValidityState> {

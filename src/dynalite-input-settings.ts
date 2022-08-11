@@ -23,6 +23,8 @@ export class DynaliteInputSettings {
 
   public suffixVal?: string;
 
+  public transformVal: (val: string) => string = (val) => val;
+
   public constructor(name: string) {
     this.nameVal = name;
   }
@@ -84,6 +86,11 @@ export class DynaliteInputSettings {
 
   public suffix(value: string): DynaliteInputSettings {
     this.suffixVal = value;
+    return this;
+  }
+
+  public transform(fn: (val: string) => string) {
+    this.transformVal = fn;
     return this;
   }
 }

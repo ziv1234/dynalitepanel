@@ -13,7 +13,7 @@
     "format:prettier": "prettier \"./src/**/*.{js,ts,json,css,md}\" --write",
     "lint:types": "tsc --project tsconfig.json",
     "lint:lit": "lit-analyzer \"./src/**/*.ts\" --format markdown --outFile result.md",
-    "lint": "yarn run lint:eslint && yarn run lint:prettier && yarn run lint:types",
+    "lint": "yarn run lint:eslint && yarn run lint:prettier",
     "format": "yarn run format:eslint && yarn run format:prettier"
   },
   "repository": "https://github.com/ziv1234/dynalitepanel.git",

@@ -96,10 +96,12 @@ export class DynaliteChannelTable extends LitElement {
       .required(),
     name: DynaliteTextInput("name").heading("Name").desc("Name for this channel"),
     fade: DynaliteFadeInput("fade").heading("Fade").desc("Preset fade time (seconds)"),
-    type: DynaliteSelectInput("type").selection([
-      ["light", "Light (default)"],
-      ["switch", "Switch"],
-    ]),
+    type: DynaliteSelectInput("type")
+      .selection([
+        ["light", "Light (default)"],
+        ["switch", "Switch"],
+      ])
+      .transform((val) => val[0].toUpperCase() + val.substring(1)),
   };
 }
 

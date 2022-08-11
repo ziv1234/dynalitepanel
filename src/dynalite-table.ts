@@ -40,16 +40,15 @@ export class DynaliteTable extends LitElement {
     console.log("table willUpdate");
     this._processedData = Object.keys(this.data).map((num) => {
       const temp: DynaliteRowData = {};
-      for (const field in this.settings.inputs) {
-        if (field === "number") {
-          temp[field] = num;
-        } else {
-          temp[field] =
-            !(field in this.data[num]) || this.settings.inputs[field].suffixVal !== "%"
-              ? this.data[num][field]
-              : this.data[num][field] * 100 + "%";
-        }
-      }
+      Object.keys(this.settings.inputs).forEach((field) => {
+        const value =
+          field === "number"
+            ? num
+            : !(field in this.data[num]) || this.settings.inputs[field].suffixVal !== "%"
+            ? this.data[num][field]
+            : this.data[num][field] * 100 + "%";
+        temp[field] = this.settings.inputs[field].transformVal(value, false);
+      });
       return temp;
     });
   }
