@@ -32,16 +32,20 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
     super.disconnectedCallback();
   }
 
-  protected willUpdate(_changedProperties: Map<string | number | symbol, unknown>): void {
+  protected async willUpdate(
+    _changedProperties: Map<string | number | symbol, unknown>
+  ): Promise<void> {
     console.log("XXX dynalite-panel willUpdate");
-    super.willUpdate(_changedProperties);
     if (!this.hass) {
       console.log("XXX no hass");
       return;
     }
     if (!this.dynalite) {
-      this._getDynaliteConfig();
+      console.log("before");
+      await this._getDynaliteConfig();
+      console.log("after");
     }
+    super.willUpdate(_changedProperties);
   }
 
   protected render(): TemplateResult | void {
@@ -62,50 +66,45 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
     `;
   }
 
-  private _getDynaliteConfig(): void {
+  private async _getDynaliteConfig(): Promise<void> {
     console.log("XXX getDynaliteConfig");
-    this.hass.connection
-      .sendMessagePromise({
-        type: "dynalite/get-config",
-      })
-      .then(
-        (resp) => {
-          console.log("XXX Message success!");
-          console.dir(resp);
-          const completeConfig = (resp as DynaliteConfigResponse).config;
-          if (completeConfig.length == 1 || !this._activeEntry) {
-            this._activeEntry = { host: completeConfig[0].host, port: completeConfig[0].port };
+    const resp = await this.hass.connection.sendMessagePromise({
+      type: "dynalite/get-config",
+    });
+    if (resp) {
+      console.log("XXX Message success!");
+      console.dir(resp);
+      const completeConfig = (resp as DynaliteConfigResponse).config;
+      if (completeConfig.length === 1 || !this._activeEntry) {
+        this._activeEntry = { host: completeConfig[0].host, port: completeConfig[0].port };
+      }
+      for (const curConfig of completeConfig) {
+        if (
+          curConfig.host === this._activeEntry!.host &&
+          curConfig.port === this._activeEntry!.port
+        ) {
+          if (!curConfig.area) curConfig.area = {};
+          if (!curConfig.autodiscover) curConfig.autodiscover = false;
+          if (!curConfig.default || !curConfig.default.fade) {
+            curConfig.default = { fade: "0" };
           }
-          for (const curConfig of completeConfig) {
-            if (
-              curConfig.host == this._activeEntry!.host &&
-              curConfig.port == this._activeEntry!.port
-            ) {
-              if (!curConfig.area) curConfig.area = {};
-              if (!curConfig.autodiscover) curConfig.autodiscover = false;
-              if (!curConfig.default || !curConfig.default.fade) {
-                curConfig.default = { fade: "0" };
-              }
-              if (!curConfig.active) curConfig.active = "off";
-              if (!curConfig.template) curConfig.template = {};
-              ["room", "time_cover"].forEach((template) => {
-                if (!curConfig.template![template]) curConfig.template![template] = {};
-              });
-              if (!curConfig.template.time_cover?.class)
-                curConfig.template.time_cover!.class = "blind";
-              curConfig.preset = { "5": { name: "abc", fade: "0.3" }, "78": { level: "0.85" } }; // XXX TBD
-              this.dynalite = {
-                config: curConfig,
-                default: (resp as DynaliteConfigResponse).default,
-              };
-              break;
-            }
-          }
-        },
-        (err) => {
-          console.error("Message failed!", err);
+          if (!curConfig.active) curConfig.active = "off";
+          if (!curConfig.template) curConfig.template = {};
+          ["room", "time_cover"].forEach((template) => {
+            if (!curConfig.template![template]) curConfig.template![template] = {};
+          });
+          if (!curConfig.template.time_cover?.class) curConfig.template.time_cover!.class = "blind";
+          curConfig.preset = { "5": { name: "abc", fade: "0.3" }, "78": { level: "0.85" } }; // XXX TBD
+          this.dynalite = {
+            config: curConfig,
+            default: (resp as DynaliteConfigResponse).default,
+          };
+          break;
         }
-      );
+      }
+    } else {
+      console.error("Message failed!");
+    }
   }
 
   private _updateDynalite(e: Event) {

@@ -87,8 +87,8 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
           class: areaData.class || DynaliteDefaultTemplates.time_cover!.class!,
           duration: areaData.duration || "",
           tiltEnabled: !(
-            areaData.tilt == "0" ||
-            (!("tilt" in areaData) && this.dynalite.config.template?.time_cover?.tilt == "0")
+            areaData.tilt === "0" ||
+            (!("tilt" in areaData) && this.dynalite.config.template?.time_cover?.tilt === "0")
           ),
           tilt: areaData.tilt || DynaliteDefaultTemplates.time_cover!.tilt!,
           fade: areaData.fade || "",
@@ -113,7 +113,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
     }
     console.log("XXX render edit area");
     const canSave =
-      this.hasChanged &&
+      this.hasElementChanged &&
       this._inputElements?.length &&
       Array.from(this._inputElements).every((elem) => elem.isValid());
     console.log("canSave=%s", canSave);
@@ -151,7 +151,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
               <h2>Area Settings</h2>
               ${this.genInputElement("number")} ${this.genInputElement("name")}
               ${this.genInputElement("template")}
-              ${this.result.template == "time_cover"
+              ${this.result.template === "time_cover"
                 ? html`
                     ${this.genInputElement("class")} ${this.genInputElement("duration")}
                     ${this.genInputElement("tiltEnabled")}
@@ -165,7 +165,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
                 .narrow=${this.narrow}
                 .route=${this.route}
                 .presets=${this._presets || {}}
-                defaultFade=${this.result.fade != ""
+                defaultFade=${this.result.fade !== ""
                   ? this.result.fade
                   : this.dynalite.config.default!.fade!}
                 @dynalite-table=${this._onDynaliteTableEvent}
@@ -176,7 +176,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
                 .narrow=${this.narrow}
                 .route=${this.route}
                 .channels=${this._channels || {}}
-                defaultFade=${this.result.fade != ""
+                defaultFade=${this.result.fade !== ""
                   ? this.result.fade
                   : this.dynalite.config.default!.fade!}
                 @dynalite-table=${this._onDynaliteTableEvent}
@@ -192,7 +192,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
   }
 
   private _onDynaliteTableEvent(_ev: CustomEvent) {
-    this.hasChanged = true;
+    this.hasElementChanged = true;
   }
 
   private _save() {
@@ -209,7 +209,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
     });
     console.dir(res);
     this.dynalite.config.area![this.result.number] = res;
-    this.hasChanged = false;
+    this.hasElementChanged = false;
     fireEvent(this, "value-changed");
   }
 

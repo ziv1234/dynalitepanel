@@ -55,6 +55,7 @@ export class DynalitePresetTable extends LitElement {
   }
 
   private _redispatchEvent(_ev: CustomEvent) {
+    console.log("redispatch");
     this.dispatchEvent(new CustomEvent("dynalite-table"));
   }
 

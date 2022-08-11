@@ -56,7 +56,7 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
       console.log("aa %s", el.isValid());
     });
     const canSave =
-      this.hasChanged &&
+      this.hasElementChanged &&
       this._inputElements?.length &&
       Array.from(this._inputElements).every((elem) => elem.isValid());
     return html`

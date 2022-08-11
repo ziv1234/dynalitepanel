@@ -3,10 +3,11 @@ import { customElement, property, query } from "lit/decorators";
 import { ifDefined } from "lit/directives/if-defined";
 import "../homeassistant-frontend/src/components/ha-settings-row";
 import "../homeassistant-frontend/src/components/ha-textfield";
+import "../homeassistant-frontend/src/components/ha-switch";
+import { HaSwitch } from "../homeassistant-frontend/src/components/ha-switch";
 import "../homeassistant-frontend/src/components/ha-select";
 import "@material/mwc-list/mwc-list-item";
 import { DynaliteInputSettings } from "./dynalite-input-settings";
-import { HaSwitch } from "../homeassistant-frontend/src/components/ha-switch";
 
 @customElement("dynalite-input")
 export class DynaliteInput extends LitElement {
@@ -74,7 +75,7 @@ export class DynaliteInput extends LitElement {
               >
                 ${this.settings.selectionVal?.map(
                   (entry) =>
-                    html` <mwc-list-item .value=${entry[0]} .selected=${entry[0] === this.value}>
+                    html` <mwc-list-item .value=${entry[0]} .selected=${entry[0] == this.value}>
                       ${entry[1]}
                     </mwc-list-item>`
                 )}
@@ -91,6 +92,7 @@ export class DynaliteInput extends LitElement {
   }
 
   private _updateParent(name: string, value: any) {
+    console.log("input update parent");
     this.dispatchEvent(
       new CustomEvent("dynalite-input", { detail: { target: name, value: value } })
     );

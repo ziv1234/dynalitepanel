@@ -6,7 +6,7 @@ import { DynaliteInputSettings } from "./dynalite-input-settings";
 export abstract class DynaliteInputElement<T> extends LitElement {
   protected abstract result: T;
 
-  protected hasChanged = false;
+  protected hasElementChanged = false;
 
   protected abstract settings: { [key in keyof T]: DynaliteInputSettings };
 
@@ -36,7 +36,7 @@ export abstract class DynaliteInputElement<T> extends LitElement {
     const value = detail.value;
     console.log("XXX TBD handle change name=%s value=%s", target, value);
     this.result![target] = value;
-    this.hasChanged = true;
+    this.hasElementChanged = true;
     this.requestUpdate();
   }
 }

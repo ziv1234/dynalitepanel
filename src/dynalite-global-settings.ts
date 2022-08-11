@@ -15,7 +15,6 @@ import {
   DynalitePresetData,
   DynaliteTemplateData,
   panelTabs,
-  underscore,
 } from "./common";
 import "@material/mwc-button/mwc-button";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
@@ -98,19 +97,35 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
         fade: "0 For No fade",
       };
       this._presets = dynaliteCopy(this.dynalite.config.preset || {});
-      for (const template in this.dynalite.config.template) {
-        for (const param in this.dynalite.config.template[template]) {
-          this.result[param] = this.dynalite.config.template[template][param];
-        }
-      }
-      for (const template in DynaliteDefaultTemplates) {
-        for (const param in DynaliteDefaultTemplates[template]) {
-          this.helpers[param] = "Default: " + DynaliteDefaultTemplates[template][param];
-        }
-      }
-      if ("tilt" in this.dynalite.config.template?.time_cover!) {
-        this.result.tilt = this.dynalite.config.template?.time_cover.tilt!;
-        if (this.result.tilt == "0") {
+      Object.keys(this.dynalite.config.template!).forEach((template) => {
+        Object.keys(this.dynalite.config.template![template]).forEach((param) => {
+          this.result[param] = this.dynalite.config.template![template][param];
+        });
+      });
+      Object.keys(DynaliteDefaultTemplates).forEach((template) => {
+        Object.keys(DynaliteDefaultTemplates[template]).forEach((param) => {
+          console.log(
+            "tempate %s param %s value %s",
+            template,
+            param,
+            DynaliteDefaultTemplates[template][param]
+          );
+          this.helpers![param] = "Default: " + DynaliteDefaultTemplates[template][param];
+        });
+      });
+      // for (const template in this.dynalite.config.template) {
+      //   for (const param in this.dynalite.config.template[template]) {
+      //     this.result[param] = this.dynalite.config.template[template][param];
+      //   }
+      // }
+      // for (const template in DynaliteDefaultTemplates) {
+      //   for (const param in DynaliteDefaultTemplates[template]) {
+      //     this.helpers[param] = "Default: " + DynaliteDefaultTemplates[template][param];
+      //   }
+      // }
+      if ("tilt" in this.dynalite.config.template!.time_cover!) {
+        this.result.tilt = this.dynalite.config.template!.time_cover.tilt!;
+        if (this.result.tilt === "0") {
           this.result.tiltEnabled = false;
           this.result.tilt = DynaliteDefaultTemplates.time_cover!.tilt!;
         } else {
@@ -133,10 +148,10 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
     console.log("XXX render global settings len=%s", this._inputElements?.length);
     console.dir(this._inputElements);
     const canSave =
-      this.hasChanged &&
+      this.hasElementChanged &&
       this._inputElements?.length &&
       Array.from(this._inputElements).every(
-        (elem) => elem.isValid() || (elem.settings.nameVal == "tilt" && !this.result.tiltEnabled)
+        (elem) => elem.isValid() || (elem.settings.nameVal === "tilt" && !this.result.tiltEnabled)
       );
     console.log("canSave=%s", canSave);
     return html`
@@ -190,7 +205,6 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
                   ? html`
                       <b>On/Off Switch</b>
                       ${this.genInputElement("room_on")} ${this.genInputElement("room_off")}
-                      ${this.genInputElement("room_on")}
                       <b>Blind or Cover</b>
                       ${this.genInputElement("open")} ${this.genInputElement("close")}
                       ${this.genInputElement("stop")} ${this.genInputElement("channel_cover")}
@@ -208,7 +222,7 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
   }
 
   private _onDynaliteTableEvent(_ev: CustomEvent) {
-    this.hasChanged = true;
+    this.hasElementChanged = true;
   }
 
   private _save() {
@@ -223,16 +237,16 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
       this.dynalite.config.preset = JSON.parse(JSON.stringify(this._presets));
     else delete this.dynalite.config.preset;
     const templates: DynaliteTemplateData = { room: {}, time_cover: {} };
-    for (const template in DynaliteDefaultTemplates) {
-      for (const param in DynaliteDefaultTemplates[template]) {
-        if (this.result[param] != "") templates[template][param] = this[underscore(param)];
-      }
-    }
+    Object.keys(DynaliteDefaultTemplates).forEach((template) => {
+      Object.keys(DynaliteDefaultTemplates[template]).forEach((param) => {
+        if (this.result[param] !== "") templates[template][param] = this.result[param];
+      });
+    });
     if (!this.result.tiltEnabled) templates.time_cover!.tilt = "0";
     this.dynalite.config.template = templates;
     console.dir(this.dynalite.config);
     console.log("XXX dispatching");
-    this.hasChanged = false;
+    this.hasElementChanged = false;
     fireEvent(this, "value-changed");
   }
 

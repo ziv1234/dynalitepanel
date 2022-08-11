@@ -1,3 +1,4 @@
+import { mdiPlus } from "@mdi/js";
 import { css, CSSResultGroup, html, LitElement, TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators";
 import {
@@ -7,7 +8,6 @@ import {
 import "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import "../homeassistant-frontend/src/components/ha-fab";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
-import { mdiPlus } from "@mdi/js";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import { showConfirmationDialog } from "../homeassistant-frontend/src/dialogs/generic/show-dialog-box";
 import { showDynaliteEditDialog } from "./show-dialog-dynalite-edit";
@@ -39,16 +39,15 @@ export class DynaliteTable extends LitElement {
   protected willUpdate(_changedProperties: Map<string | number | symbol, unknown>): void {
     console.log("table willUpdate");
     this._processedData = Object.keys(this.data).map((num) => {
-      let temp: DynaliteRowData = {};
+      const temp: DynaliteRowData = {};
       for (const field in this.settings.inputs) {
-        if (field == "number") {
+        if (field === "number") {
           temp[field] = num;
         } else {
-          if (!(field in this.data[num]) || this.settings.inputs[field].suffixVal != "%") {
-            temp[field] = this.data[num][field];
-          } else {
-            temp[field] = this.data[num][field] * 100 + "%";
-          }
+          temp[field] =
+            !(field in this.data[num]) || this.settings.inputs[field].suffixVal !== "%"
+              ? this.data[num][field]
+              : this.data[num][field] * 100 + "%";
         }
       }
       return temp;

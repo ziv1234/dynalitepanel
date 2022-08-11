@@ -135,7 +135,3 @@ export const panelTabs = [
 export function dynaliteCopy<T>(src: T): T {
   return JSON.parse(JSON.stringify(src));
 }
-
-export function underscore(src: string): string {
-  return "_" + src;
-}
