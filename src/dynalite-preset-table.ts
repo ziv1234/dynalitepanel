@@ -1,8 +1,5 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators";
-import type { DataTableColumnContainer } from "../homeassistant-frontend/src/components/data-table/ha-data-table";
-import "../homeassistant-frontend/src/components/data-table/ha-data-table";
-import "../homeassistant-frontend/src/components/ha-fab";
 import type { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { DynalitePresetData } from "./common";
 import {
@@ -35,7 +32,6 @@ export class DynalitePresetTable extends LitElement {
     console.log("XXX preset table render2");
     const settings: DynaliteTableSettings = {
       name: "Preset",
-      columns: this._columns,
       inputs: this._inputs,
     };
     const helpers = { name: `Default: Preset NUMBER`, fade: `Default: ${this.defaultFade}` };
@@ -59,46 +55,18 @@ export class DynalitePresetTable extends LitElement {
     this.dispatchEvent(new CustomEvent("dynalite-table"));
   }
 
-  private _columns: DataTableColumnContainer = {
-    // XXX move to memoizeOne
-    number: {
-      title: "Number",
-      sortable: false,
-      hidden: false,
-      filterable: false,
-      width: "15%",
-    },
-    name: {
-      title: "Name",
-      sortable: false,
-      hidden: false,
-      filterable: false,
-      width: "35%",
-    },
-    level: {
-      title: "Level",
-      sortable: false,
-      hidden: false,
-      filterable: false,
-      width: "15%",
-    },
-    fade: {
-      title: "Fade",
-      sortable: false,
-      hidden: false,
-      filterable: false,
-      width: "15%",
-    },
-  };
-
   private _inputs = {
     number: DynaliteIdInput("number", "preset")
       .heading("Number")
+      .width("15%")
       .desc("Dynalite preset number (1-255)")
       .required(),
-    name: DynaliteTextInput("name").heading("Name").desc("Name for this preset"),
-    level: DynalitePercentageInput("level").heading("Level").desc("Channel levels for this preset"),
-    fade: DynaliteFadeInput("fade").heading("Fade").desc("Preset fade time (seconds)"),
+    name: DynaliteTextInput("name").heading("Name").desc("Name for this preset").width("35%"),
+    level: DynalitePercentageInput("level")
+      .heading("Level")
+      .desc("Channel levels for this preset")
+      .width("15%"),
+    fade: DynaliteFadeInput("fade").heading("Fade").desc("Preset fade time (seconds)").width("15%"),
   };
 }
 

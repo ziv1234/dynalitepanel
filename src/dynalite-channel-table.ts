@@ -1,8 +1,5 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators";
-import type { DataTableColumnContainer } from "../homeassistant-frontend/src/components/data-table/ha-data-table";
-import "../homeassistant-frontend/src/components/data-table/ha-data-table";
-import "../homeassistant-frontend/src/components/ha-fab";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { DynaliteChannelData } from "./common";
 import "./dynalite-table";
@@ -35,7 +32,6 @@ export class DynaliteChannelTable extends LitElement {
     console.log("XXX channel table render2");
     const settings: DynaliteTableSettings = {
       name: "Channel",
-      columns: this._columns,
       inputs: this._inputs,
     };
     const helpers = { name: `Default: Channel NUMBER`, fade: `Default: ${this.defaultFade}` };
@@ -57,46 +53,18 @@ export class DynaliteChannelTable extends LitElement {
     this.dispatchEvent(new CustomEvent("dynalite-table"));
   }
 
-  private _columns: DataTableColumnContainer = {
-    // XXX move to memoizeOne
-    number: {
-      title: "Number",
-      sortable: false,
-      hidden: false,
-      filterable: false,
-      width: "15%",
-    },
-    name: {
-      title: "Name",
-      sortable: false,
-      hidden: false,
-      filterable: false,
-      width: "15%",
-    },
-    fade: {
-      title: "Fade",
-      sortable: false,
-      hidden: false,
-      filterable: false,
-      width: "15%",
-    },
-    type: {
-      title: "Type",
-      sortable: false,
-      hidden: false,
-      filterable: false,
-      width: "15%",
-    },
-  };
-
   private _inputs = {
     number: DynaliteIdInput("number", "channel")
       .heading("Number")
+      .width("15%")
       .desc("Dynalite channel number (1-255)")
       .required(),
-    name: DynaliteTextInput("name").heading("Name").desc("Name for this channel"),
-    fade: DynaliteFadeInput("fade").heading("Fade").desc("Preset fade time (seconds)"),
+    name: DynaliteTextInput("name").heading("Name").desc("Name for this channel").width("15%"),
+    fade: DynaliteFadeInput("fade").heading("Fade").desc("Preset fade time (seconds)").width("15%"),
     type: DynaliteSelectInput("type")
+      .heading("Type")
+      .desc("Entity type to create")
+      .width("15%")
       .selection([
         ["light", "Light (default)"],
         ["switch", "Switch"],

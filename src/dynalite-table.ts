@@ -16,7 +16,6 @@ import { DynaliteInputSettings } from "./dynalite-input-settings";
 
 export interface DynaliteTableSettings {
   name: string;
-  columns: DataTableColumnContainer;
   inputs: { [key: string]: DynaliteInputSettings };
 }
 
@@ -36,6 +35,8 @@ export class DynaliteTable extends LitElement {
 
   @state() private _processedData: DataTableRowData[] = [];
 
+  @state() private _columns: DataTableColumnContainer = {};
+
   protected willUpdate(_changedProperties: Map<string | number | symbol, unknown>): void {
     console.log("table willUpdate");
     this._processedData = Object.keys(this.data).map((num) => {
@@ -47,9 +48,19 @@ export class DynaliteTable extends LitElement {
             : !(field in this.data[num]) || this.settings.inputs[field].suffixVal !== "%"
             ? this.data[num][field]
             : this.data[num][field] * 100 + "%";
-        temp[field] = this.settings.inputs[field].transformVal(value, false);
+        temp[field] = this.settings.inputs[field].transformVal(value);
       });
       return temp;
+    });
+    this._columns = {};
+    Object.entries(this.settings.inputs).forEach(([field, input]) => {
+      this._columns[field] = {
+        title: input.headingVal!,
+        width: input.widthVal!,
+        hidden: false,
+        sortable: true,
+        filterable: false,
+      };
     });
   }
 
@@ -66,7 +77,7 @@ export class DynaliteTable extends LitElement {
           .hass=${this.hass}
           .narrow=${this.narrow}
           .route=${this.route}
-          .columns=${this.settings.columns}
+          .columns=${this._columns}
           .data=${this._processedData}
           clickable
           id="number"

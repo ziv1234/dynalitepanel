@@ -25,6 +25,8 @@ export class DynaliteInputSettings {
 
   public transformVal: (val: string) => string = (val) => val;
 
+  public widthVal?: string;
+
   public constructor(name: string) {
     this.nameVal = name;
   }
@@ -91,6 +93,11 @@ export class DynaliteInputSettings {
 
   public transform(fn: (val: string) => string) {
     this.transformVal = fn;
+    return this;
+  }
+
+  public width(value: string): DynaliteInputSettings {
+    this.widthVal = value;
     return this;
   }
 }
