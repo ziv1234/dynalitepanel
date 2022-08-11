@@ -3,12 +3,9 @@ const gulp = require("gulp");
 const env = require("../env");
 
 require("./clean.js");
-require("./gen-icons-json.js");
 require("./webpack.js");
 require("./compress.js");
-require("./rollup.js");
-require("./gather-static.js");
-require("./translations-dynalite.js");
+require("./entry-html.js");
 
 gulp.task(
   "develop-dynalite",
@@ -18,7 +15,6 @@ gulp.task(
     },
     "clean-dynalite",
     "gen-index-dynalite-dev",
-    "generate-translations-dynalite",
     "webpack-watch-dynalite"
   )
 );
@@ -31,7 +27,6 @@ gulp.task(
     },
     "clean-dynalite",
     "ensure-dynalite-build-dir",
-    "generate-translations-dynalite",
     "webpack-prod-dynalite",
     "gen-index-dynalite-prod",
     ...// Don't compress running tests

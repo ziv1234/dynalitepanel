@@ -7,12 +7,12 @@
   "scripts": {
     "develop": "./script/develop",
     "build": "./script/build",
-    "lint:eslint": "eslint \"**/src/**/*.{js,ts,html}\" --ignore-path .gitignore",
-    "format:eslint": "eslint \"**/src/**/*.{js,ts,html}\" --fix --ignore-path .gitignore",
-    "lint:prettier": "prettier \"**/src/**/*.{js,ts,json,css,md}\" --check",
-    "format:prettier": "prettier \"**/src/**/*.{js,ts,json,css,md}\" --write",
-    "lint:types": "tsc",
-    "lint:lit": "lit-analyzer \"**/src/**/*.ts\" --format markdown --outFile result.md",
+    "lint:eslint": "eslint \"./src/**/*.{js,ts,html}\" --ignore-path .gitignore",
+    "format:eslint": "eslint \"./src/**/*.{js,ts,html}\" --fix --ignore-path .gitignore",
+    "lint:prettier": "prettier \"./src/**/*.{js,ts,json,css,md}\" --check",
+    "format:prettier": "prettier \"./src/**/*.{js,ts,json,css,md}\" --write",
+    "lint:types": "tsc \"./src/**/*.ts\"",
+    "lint:lit": "lit-analyzer \"./src/**/*.ts\" --format markdown --outFile result.md",
     "lint": "yarn run lint:eslint && yarn run lint:prettier && yarn run lint:types",
     "format": "yarn run format:eslint && yarn run format:prettier"
   },

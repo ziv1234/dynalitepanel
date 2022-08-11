@@ -8,6 +8,8 @@ src/localize/generated.ts
 yarn-error.log
 .yarn
 
+result.md
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
