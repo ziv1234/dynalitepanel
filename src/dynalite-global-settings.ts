@@ -213,6 +213,7 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
 
   private _onDynaliteTableEvent(_ev: CustomEvent) {
     this.hasElementChanged = true;
+    this.requestUpdate();
   }
 
   private _save() {

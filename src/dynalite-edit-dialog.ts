@@ -1,4 +1,3 @@
-import { mdiDelete, mdiDotsVertical } from "@mdi/js";
 import { css, CSSResultGroup, html, TemplateResult } from "lit";
 import { customElement, property, queryAll, state } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
@@ -17,6 +16,7 @@ import "@material/mwc-button";
 import { DynaliteInput } from "./dynalite-input";
 import { DynaliteEditDialogParams, DynaliteRowData } from "./dynalite-edit-dialog-types";
 import { DynaliteInputElement } from "./dynalite-input-element";
+import "./dynalite-action-button";
 
 @customElement("dynalite-edit-dialog")
 export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
@@ -69,23 +69,12 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
                 : `Edit ${this._params.name} ` + this._params.value.number}
             </span>
             ${this._params.onDelete
-              ? html` <span slot="actionItems">
-                  <ha-button-menu
-                    @action=${this._handleAction}
-                    @closed=${this._onButtonClose}
-                    corner="BOTTOM_START"
-                    fixed
-                  >
-                    <ha-icon-button
-                      slot="trigger"
-                      label="Additional Actions"
-                      .path=${mdiDotsVertical}
-                    ></ha-icon-button>
-                    <mwc-list-item class="warning" graphic="icon">
-                      Delete ${this._params.name}
-                      <ha-svg-icon slot="graphic" .path=${mdiDelete} class="warning"> </ha-svg-icon>
-                    </mwc-list-item>
-                  </ha-button-menu>
+              ? html`<span slot="actionItems">
+                  <dynalite-action-button
+                    @dynalite-action-button=${this._onDelete}
+                    param=${this._params.value.number || ""}
+                    label=${this._params.name}
+                  ></dynalite-action-button>
                 </span>`
               : html``}
           </ha-header-bar>
@@ -105,23 +94,11 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
     `;
   }
 
-  private async _handleAction(ev) {
-    console.log("handleAction");
-    console.dir(ev);
-    const index = ev.detail.index;
-    switch (index) {
-      case 0: {
-        if (await this._params!.onDelete!(this._params!)) this._close();
-        break;
-      }
-      default: {
-        console.error("invalid index %s", index);
-      }
-    }
-  }
-
-  private _onButtonClose(ev) {
-    ev.stopPropagation();
+  private _onDelete(ev): void {
+    const itemNumber = ev.detail;
+    console.log("_onDelete edit-dialog num=%s", itemNumber);
+    this._params!.onDelete!(itemNumber);
+    this._close();
   }
 
   private _close(): void {

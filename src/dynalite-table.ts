@@ -9,7 +9,6 @@ import "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import "../homeassistant-frontend/src/components/ha-fab";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
-import { showConfirmationDialog } from "../homeassistant-frontend/src/dialogs/generic/show-dialog-box";
 import { showDynaliteEditDialog } from "./show-dialog-dynalite-edit";
 import { DynaliteEditDialogParams, DynaliteRowData } from "./dynalite-edit-dialog-types";
 import { DynaliteInputSettings } from "./dynalite-input-settings";
@@ -147,23 +146,10 @@ export class DynaliteTable extends LitElement {
     });
   }
 
-  private async _deleteRow(params: DynaliteEditDialogParams): Promise<boolean> {
-    const number = params.value.number!;
-    if (
-      !(await showConfirmationDialog(this, {
-        title: `Delete ${this.settings.name} ${number}`,
-        text: `Are you sure you want to delete ${this.settings.name.toLowerCase()} ${number}`,
-        confirmText: "Confirm",
-      }))
-    ) {
-      console.log("received no");
-      return false;
-    }
-    console.log("received yes");
+  private _deleteRow(number: string): void {
     delete this.data[number];
     this.dispatchEvent(new CustomEvent("dynalite-table"));
     this.requestUpdate();
-    return true;
   }
 
   static get styles(): CSSResultGroup {

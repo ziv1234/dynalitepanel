@@ -14,5 +14,5 @@ export interface DynaliteEditDialogParams {
   disabled?: string[];
   helpers?: { [key: string]: string };
   onSave: (params: DynaliteEditDialogParams) => void;
-  onDelete?: (params: DynaliteEditDialogParams) => Promise<boolean>;
+  onDelete?: (number: string) => void;
 }

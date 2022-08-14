@@ -1,4 +1,3 @@
-import { mdiDelete, mdiDotsVertical } from "@mdi/js";
 import { css, CSSResultGroup, html, TemplateResult } from "lit";
 import { customElement, property, queryAll, state } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
@@ -34,6 +33,7 @@ import {
 } from "./dynalite-input-settings";
 import { navigate } from "../homeassistant-frontend/src/common/navigate";
 import { DynaliteInputElement } from "./dynalite-input-element";
+import "./dynalite-action-button";
 
 interface DynaliteEditAreaInputs {
   number: string;
@@ -117,6 +117,9 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
       this._inputElements?.length &&
       Array.from(this._inputElements).every((elem) => elem.isValid());
     console.log("canSave=%s", canSave);
+    console.dir(this._inputElements);
+    if (this._inputElements)
+      console.dir(Array.from(this._inputElements).map((elem) => elem.isValid()));
 
     return html`
       <hass-tabs-subpage
@@ -127,23 +130,15 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
         searchLabel="abcde1"
         )}
         clickable
-      >
-        <ha-button-menu
-          corner="BOTTOM_START"
-          slot="toolbar-icon"
-          @action=${this._deleteArea}
-          activatable
-        >
-          <ha-icon-button
-            slot="trigger"
-            label="Additional Actions"
-            .path=${mdiDotsVertical}
-          ></ha-icon-button>
-          <mwc-list-item graphic="icon" class="warning">
-            Delete Area
-            <ha-svg-icon slot="graphic" .path=${mdiDelete} class="warning"> </ha-svg-icon>
-          </mwc-list-item>
-        </ha-button-menu>
+        >${this._isNew
+          ? html``
+          : html` <span slot="toolbar-icon">
+              <dynalite-action-button
+                @dynalite-action-button=${this._deleteArea}
+                param=${this.areaNumber}
+                label="Area"
+              ></dynalite-action-button>
+            </span>`}
         <div class="content">
           <ha-card outlined>
             <div class="card-content">
@@ -193,6 +188,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
 
   private _onDynaliteTableEvent(_ev: CustomEvent) {
     this.hasElementChanged = true;
+    this.requestUpdate();
   }
 
   private _save() {
@@ -214,9 +210,9 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
   }
 
   private _deleteArea(ev) {
-    console.log("delete area %s", this.areaNumber);
-    console.dir(ev);
-    delete this.dynalite.config.area![this.areaNumber];
+    const areaNumber = ev.detail;
+    console.log("delete area %s", areaNumber);
+    delete this.dynalite.config.area![areaNumber];
     fireEvent(this, "value-changed");
     navigate("/dynalite/areas");
   }
