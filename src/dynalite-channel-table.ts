@@ -34,7 +34,7 @@ export class DynaliteChannelTable extends LitElement {
       name: "Channel",
       inputs: this._inputs,
     };
-    const helpers = { name: `Default: Channel NUMBER`, fade: `Default: ${this.defaultFade}` };
+    const helpers = { name: `Default: Channel DYNETID`, fade: `Default: ${this.defaultFade}` };
     return html`
       <dynalite-table
         .hass=${this.hass}
@@ -54,7 +54,7 @@ export class DynaliteChannelTable extends LitElement {
   }
 
   private _inputs = {
-    number: DynaliteIdInput("number", "channel")
+    dynetId: DynaliteIdInput("dynetId", "channel")
       .heading("Number")
       .width("15%")
       .desc("Dynalite channel number (1-255)")

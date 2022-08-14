@@ -34,7 +34,7 @@ export class DynalitePresetTable extends LitElement {
       name: "Preset",
       inputs: this._inputs,
     };
-    const helpers = { name: `Default: Preset NUMBER`, fade: `Default: ${this.defaultFade}` };
+    const helpers = { name: `Default: Preset DYNETID`, fade: `Default: ${this.defaultFade}` };
     return html`
       <dynalite-table
         .hass=${this.hass}
@@ -56,7 +56,7 @@ export class DynalitePresetTable extends LitElement {
   }
 
   private _inputs = {
-    number: DynaliteIdInput("number", "preset")
+    dynetId: DynaliteIdInput("dynetId", "preset")
       .heading("Number")
       .width("15%")
       .desc("Dynalite preset number (1-255)")

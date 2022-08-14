@@ -1,6 +1,5 @@
-import { css, CSSResultGroup, html, LitElement, TemplateResult } from "lit";
+import { CSSResultGroup, html, LitElement, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators";
-import { ifDefined } from "lit/directives/if-defined";
 import "../homeassistant-frontend/src/components/ha-button-menu";
 import "../homeassistant-frontend/src/components/ha-icon-button";
 import { mdiDelete, mdiDotsVertical } from "@mdi/js";

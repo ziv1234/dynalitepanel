@@ -41,9 +41,9 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
     this._params = params;
     this.result = params.value;
     this.settings = params.inputs;
-    this.excluded = { number: params.excluded };
+    this.excluded = { dynetId: params.excluded };
     this.disabled = (params.disabled as any) || [];
-    this._isNew = !("number" in this._params.value);
+    this._isNew = !("dynetId" in this._params.value);
     this._genHelpers();
     console.log("show %s", this._isNew);
   }
@@ -66,13 +66,13 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
             <span slot="title">
               ${this._isNew
                 ? `New ${this._params.name}`
-                : `Edit ${this._params.name} ` + this._params.value.number}
+                : `Edit ${this._params.name} ` + this._params.value.dynetId}
             </span>
             ${this._params.onDelete
               ? html`<span slot="actionItems">
                   <dynalite-action-button
                     @dynalite-action-button=${this._onDelete}
-                    param=${this._params.value.number || ""}
+                    param=${this._params.value.dynetId || ""}
                     label=${this._params.name}
                   ></dynalite-action-button>
                 </span>`
@@ -95,9 +95,9 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
   }
 
   private _onDelete(ev): void {
-    const itemNumber = ev.detail;
-    console.log("_onDelete edit-dialog num=%s", itemNumber);
-    this._params!.onDelete!(itemNumber);
+    const dynetId = ev.detail;
+    console.log("_onDelete edit-dialog num=%s", dynetId);
+    this._params!.onDelete!(dynetId);
     this._close();
   }
 
@@ -115,13 +115,13 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
 
   private _genHelpers(): void {
     const res: { [key: string]: string } = {};
-    if (this._params?.value.number) {
+    if (this._params?.value.dynetId) {
       Object.keys(this._params.helpers!).forEach((key) => {
-        res[key] = this._params!.helpers![key].replace("NUMBER", this._params!.value.number!);
+        res[key] = this._params!.helpers![key].replace("DYNETID", this._params!.value.dynetId!);
       });
     } else {
       for (const key in this._params?.helpers) {
-        if (!this._params?.helpers[key].includes("NUMBER")) {
+        if (!this._params?.helpers[key].includes("DYNETID")) {
           res[key] = this._params!.helpers[key];
         }
       }

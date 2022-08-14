@@ -36,7 +36,7 @@ import { DynaliteInputElement } from "./dynalite-input-element";
 import "./dynalite-action-button";
 
 interface DynaliteEditAreaInputs {
-  number: string;
+  dynetId: string;
   name: string;
   template: string;
   class: string;
@@ -81,7 +81,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
         this._isNew = false;
         const areaData: DynaliteAreaData = this.dynalite.config.area![this.areaNumber];
         this.result = {
-          number: this.areaNumber || "",
+          dynetId: this.areaNumber || "",
           name: areaData.name || "",
           template: areaData.template || "",
           class: areaData.class || DynaliteDefaultTemplates.time_cover!.class!,
@@ -96,10 +96,10 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
         };
         this._channels = JSON.parse(JSON.stringify(areaData.channel || {}));
         this._presets = JSON.parse(JSON.stringify(areaData.preset || {}));
-        this.disabled = ["number"];
+        this.disabled = ["dynetId"];
       } else {
         this._isNew = true;
-        this.excluded = { number: Object.keys(this.dynalite.config!.area!) };
+        this.excluded = { dynetId: Object.keys(this.dynalite.config!.area!) };
       }
       this._hasInitialized = true;
     }
@@ -144,7 +144,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
             <div class="card-content">
               <h1>${this._isNew ? html`New Area` : html`Edit Area ${this.areaNumber}`}</h1>
               <h2>Area Settings</h2>
-              ${this.genInputElement("number")} ${this.genInputElement("name")}
+              ${this.genInputElement("dynetId")} ${this.genInputElement("name")}
               ${this.genInputElement("template")}
               ${this.result.template === "time_cover"
                 ? html`
@@ -204,7 +204,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
       if (this.result[param]) res[param] = this.result[param];
     });
     console.dir(res);
-    this.dynalite.config.area![this.result.number] = res;
+    this.dynalite.config.area![this.result.dynetId] = res;
     this.hasElementChanged = false;
     fireEvent(this, "value-changed");
   }
@@ -218,7 +218,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
   }
 
   protected result = {
-    number: "",
+    dynetId: "",
     name: "",
     template: "",
     class: "",
@@ -230,7 +230,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
   };
 
   protected settings = {
-    number: DynaliteIdInput("number", "area")
+    dynetId: DynaliteIdInput("dynetId", "area")
       .heading("Number")
       .desc("Dynalite area number (1-255)")
       .required(),

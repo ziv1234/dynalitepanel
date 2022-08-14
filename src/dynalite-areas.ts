@@ -40,7 +40,7 @@ export class DynaliteAreas extends LitElement {
         .route=${this.route}
         .columns=${this._columns(this.narrow)}
         .data=${data}
-        id="number"
+        id="dynetId"
         clickable
         @row-click=${this._handleRowClicked}
       >
@@ -52,10 +52,10 @@ export class DynaliteAreas extends LitElement {
   }
 
   private _handleRowClicked(ev) {
-    const number = ev.detail.id;
-    console.log("XXX TBD table row-click number=%s", number);
+    const dynetId = ev.detail.id;
+    console.log("XXX TBD table row-click dynetId=%s", dynetId);
     console.dir(ev);
-    navigate(`/dynalite/edit/${number}`);
+    navigate(`/dynalite/edit/${dynetId}`);
   }
 
   private _columns = memoizeOne((narrow: boolean): DataTableColumnContainer => {
@@ -65,7 +65,7 @@ export class DynaliteAreas extends LitElement {
       return columns;
     }
     const columns: DataTableColumnContainer = {
-      number: {
+      dynetId: {
         title: "Area Number",
         sortable: true,
         hidden: false,
@@ -116,7 +116,7 @@ export class DynaliteAreas extends LitElement {
       const templateNames = { room: "On/Off Switch", time_cover: "Blind or Cover" };
       return {
         name: areaConfig.name,
-        number: areaNum,
+        dynetId: areaNum,
         template: areaConfig.template ? templateNames[areaConfig.template] : "Manual",
         fade: areaConfig.fade,
         preset: areaConfig.preset ? Object.keys(areaConfig.preset).join(", ") : "-",

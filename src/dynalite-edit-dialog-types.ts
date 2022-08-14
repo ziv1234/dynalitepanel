@@ -2,7 +2,7 @@ import { HomeAssistant } from "../homeassistant-frontend/src/types";
 import { DynaliteInputSettings } from "./dynalite-input-settings";
 
 export interface DynaliteRowData {
-  number?: string;
+  dynetId?: string;
 }
 
 export interface DynaliteEditDialogParams {
@@ -14,5 +14,5 @@ export interface DynaliteEditDialogParams {
   disabled?: string[];
   helpers?: { [key: string]: string };
   onSave: (params: DynaliteEditDialogParams) => void;
-  onDelete?: (number: string) => void;
+  onDelete?: (dynetId: string) => void;
 }

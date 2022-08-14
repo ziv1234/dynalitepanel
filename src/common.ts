@@ -98,7 +98,7 @@ export interface LocationChangedEvent {
 
 export interface DynaliteAreaRowInfo {
   // some things are modified (e.g. presets and channels presented as strings)
-  number: string;
+  dynetId: string;
   name?: string;
   template?: string;
   fade?: string;

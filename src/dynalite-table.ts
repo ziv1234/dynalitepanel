@@ -42,7 +42,7 @@ export class DynaliteTable extends LitElement {
       const temp: DynaliteRowData = {};
       Object.keys(this.settings.inputs).forEach((field) => {
         const value =
-          field === "number"
+          field === "dynetId"
             ? num
             : !(field in this.data[num]) || this.settings.inputs[field].suffixVal !== "%"
             ? this.data[num][field]
@@ -79,7 +79,7 @@ export class DynaliteTable extends LitElement {
           .columns=${this._columns}
           .data=${this._processedData}
           clickable
-          id="number"
+          id="dynetId"
           auto-height
           @row-click=${this._handleRowClicked}
         >
@@ -98,11 +98,11 @@ export class DynaliteTable extends LitElement {
   }
 
   private _handleRowClicked(ev) {
-    const number = ev.detail.id;
-    console.log("XXX TBD table row-click number=%s", number);
+    const dynetId = ev.detail.id;
+    console.log("XXX TBD table row-click dynetId=%s", dynetId);
     console.dir(ev);
-    const value: DynaliteRowData = this.data[number];
-    value.number = number;
+    const value: DynaliteRowData = this.data[dynetId];
+    value.dynetId = dynetId;
     console.log("handle row click");
     console.dir(value);
     showDynaliteEditDialog(this, {
@@ -111,7 +111,7 @@ export class DynaliteTable extends LitElement {
       value: value,
       inputs: this.settings.inputs,
       excluded: undefined,
-      disabled: ["number"],
+      disabled: ["dynetId"],
       helpers: this.helpers,
       onSave: this._saveRow.bind(this),
       onDelete: this._deleteRow.bind(this),
@@ -123,9 +123,9 @@ export class DynaliteTable extends LitElement {
     console.dir(params);
     console.dir(this.data);
     const newRow: DynaliteRowData = JSON.parse(JSON.stringify(params.value));
-    const number = newRow.number!;
-    delete newRow.number;
-    this.data[number] = newRow;
+    const dynetId = newRow.dynetId!;
+    delete newRow.dynetId;
+    this.data[dynetId] = newRow;
     console.dir(this.data);
     this.dispatchEvent(new CustomEvent("dynalite-table"));
     this.requestUpdate();
@@ -146,8 +146,8 @@ export class DynaliteTable extends LitElement {
     });
   }
 
-  private _deleteRow(number: string): void {
-    delete this.data[number];
+  private _deleteRow(dynetId: string): void {
+    delete this.data[dynetId];
     this.dispatchEvent(new CustomEvent("dynalite-table"));
     this.requestUpdate();
   }
