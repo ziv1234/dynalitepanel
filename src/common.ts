@@ -1,5 +1,4 @@
 import { mdiDevices, mdiPuzzle } from "@mdi/js";
-import { Route } from "../homeassistant-frontend/src/types";
 
 export interface DynaliteChannelData {
   name?: string;
@@ -99,11 +98,6 @@ export interface DynaliteConfigResponse {
 export interface DynaliteEntryIdentifier {
   host: string;
   port: string;
-}
-
-export interface LocationChangedEvent {
-  // XXX TBD
-  detail?: { route: Route; force?: boolean };
 }
 
 export interface DynaliteAreaRowInfo {
