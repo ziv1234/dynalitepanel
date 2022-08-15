@@ -23,6 +23,12 @@ export interface DynaliteAreaData {
   nodefault?: boolean;
   channel?: { [key: string]: DynaliteChannelData };
   preset?: { [key: string]: DynalitePresetData };
+  room_on?: string;
+  room_off?: string;
+  open?: string;
+  close?: string;
+  stop?: string;
+  channel_cover?: string;
 }
 
 export interface DynaliteRoomData {
