@@ -52,6 +52,7 @@ export class DynaliteInput extends LitElement {
                 .validityTransform=${this.boundValidityTransform}
                 suffix=${ifDefined(this.settings.suffixVal)}
                 @input=${this._handleTextChange}
+                @wheel=${this._onWheel}
               ></ha-textfield>
             `
           : this.settings.typeVal === "boolean"
@@ -133,6 +134,10 @@ export class DynaliteInput extends LitElement {
 
   private _onSelectClose(ev) {
     ev.stopPropagation();
+  }
+
+  private _onWheel(_ev) {
+    this.blur();
   }
 
   private _validityTransform(value: string, nativeValidity: ValidityState): Partial<ValidityState> {
