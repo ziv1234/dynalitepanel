@@ -38,16 +38,16 @@ export class DynaliteTable extends LitElement {
 
   protected willUpdate(_changedProperties: Map<string | number | symbol, unknown>): void {
     console.log("table willUpdate");
-    this._processedData = Object.keys(this.data).map((num) => {
+    this._processedData = Object.entries(this.data).map(([num, rowData]) => {
       const temp: DynaliteRowData = {};
-      Object.keys(this.settings.inputs).forEach((field) => {
+      Object.entries(this.settings.inputs).forEach(([field, data]) => {
         const value =
           field === "dynetId"
             ? num
-            : !(field in this.data[num]) || this.settings.inputs[field].suffixVal !== "%"
-            ? this.data[num][field]
-            : this.data[num][field] * 100 + "%";
-        temp[field] = this.settings.inputs[field].transformVal(value);
+            : field in rowData && data.suffixVal === "%"
+            ? rowData[field] * 100 + "%"
+            : rowData[field];
+        temp[field] = data.transformVal(value);
       });
       return temp;
     });

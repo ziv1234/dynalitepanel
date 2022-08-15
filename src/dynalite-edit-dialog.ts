@@ -116,15 +116,15 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
   private _genHelpers(): void {
     const res: { [key: string]: string } = {};
     if (this._params?.value.dynetId) {
-      Object.keys(this._params.helpers!).forEach((key) => {
-        res[key] = this._params!.helpers![key].replace("DYNETID", this._params!.value.dynetId!);
+      Object.entries(this._params.helpers!).forEach(([key, value]) => {
+        res[key] = value.replace("DYNETID", this._params!.value.dynetId!);
       });
     } else {
-      for (const key in this._params?.helpers) {
-        if (!this._params?.helpers[key].includes("DYNETID")) {
-          res[key] = this._params!.helpers[key];
+      Object.entries(this._params!.helpers!).forEach(([key, value]) => {
+        if (!value.includes("DYNETID")) {
+          res[key] = value;
         }
-      }
+      });
     }
     console.log("gen helpers");
     console.dir(res);

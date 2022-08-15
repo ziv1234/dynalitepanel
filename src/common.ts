@@ -64,6 +64,10 @@ export const DynaliteDefaultTemplates: DynaliteTemplateData = {
   },
 };
 
+export const enumeratedTemplates: string[][] = Object.entries(DynaliteDefaultTemplates)
+  .map(([template, conf]) => Object.keys(conf).map((param) => [template, param]))
+  .flat(1);
+
 export interface DynaliteConfigData {
   host: string;
   port: string;

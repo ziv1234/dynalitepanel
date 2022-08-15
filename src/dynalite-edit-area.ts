@@ -15,6 +15,7 @@ import {
   dynaliteCopy,
   DynaliteDefaultTemplates,
   DynalitePresetData,
+  enumeratedTemplates,
   panelTabs,
 } from "./common";
 import "./dynalite-input";
@@ -84,13 +85,12 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
     if (!this._hasInitialized) {
       console.log("initizlizing global settings");
       this.helpers = { fade: `Default: ${this.dynalite.config.default?.fade}` };
-      Object.entries(DynaliteDefaultTemplates).forEach(([_template, conf]) =>
-        Object.keys(conf).forEach((param) => {
-          const defValue =
-            this.dynalite.config.template?.[param] || DynaliteDefaultTemplates[_template][param];
-          this.helpers![param] = `Default: ${defValue}`;
-        })
-      );
+      enumeratedTemplates.forEach(([template, param]) => {
+        const defValue =
+          this.dynalite.config.template![template][param] ||
+          DynaliteDefaultTemplates[template][param];
+        this.helpers![param] = `Default: ${defValue}`;
+      });
       if (this.areaNumber && this.areaNumber in (this.dynalite.config.area || {})) {
         this._isNew = false;
         const areaData: DynaliteAreaData = this.dynalite.config.area![this.areaNumber];
@@ -107,9 +107,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
           tilt: areaData.tilt || DynaliteDefaultTemplates.time_cover!.tilt!,
           fade: areaData.fade || "",
           nodefault: areaData.nodefault || false,
-          advanced: Object.entries(DynaliteDefaultTemplates).some(([_template, conf]) =>
-            Object.keys(conf).some((param) => areaData[param])
-          ),
+          advanced: enumeratedTemplates.some(([_template, param]) => areaData[param]),
           room_on: areaData.room_on || "",
           room_off: areaData.room_off || "",
           open: areaData.open || "",

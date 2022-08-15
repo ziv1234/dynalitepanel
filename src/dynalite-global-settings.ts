@@ -14,6 +14,7 @@ import {
   DynaliteDefaultTemplates,
   DynalitePresetData,
   DynaliteTemplateData,
+  enumeratedTemplates,
   panelTabs,
 } from "./common";
 import "@material/mwc-button/mwc-button";
@@ -97,29 +98,18 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
         fade: "0 For No fade",
       };
       this._presets = dynaliteCopy(this.dynalite.config.preset || {});
-      Object.keys(this.dynalite.config.template!).forEach((template) => {
-        Object.keys(this.dynalite.config.template![template]).forEach((param) => {
+      enumeratedTemplates.forEach(([template, param]) => {
+        if (param in this.dynalite.config.template![template])
           this.result[param] = this.dynalite.config.template![template][param];
-        });
-      });
-      Object.keys(DynaliteDefaultTemplates).forEach((template) => {
-        Object.keys(DynaliteDefaultTemplates[template]).forEach((param) => {
-          console.log(
-            "tempate %s param %s value %s",
-            template,
-            param,
-            DynaliteDefaultTemplates[template][param]
-          );
-          this.helpers![param] = "Default: " + DynaliteDefaultTemplates[template][param];
-        });
+        this.helpers![param] = "Default: " + DynaliteDefaultTemplates[template][param];
       });
       if ("tilt" in this.dynalite.config.template!.time_cover!) {
-        this.result.tilt = this.dynalite.config.template!.time_cover.tilt!;
         if (this.result.tilt === "0") {
           this.result.tiltEnabled = false;
           this.result.tilt = DynaliteDefaultTemplates.time_cover!.tilt!;
         } else {
           this.result.tiltEnabled = true;
+          this.result.tilt = this.dynalite.config.template!.time_cover.tilt!;
         }
       } else {
         this.result.tilt = DynaliteDefaultTemplates.time_cover!.tilt!;
@@ -228,10 +218,8 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
       this.dynalite.config.preset = JSON.parse(JSON.stringify(this._presets));
     else delete this.dynalite.config.preset;
     const templates: DynaliteTemplateData = { room: {}, time_cover: {} };
-    Object.keys(DynaliteDefaultTemplates).forEach((template) => {
-      Object.keys(DynaliteDefaultTemplates[template]).forEach((param) => {
-        if (this.result[param] !== "") templates[template][param] = this.result[param];
-      });
+    enumeratedTemplates.forEach(([template, param]) => {
+      if (this.result[param] !== "") templates[template][param] = this.result[param];
     });
     if (!this.result.tiltEnabled) templates.time_cover!.tilt = "0";
     this.dynalite.config.template = templates;
