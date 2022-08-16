@@ -61,7 +61,7 @@ export class DynaliteAreas extends LitElement {
   private _columns = memoizeOne((narrow: boolean): DataTableColumnContainer => {
     if (narrow) {
       const columns: DataTableColumnContainer = {};
-      // XXX TODO
+      // XXX TODO narrow
       return columns;
     }
     const columns: DataTableColumnContainer = {

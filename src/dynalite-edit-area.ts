@@ -91,6 +91,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
           DynaliteDefaultTemplates[template][param];
         this.helpers![param] = `Default: ${defValue}`;
       });
+      this.settings.class.selection(this.dynalite.classSelection);
       if (this.areaNumber && this.areaNumber in (this.dynalite.config.area || {})) {
         this._isNew = false;
         const areaData: DynaliteAreaData = this.dynalite.config.area![this.areaNumber];
@@ -298,14 +299,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
         ["time_cover", "Blind or Cover"],
         ["", "Manual Setup"],
       ]),
-    class: DynaliteSelectInput("class")
-      .heading("Type")
-      .desc("Default type for new blinds")
-      .selection([
-        // XXX add
-        ["blind", "Blind"],
-        ["cover", "Cover"],
-      ]),
+    class: DynaliteSelectInput("class").heading("Type").desc("Blind type"),
     duration: DynaliteDurationInput("duration")
       .heading("Open/Close Duration")
       .desc("Time in seconds to open this blind"),

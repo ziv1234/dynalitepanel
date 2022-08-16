@@ -83,11 +83,13 @@ export interface DynaliteConfigData {
 
 export interface DynaliteDefaultData {
   DEFAULT_NAME: string;
+  DEVICE_CLASSES: string[];
 }
 
 export interface Dynalite {
   config: DynaliteConfigData;
   default: DynaliteDefaultData;
+  classSelection: string[][];
 }
 
 export interface DynaliteConfigResponse {
@@ -138,4 +140,8 @@ export const panelTabs = [
 
 export function dynaliteCopy<T>(src: T): T {
   return JSON.parse(JSON.stringify(src));
+}
+
+export function capitalizeFirst(val: string): string {
+  return val[0].toUpperCase() + val.substring(1);
 }

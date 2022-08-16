@@ -1,7 +1,7 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
-import { DynaliteChannelData } from "./common";
+import { capitalizeFirst, DynaliteChannelData } from "./common";
 import "./dynalite-table";
 import type { DynaliteTableSettings } from "./dynalite-table";
 import {
@@ -69,7 +69,7 @@ export class DynaliteChannelTable extends LitElement {
         ["light", "Light (default)"],
         ["switch", "Switch"],
       ])
-      .transform((val) => val[0].toUpperCase() + val.substring(1)),
+      .transform(capitalizeFirst),
   };
 }
 

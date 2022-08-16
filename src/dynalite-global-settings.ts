@@ -75,6 +75,7 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
     if (!this.dynalite) return;
     if (!this._hasInitialized) {
       console.log("initizlizing global settings");
+      this.settings.class.selection(this.dynalite.classSelection);
       this.result = {
         name: this.dynalite.config.name || "",
         autodiscover: this.dynalite.config.autodiscover!,
@@ -266,14 +267,7 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
         ["init", "Initial Init"],
         ["on", "Always Active"],
       ]),
-    class: DynaliteSelectInput("class")
-      .heading("Type")
-      .desc("Default type for new blinds")
-      .selection([
-        // XXX add
-        ["blind", "Blind"],
-        ["cover", "Cover"],
-      ]),
+    class: DynaliteSelectInput("class").heading("Type").desc("Default type for new blinds"),
     duration: DynaliteDurationInput("duration")
       .heading("Default Open/Close Duration")
       .desc("Time in seconds to open a blind"),

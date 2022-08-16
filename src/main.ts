@@ -5,7 +5,12 @@ import "../homeassistant-frontend/src/resources/ha-style";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { ProvideHassLitMixin } from "../homeassistant-frontend/src/mixins/provide-hass-lit-mixin";
 import "./dynalite-router";
-import { Dynalite, DynaliteConfigResponse, DynaliteEntryIdentifier } from "./common";
+import {
+  capitalizeFirst,
+  Dynalite,
+  DynaliteConfigResponse,
+  DynaliteEntryIdentifier,
+} from "./common";
 
 @customElement("dynalite-panel")
 class DynalitePanel extends ProvideHassLitMixin(LitElement) {
@@ -95,10 +100,17 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
           });
           if (!curConfig.template.time_cover?.class) curConfig.template.time_cover!.class = "blind";
           curConfig.preset = { "5": { name: "abc", fade: "0.3" }, "78": { level: "0.85" } }; // XXX TBD
+          const defaults = (resp as DynaliteConfigResponse).default;
           this.dynalite = {
             config: curConfig,
-            default: (resp as DynaliteConfigResponse).default,
+            default: defaults,
+            classSelection: defaults.DEVICE_CLASSES.map((devClass) => [
+              devClass,
+              capitalizeFirst(devClass),
+            ]),
           };
+          console.log("DEFAULTS");
+          console.dir(this.dynalite.classSelection);
           break;
         }
       }
