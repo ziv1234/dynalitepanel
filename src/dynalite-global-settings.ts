@@ -105,7 +105,7 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
         this.helpers![param] = "Default: " + DynaliteDefaultTemplates[template][param];
       });
       if ("tilt" in this.dynalite.config.template!.time_cover!) {
-        if (this.result.tilt === "0") {
+        if (parseFloat(this.result.tilt) === 0) {
           this.result.tiltEnabled = false;
           this.result.tilt = DynaliteDefaultTemplates.time_cover!.tilt!;
         } else {

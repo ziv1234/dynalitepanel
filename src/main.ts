@@ -90,7 +90,6 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
         if (!curConfig.template![template]) curConfig.template![template] = {};
       });
       if (!curConfig.template.time_cover?.class) curConfig.template.time_cover!.class = "blind";
-      curConfig.preset = { "5": { name: "abc", fade: "0.3" }, "78": { level: "0.85" } }; // XXX TBD
       const defaults = (resp as DynaliteConfigResponse).default;
       this.dynalite = {
         config: curConfig,
@@ -107,10 +106,16 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
     }
   }
 
-  private _updateDynalite(e: Event) {
+  private async _updateDynalite(e: Event) {
     console.log("XXX TBD _updateDynalite");
     console.dir(e);
     console.dir(this.dynalite.config);
+    const resp = await this.hass.connection.sendMessagePromise({
+      type: "dynalite/save-config",
+      entry_id: this._activeEntry,
+      config: this.dynalite.config,
+    });
+    console.error("XXX resp=%s", resp);
   }
 }
 

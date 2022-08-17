@@ -102,7 +102,7 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
           class: areaData.class || DynaliteDefaultTemplates.time_cover!.class!,
           duration: areaData.duration || "",
           tiltEnabled: !(
-            areaData.tilt === "0" ||
+            parseFloat(areaData.tilt!) === 0 ||
             (!("tilt" in areaData) && this.dynalite.config.template?.time_cover?.tilt === "0")
           ),
           tilt: areaData.tilt || DynaliteDefaultTemplates.time_cover!.tilt!,
