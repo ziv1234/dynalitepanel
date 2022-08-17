@@ -5,12 +5,7 @@ import "../homeassistant-frontend/src/resources/ha-style";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { ProvideHassLitMixin } from "../homeassistant-frontend/src/mixins/provide-hass-lit-mixin";
 import "./dynalite-router";
-import {
-  capitalizeFirst,
-  Dynalite,
-  DynaliteConfigResponse,
-  DynaliteEntryIdentifier,
-} from "./common";
+import { capitalizeFirst, Dynalite, DynaliteConfigResponse } from "./common";
 
 @customElement("dynalite-panel")
 class DynalitePanel extends ProvideHassLitMixin(LitElement) {
@@ -22,7 +17,7 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
 
   @property({ attribute: false }) public dynalite!: Dynalite;
 
-  @state() private _activeEntry?: DynaliteEntryIdentifier;
+  @state() private _activeEntry?: string;
 
   public connectedCallback() {
     console.log("XXX addEventListener");
@@ -81,39 +76,32 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
       console.dir(resp);
       const completeConfig = (resp as DynaliteConfigResponse).config;
       if (completeConfig.length === 1 || !this._activeEntry) {
-        this._activeEntry = { host: completeConfig[0].host, port: completeConfig[0].port };
+        this._activeEntry = Object.keys(completeConfig)[0];
       }
-      for (const curConfig of completeConfig) {
-        if (
-          curConfig.host === this._activeEntry!.host &&
-          curConfig.port === this._activeEntry!.port
-        ) {
-          if (!curConfig.area) curConfig.area = {};
-          if (!curConfig.autodiscover) curConfig.autodiscover = false;
-          if (!curConfig.default || !curConfig.default.fade) {
-            curConfig.default = { fade: "0" };
-          }
-          if (!curConfig.active) curConfig.active = "off";
-          if (!curConfig.template) curConfig.template = {};
-          ["room", "time_cover"].forEach((template) => {
-            if (!curConfig.template![template]) curConfig.template![template] = {};
-          });
-          if (!curConfig.template.time_cover?.class) curConfig.template.time_cover!.class = "blind";
-          curConfig.preset = { "5": { name: "abc", fade: "0.3" }, "78": { level: "0.85" } }; // XXX TBD
-          const defaults = (resp as DynaliteConfigResponse).default;
-          this.dynalite = {
-            config: curConfig,
-            default: defaults,
-            classSelection: defaults.DEVICE_CLASSES.map((devClass) => [
-              devClass,
-              capitalizeFirst(devClass),
-            ]),
-          };
-          console.log("DEFAULTS");
-          console.dir(this.dynalite.classSelection);
-          break;
-        }
+      const curConfig = completeConfig[this._activeEntry];
+      if (!curConfig.area) curConfig.area = {};
+      if (!curConfig.autodiscover) curConfig.autodiscover = false;
+      if (!curConfig.default || !curConfig.default.fade) {
+        curConfig.default = { fade: "0" };
       }
+      if (!curConfig.active) curConfig.active = "off";
+      if (!curConfig.template) curConfig.template = {};
+      ["room", "time_cover"].forEach((template) => {
+        if (!curConfig.template![template]) curConfig.template![template] = {};
+      });
+      if (!curConfig.template.time_cover?.class) curConfig.template.time_cover!.class = "blind";
+      curConfig.preset = { "5": { name: "abc", fade: "0.3" }, "78": { level: "0.85" } }; // XXX TBD
+      const defaults = (resp as DynaliteConfigResponse).default;
+      this.dynalite = {
+        config: curConfig,
+        default: defaults,
+        classSelection: defaults.DEVICE_CLASSES.map((devClass) => [
+          devClass,
+          capitalizeFirst(devClass),
+        ]),
+      };
+      console.log("DEFAULTS");
+      console.dir(this.dynalite.classSelection);
     } else {
       console.error("Message failed!");
     }

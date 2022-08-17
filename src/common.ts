@@ -97,11 +97,6 @@ export interface DynaliteConfigResponse {
   default: DynaliteDefaultData;
 }
 
-export interface DynaliteEntryIdentifier {
-  host: string;
-  port: string;
-}
-
 export interface DynaliteAreaRowInfo {
   // some things are modified (e.g. presets and channels presented as strings)
   dynetId: string;

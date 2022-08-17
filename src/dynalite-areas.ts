@@ -6,12 +6,13 @@ import "../homeassistant-frontend/src/components/ha-card";
 import "../homeassistant-frontend/src/layouts/hass-subpage";
 import "../homeassistant-frontend/src/components/ha-fab";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
-import "../homeassistant-frontend/src/layouts/hass-tabs-subpage-data-table";
+import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
 import { Dynalite, panelTabs, DynaliteAreaRowInfo } from "./common";
-import {
+import type {
   DataTableColumnContainer,
   DataTableRowData,
 } from "../homeassistant-frontend/src/components/data-table/ha-data-table";
+import "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import { navigate } from "../homeassistant-frontend/src/common/navigate";
 
 @customElement("dynalite-areas")
@@ -33,21 +34,27 @@ export class DynaliteAreas extends LitElement {
     console.log("XXX render areas");
     const data = this._calculateData();
     return html`
-      <hass-tabs-subpage-data-table
+      <hass-tabs-subpage
         .hass=${this.hass}
         .narrow=${this.narrow}
         .tabs=${panelTabs}
         .route=${this.route}
-        .columns=${this._columns(this.narrow)}
-        .data=${data}
-        id="dynetId"
-        clickable
-        @row-click=${this._handleRowClicked}
       >
+        <ha-data-table
+          .hass=${this.hass}
+          .narrow=${this.narrow}
+          .tabs=${panelTabs}
+          .route=${this.route}
+          .columns=${this._columns(this.narrow)}
+          .data=${data}
+          id="dynetId"
+          clickable
+          @row-click=${this._handleRowClicked}
+        ></ha-data-table>
         <ha-fab slot="fab" label="Define New Area" extended @click=${this._createNew}>
           <ha-svg-icon slot="icon" .path=${mdiPlus}></ha-svg-icon>
         </ha-fab>
-      </hass-tabs-subpage-data-table>
+      </hass-tabs-subpage>
     `;
   }
 
@@ -69,42 +76,42 @@ export class DynaliteAreas extends LitElement {
         title: "Area Number",
         sortable: true,
         hidden: false,
-        filterable: true,
+        filterable: false,
         width: "10%",
       },
       name: {
         title: "Name",
         sortable: true,
         hidden: false,
-        filterable: true,
+        filterable: false,
         width: "15%",
       },
       template: {
         title: "Behavior",
         sortable: true,
         hidden: narrow,
-        filterable: true,
+        filterable: false,
         width: "10%",
       },
       fade: {
         title: "Fade",
         sortable: true,
         hidden: narrow,
-        filterable: true,
+        filterable: false,
         width: "10%",
       },
       preset: {
         title: "Presets",
         sortable: true,
         hidden: narrow,
-        filterable: true,
+        filterable: false,
         width: "25%",
       },
       channel: {
         title: "Channels",
         sortable: true,
         hidden: narrow,
-        filterable: true,
+        filterable: false,
         width: "25%",
       },
     };
