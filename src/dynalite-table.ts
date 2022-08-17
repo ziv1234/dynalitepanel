@@ -12,6 +12,7 @@ import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import { showDynaliteEditDialog } from "./show-dialog-dynalite-edit";
 import { DynaliteEditDialogParams, DynaliteRowData } from "./dynalite-edit-dialog-types";
 import { DynaliteInputSettings } from "./dynalite-input-settings";
+import { CONF_DYNET_ID } from "./const";
 
 export interface DynaliteTableSettings {
   name: string;
@@ -37,12 +38,11 @@ export class DynaliteTable extends LitElement {
   @state() private _columns: DataTableColumnContainer = {};
 
   protected willUpdate(_changedProperties: Map<string | number | symbol, unknown>): void {
-    console.log("table willUpdate");
     this._processedData = Object.entries(this.data).map(([num, rowData]) => {
       const temp: DynaliteRowData = {};
       Object.entries(this.settings.inputs).forEach(([field, data]) => {
         const value =
-          field === "dynetId"
+          field === CONF_DYNET_ID
             ? num
             : field in rowData && data.suffixVal === "%"
             ? rowData[field] * 100 + "%"
@@ -64,12 +64,9 @@ export class DynaliteTable extends LitElement {
   }
 
   protected render(): TemplateResult | void {
-    console.log("XXX table render");
-    console.dir(this.hass);
     if (!this.hass) {
       return html``;
     }
-    console.log("XXX table render2");
     return html`
       <div class="dynalite-table">
         <ha-data-table
@@ -79,7 +76,7 @@ export class DynaliteTable extends LitElement {
           .columns=${this._columns}
           .data=${this._processedData}
           clickable
-          id="dynetId"
+          id=${CONF_DYNET_ID}
           auto-height
           @row-click=${this._handleRowClicked}
         >
@@ -99,19 +96,15 @@ export class DynaliteTable extends LitElement {
 
   private _handleRowClicked(ev) {
     const dynetId = ev.detail.id;
-    console.log("XXX TBD table row-click dynetId=%s", dynetId);
-    console.dir(ev);
     const value: DynaliteRowData = this.data[dynetId];
     value.dynetId = dynetId;
-    console.log("handle row click");
-    console.dir(value);
     showDynaliteEditDialog(this, {
       hass: this.hass,
       name: this.settings.name,
       value: value,
       inputs: this.settings.inputs,
       excluded: undefined,
-      disabled: ["dynetId"],
+      disabled: [CONF_DYNET_ID],
       helpers: this.helpers,
       onSave: this._saveRow.bind(this),
       onDelete: this._deleteRow.bind(this),
@@ -119,21 +112,15 @@ export class DynaliteTable extends LitElement {
   }
 
   private _saveRow(params: DynaliteEditDialogParams): void {
-    console.log("saving row");
-    console.dir(params);
-    console.dir(this.data);
     const newRow: DynaliteRowData = JSON.parse(JSON.stringify(params.value));
     const dynetId = newRow.dynetId!;
     delete newRow.dynetId;
     this.data[dynetId] = newRow;
-    console.dir(this.data);
     this.dispatchEvent(new CustomEvent("dynalite-table"));
     this.requestUpdate();
   }
 
-  private async _addRow(ev) {
-    console.log("XXX TBD table addRow");
-    console.dir(ev);
+  private async _addRow(_ev) {
     showDynaliteEditDialog(this, {
       hass: this.hass,
       name: this.settings.name,

@@ -35,6 +35,33 @@ import {
 import { navigate } from "../homeassistant-frontend/src/common/navigate";
 import { DynaliteInputElement } from "./dynalite-input-element";
 import "./dynalite-action-button";
+import {
+  CONF_ADVANCED,
+  CONF_AREA,
+  CONF_CHANNEL,
+  CONF_CHANNEL_COVER,
+  CONF_CLASS,
+  CONF_CLOSE,
+  CONF_DURATION,
+  CONF_DYNET_ID,
+  CONF_FADE,
+  CONF_NAME,
+  CONF_NODEFAULT,
+  CONF_OPEN,
+  CONF_PRESET,
+  CONF_ROOM,
+  CONF_ROOM_OFF,
+  CONF_ROOM_ON,
+  CONF_STOP,
+  CONF_TEMPLATE,
+  CONF_TILT,
+  CONF_TILT_ENABLED,
+  CONF_TIME_COVER,
+  EVENT_CONFIG_CHANGED,
+  TEMPLATE_COVER,
+  TEMPLATE_MANUAL,
+  TEMPLATE_ROOM,
+} from "./const";
 
 interface DynaliteEditAreaInputs {
   dynetId: string;
@@ -79,11 +106,8 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
 
   protected willUpdate(_changedProperties: Map<string | number | symbol, unknown>): void {
     super.willUpdate(_changedProperties);
-    console.log("XXX conn");
-    console.dir(this.dynalite);
     if (!this.dynalite) return;
     if (!this._hasInitialized) {
-      console.log("initizlizing global settings");
       this.helpers = { fade: `Default: ${this.dynalite.config.default?.fade}` };
       enumeratedTemplates.forEach(([template, param]) => {
         const defValue =
@@ -94,54 +118,51 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
       this.settings.class.selection(this.dynalite.classSelection);
       if (this.areaNumber && this.areaNumber in (this.dynalite.config.area || {})) {
         this._isNew = false;
-        const areaData: DynaliteAreaData = this.dynalite.config.area![this.areaNumber];
-        this.result = {
-          dynetId: this.areaNumber || "",
-          name: areaData.name || "",
-          template: areaData.template || "",
-          class: areaData.class || DynaliteDefaultTemplates.time_cover!.class!,
-          duration: areaData.duration || "",
-          tiltEnabled: !(
-            parseFloat(areaData.tilt!) === 0 ||
-            (!("tilt" in areaData) && this.dynalite.config.template?.time_cover?.tilt === "0")
-          ),
-          tilt: areaData.tilt || DynaliteDefaultTemplates.time_cover!.tilt!,
-          fade: areaData.fade || "",
-          nodefault: areaData.nodefault || false,
-          advanced: enumeratedTemplates.some(([_template, param]) => areaData[param]),
-          room_on: areaData.room_on || "",
-          room_off: areaData.room_off || "",
-          open: areaData.open || "",
-          close: areaData.close || "",
-          stop: areaData.stop || "",
-          channel_cover: areaData.channel_cover || "",
-        };
-        this._channels = JSON.parse(JSON.stringify(areaData.channel || {}));
-        this._presets = JSON.parse(JSON.stringify(areaData.preset || {}));
-        this.disabled = ["dynetId"];
+        this.disabled = [CONF_DYNET_ID];
       } else {
         this._isNew = true;
         this.excluded = { dynetId: Object.keys(this.dynalite.config!.area!) };
       }
+      const areaData: DynaliteAreaData = this.dynalite.config.area![this.areaNumber] || {};
+      const calcTilt = parseFloat(
+        CONF_TILT in areaData
+          ? areaData.tilt!
+          : CONF_TILT in this.dynalite.config.template!.time_cover!
+          ? this.dynalite.config.template!.time_cover.tilt!
+          : DynaliteDefaultTemplates.time_cover!.tilt!
+      );
+      this.result = {
+        dynetId: this.areaNumber || "",
+        name: areaData.name || "",
+        template: areaData.template || "",
+        class: areaData.class || DynaliteDefaultTemplates.time_cover!.class!,
+        duration: areaData.duration || "",
+        tiltEnabled: calcTilt !== 0,
+        tilt: calcTilt.toString() || DynaliteDefaultTemplates.time_cover!.tilt!,
+        fade: areaData.fade || "",
+        nodefault: areaData.nodefault || false,
+        advanced: enumeratedTemplates.some(([_template, param]) => areaData[param]),
+        room_on: areaData.room_on || "",
+        room_off: areaData.room_off || "",
+        open: areaData.open || "",
+        close: areaData.close || "",
+        stop: areaData.stop || "",
+        channel_cover: areaData.channel_cover || "",
+      };
+      this._channels = JSON.parse(JSON.stringify(areaData.channel || {}));
+      this._presets = JSON.parse(JSON.stringify(areaData.preset || {}));
       this._hasInitialized = true;
     }
   }
 
   protected render(): TemplateResult | void {
-    console.log("XXX edit area render");
-    console.dir(this.hass);
     if (!this.hass || !this.dynalite) {
       return html``;
     }
-    console.log("XXX render edit area");
     const canSave =
       this.hasElementChanged &&
       this._inputElements?.length &&
       Array.from(this._inputElements).every((elem) => elem.isValid());
-    console.log("canSave=%s", canSave);
-    console.dir(this._inputElements);
-    if (this._inputElements)
-      console.dir(Array.from(this._inputElements).map((elem) => elem.isValid()));
 
     return html`
       <hass-tabs-subpage
@@ -166,16 +187,16 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
             <div class="card-content">
               <h1>${this._isNew ? html`New Area` : html`Edit Area ${this.areaNumber}`}</h1>
               <h2>Area Settings</h2>
-              ${this.genInputElement("dynetId")} ${this.genInputElement("name")}
-              ${this.genInputElement("template")}
-              ${this.result.template === "time_cover"
+              ${this.genInputElement(CONF_DYNET_ID)} ${this.genInputElement(CONF_NAME)}
+              ${this.genInputElement(CONF_TEMPLATE)}
+              ${this.result.template === CONF_TIME_COVER
                 ? html`
-                    ${this.genInputElement("class")} ${this.genInputElement("duration")}
-                    ${this.genInputElement("tiltEnabled")}
-                    ${this.result.tiltEnabled ? this.genInputElement("tilt") : html``}
+                    ${this.genInputElement(CONF_CLASS)} ${this.genInputElement(CONF_DURATION)}
+                    ${this.genInputElement(CONF_TILT_ENABLED)}
+                    ${this.result.tiltEnabled ? this.genInputElement(CONF_TILT) : html``}
                   `
                 : html``}
-              ${this.genInputElement("fade")} ${this.genInputElement("nodefault")}
+              ${this.genInputElement(CONF_FADE)} ${this.genInputElement(CONF_NODEFAULT)}
               <h2>Area Specific Presets</h2>
               <dynalite-preset-table
                 .hass=${this.hass}
@@ -200,14 +221,15 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
               ></dynalite-channel-table>
               ${this.result.template
                 ? html`<h2>Area Specific Behavior</h2>
-                    ${this.genInputElement("advanced")}
+                    ${this.genInputElement(CONF_ADVANCED)}
                     ${this.result.advanced
-                      ? this.result.template === "room"
-                        ? html`${this.genInputElement("room_on")}
-                          ${this.genInputElement("room_off")}`
-                        : this.result.template === "time_cover"
-                        ? html`${this.genInputElement("open")} ${this.genInputElement("close")}
-                          ${this.genInputElement("stop")} ${this.genInputElement("channel_cover")}`
+                      ? this.result.template === CONF_ROOM
+                        ? html`${this.genInputElement(CONF_ROOM_ON)}
+                          ${this.genInputElement(CONF_ROOM_OFF)}`
+                        : this.result.template === CONF_TIME_COVER
+                        ? html`${this.genInputElement(CONF_OPEN)}
+                          ${this.genInputElement(CONF_CLOSE)} ${this.genInputElement(CONF_STOP)}
+                          ${this.genInputElement(CONF_CHANNEL_COVER)}`
                         : html``
                       : html``}`
                 : html``}
@@ -228,38 +250,43 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
 
   private _save() {
     // fill complete and send update signal
-    console.log("XXX save");
     const res: DynaliteAreaData = {
       channel: dynaliteCopy(this._channels),
       preset: dynaliteCopy(this._presets),
     };
-    ["name", "template", "fade", "nodefault"].forEach((param) => {
+    [CONF_NAME, CONF_TEMPLATE, CONF_FADE, CONF_NODEFAULT].forEach((param) => {
       if (this.result[param]) res[param] = this.result[param];
     });
     if (this.result.template && this.result.advanced) {
-      if (this.result.template === "room") {
-        ["room_on", "room_off"].forEach((param) => {
+      if (this.result.template === CONF_ROOM) {
+        [CONF_ROOM_ON, CONF_ROOM_OFF].forEach((param) => {
           if (this.result[param]) res[param] = this.result[param];
         });
       }
-      if (this.result.template === "room") {
-        ["open", "close", "stop", "channel_cover", "class", "duration", "tilt"].forEach((param) => {
+      if (this.result.template === CONF_TIME_COVER) {
+        [
+          CONF_OPEN,
+          CONF_CLOSE,
+          CONF_STOP,
+          CONF_CHANNEL_COVER,
+          CONF_CLASS,
+          CONF_DURATION,
+          CONF_TILT,
+        ].forEach((param) => {
           if (this.result[param]) res[param] = this.result[param];
         });
         if (!this.result.tiltEnabled) res.tilt = "0";
       }
     }
-    console.dir(res);
     this.dynalite.config.area![this.result.dynetId] = res;
     this.hasElementChanged = false;
-    fireEvent(this, "value-changed");
+    fireEvent(this, EVENT_CONFIG_CHANGED);
   }
 
   private _deleteArea(ev) {
     const areaNumber = ev.detail;
-    console.log("delete area %s", areaNumber);
     delete this.dynalite.config.area![areaNumber];
-    fireEvent(this, "value-changed");
+    fireEvent(this, EVENT_CONFIG_CHANGED);
     navigate("/dynalite/areas");
   }
 
@@ -283,51 +310,53 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
   };
 
   protected settings = {
-    dynetId: DynaliteIdInput("dynetId", "area")
+    dynetId: DynaliteIdInput(CONF_DYNET_ID, CONF_AREA)
       .heading("Number")
       .desc("Dynalite area number (1-255)")
       .required(),
-    name: DynaliteTextInput("name")
+    name: DynaliteTextInput(CONF_NAME)
       .heading("Area Name")
       .desc("Usually a room or a function")
       .required(),
-    template: DynaliteSelectInput("template")
+    template: DynaliteSelectInput(CONF_TEMPLATE)
       .heading("Area Behavior")
       .desc("Configure specific area behaviors")
       .selection([
-        ["room", "On/Off Switch"],
-        ["time_cover", "Blind or Cover"],
-        ["", "Manual Setup"],
+        [CONF_ROOM, TEMPLATE_ROOM],
+        [CONF_TIME_COVER, TEMPLATE_COVER],
+        ["", TEMPLATE_MANUAL],
       ]),
-    class: DynaliteSelectInput("class").heading("Type").desc("Blind type"),
-    duration: DynaliteDurationInput("duration")
+    class: DynaliteSelectInput(CONF_CLASS).heading("Type").desc("Blind type"),
+    duration: DynaliteDurationInput(CONF_DURATION)
       .heading("Open/Close Duration")
       .desc("Time in seconds to open this blind"),
-    tiltEnabled: DynaliteBooleanInput("tiltEnabled")
+    tiltEnabled: DynaliteBooleanInput(CONF_TILT_ENABLED)
       .heading("Enable Tilt")
       .desc("Enable tilt for this blind"),
-    tilt: DynaliteDurationInput("tilt")
+    tilt: DynaliteDurationInput(CONF_TILT)
       .heading("Tilt Duration")
       .desc("Time in seconds to open this tilt"),
-    fade: DynaliteFadeInput("fade")
+    fade: DynaliteFadeInput(CONF_FADE)
       .heading("Fade Time")
       .desc("Default fade for this area (seconds)"),
-    nodefault: DynaliteBooleanInput("nodefault")
+    nodefault: DynaliteBooleanInput(CONF_NODEFAULT)
       .heading("Ignore Default Presets")
       .desc("Do not use the globally configured presets"),
-    advanced: DynaliteBooleanInput("advanced")
+    advanced: DynaliteBooleanInput(CONF_ADVANCED)
       .heading("Area-specific Behaviors")
       .desc("Advanced only"),
-    room_on: DynaliteIdInput("room_on", "preset")
+    room_on: DynaliteIdInput(CONF_ROOM_ON, CONF_PRESET)
       .heading("Turn On")
       .desc("Preset that turns this area on"),
-    room_off: DynaliteIdInput("room_off", "preset")
+    room_off: DynaliteIdInput(CONF_ROOM_OFF, CONF_PRESET)
       .heading("Turn Off")
       .desc("Preset that turns this area off"),
-    open: DynaliteIdInput("open", "preset").heading("Open").desc("Preset to open this blind"),
-    close: DynaliteIdInput("close", "preset").heading("Close").desc("Preset to close this blind"),
-    stop: DynaliteIdInput("stop", "preset").heading("Open").desc("Preset to open this blind"),
-    channel_cover: DynaliteIdInput("channel_cover", "channel")
+    open: DynaliteIdInput(CONF_OPEN, CONF_PRESET).heading("Open").desc("Preset to open this blind"),
+    close: DynaliteIdInput(CONF_CLOSE, CONF_PRESET)
+      .heading("Close")
+      .desc("Preset to close this blind"),
+    stop: DynaliteIdInput(CONF_STOP, CONF_PRESET).heading("Open").desc("Preset to open this blind"),
+    channel_cover: DynaliteIdInput(CONF_CHANNEL_COVER, CONF_CHANNEL)
       .heading("Controlling channel")
       .desc("Channel number to control this blind"),
   };

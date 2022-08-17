@@ -10,6 +10,7 @@ import {
 } from "./dynalite-input-settings";
 import type { DynaliteTableSettings } from "./dynalite-table";
 import "./dynalite-table";
+import { CONF_DYNET_ID, CONF_FADE, CONF_LEVEL, CONF_NAME } from "./const";
 
 @customElement("dynalite-preset-table")
 export class DynalitePresetTable extends LitElement {
@@ -24,17 +25,17 @@ export class DynalitePresetTable extends LitElement {
   @property({ type: String }) public defaultFade!: string;
 
   protected render(): TemplateResult | void {
-    console.log("XXX preset table render");
-    console.dir(this.hass);
     if (!this.hass) {
       return html``;
     }
-    console.log("XXX preset table render2");
     const settings: DynaliteTableSettings = {
       name: "Preset",
       inputs: this._inputs,
     };
-    const helpers = { name: `Default: Preset DYNETID`, fade: `Default: ${this.defaultFade}` };
+    const helpers = {
+      name: `Default: Preset ${CONF_DYNET_ID}`,
+      fade: `Default: ${this.defaultFade}`,
+    };
     return html`
       <dynalite-table
         .hass=${this.hass}
@@ -51,22 +52,24 @@ export class DynalitePresetTable extends LitElement {
   }
 
   private _redispatchEvent(_ev: CustomEvent) {
-    console.log("redispatch");
     this.dispatchEvent(new CustomEvent("dynalite-table"));
   }
 
   private _inputs = {
-    dynetId: DynaliteIdInput("dynetId", "preset")
+    dynetId: DynaliteIdInput(CONF_DYNET_ID, "preset")
       .heading("Number")
       .width("15%")
       .desc("Dynalite preset number (1-255)")
       .required(),
-    name: DynaliteTextInput("name").heading("Name").desc("Name for this preset").width("35%"),
-    level: DynalitePercentageInput("level")
+    name: DynaliteTextInput(CONF_NAME).heading("Name").desc("Name for this preset").width("35%"),
+    level: DynalitePercentageInput(CONF_LEVEL)
       .heading("Level")
       .desc("Channel levels for this preset")
       .width("15%"),
-    fade: DynaliteFadeInput("fade").heading("Fade").desc("Preset fade time (seconds)").width("15%"),
+    fade: DynaliteFadeInput(CONF_FADE)
+      .heading("Fade")
+      .desc("Preset fade time (seconds)")
+      .width("15%"),
   };
 }
 

@@ -14,8 +14,6 @@ export class DynaliteActionButton extends LitElement {
   @property({ type: String }) public label!: string;
 
   protected render(): TemplateResult | void {
-    console.log("XXX render action-button param=%s", this.param);
-    console.dir(this);
     return html`
       <ha-button-menu
         @action=${this._handleAction}
@@ -37,9 +35,6 @@ export class DynaliteActionButton extends LitElement {
   }
 
   private async _handleAction(ev) {
-    console.log("handleAction");
-    console.dir(ev);
-    console.dir(this);
     const index = ev.detail.index;
     switch (index) {
       case 0: {
@@ -50,15 +45,10 @@ export class DynaliteActionButton extends LitElement {
             confirmText: "Confirm",
           }))
         ) {
-          console.log("received no");
           return;
         }
-        console.log("received yes");
         this.dispatchEvent(new CustomEvent("dynalite-action-button", { detail: this.param }));
         break;
-      }
-      default: {
-        console.error("invalid index %s", index);
       }
     }
   }

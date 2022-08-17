@@ -10,6 +10,15 @@ import {
   DynaliteSelectInput,
   DynaliteTextInput,
 } from "./dynalite-input-settings";
+import {
+  CONF_CHANNEL,
+  CONF_DYNET_ID,
+  CONF_FADE,
+  CONF_LIGHT,
+  CONF_NAME,
+  CONF_SWITCH,
+  CONF_TYPE,
+} from "./const";
 
 @customElement("dynalite-channel-table")
 export class DynaliteChannelTable extends LitElement {
@@ -24,17 +33,17 @@ export class DynaliteChannelTable extends LitElement {
   @property({ type: String }) public defaultFade!: string;
 
   protected render(): TemplateResult | void {
-    console.log("XXX channel table render");
-    console.dir(this.hass);
     if (!this.hass) {
       return html``;
     }
-    console.log("XXX channel table render2");
     const settings: DynaliteTableSettings = {
       name: "Channel",
       inputs: this._inputs,
     };
-    const helpers = { name: `Default: Channel DYNETID`, fade: `Default: ${this.defaultFade}` };
+    const helpers = {
+      name: `Default: Channel ${CONF_DYNET_ID}`,
+      fade: `Default: ${this.defaultFade}`,
+    };
     return html`
       <dynalite-table
         .hass=${this.hass}
@@ -54,20 +63,23 @@ export class DynaliteChannelTable extends LitElement {
   }
 
   private _inputs = {
-    dynetId: DynaliteIdInput("dynetId", "channel")
+    dynetId: DynaliteIdInput(CONF_DYNET_ID, CONF_CHANNEL)
       .heading("Number")
       .width("15%")
       .desc("Dynalite channel number (1-255)")
       .required(),
-    name: DynaliteTextInput("name").heading("Name").desc("Name for this channel").width("15%"),
-    fade: DynaliteFadeInput("fade").heading("Fade").desc("Preset fade time (seconds)").width("15%"),
-    type: DynaliteSelectInput("type")
+    name: DynaliteTextInput(CONF_NAME).heading("Name").desc("Name for this channel").width("15%"),
+    fade: DynaliteFadeInput(CONF_FADE)
+      .heading("Fade")
+      .desc("Preset fade time (seconds)")
+      .width("15%"),
+    type: DynaliteSelectInput(CONF_TYPE)
       .heading("Type")
       .desc("Entity type to create")
       .width("15%")
       .selection([
-        ["light", "Light (default)"],
-        ["switch", "Switch"],
+        [CONF_LIGHT, "Light (default)"],
+        [CONF_SWITCH, "Switch"],
       ])
       .transform(capitalizeFirst),
   };

@@ -8,6 +8,7 @@ import type { HaSwitch } from "../homeassistant-frontend/src/components/ha-switc
 import "../homeassistant-frontend/src/components/ha-select";
 import "@material/mwc-list/mwc-list-item";
 import { DynaliteInputSettings } from "./dynalite-input-settings";
+import { TYPE_BOOLEAN, TYPE_NUMBER, TYPE_SELECT } from "./const";
 
 @customElement("dynalite-input")
 export class DynaliteInput extends LitElement {
@@ -34,7 +35,7 @@ export class DynaliteInput extends LitElement {
       <ha-settings-row>
         <span slot="heading" data-for=${this.settings.nameVal}> ${this.settings.headingVal} </span>
         <span slot="description" data-for=${this.settings.nameVal}> ${this.settings.descVal} </span>
-        ${!this.settings.typeVal || this.settings.typeVal === "number"
+        ${!this.settings.typeVal || this.settings.typeVal === TYPE_NUMBER
           ? html`
               <ha-textfield
                 id="my-textfield"
@@ -55,7 +56,7 @@ export class DynaliteInput extends LitElement {
                 @wheel=${this._onWheel}
               ></ha-textfield>
             `
-          : this.settings.typeVal === "boolean"
+          : this.settings.typeVal === TYPE_BOOLEAN
           ? html`
               <ha-switch
                 .preference=${this.settings.nameVal}
@@ -66,7 +67,7 @@ export class DynaliteInput extends LitElement {
               >
               </ha-switch>
             `
-          : this.settings.typeVal === "select"
+          : this.settings.typeVal === TYPE_SELECT
           ? html`
               <ha-select
                 name=${this.settings.nameVal}
@@ -91,44 +92,30 @@ export class DynaliteInput extends LitElement {
   }
 
   public isValid(): boolean {
-    if (["boolean", "select"].includes(this.settings.typeVal || "")) return true;
+    if ([TYPE_BOOLEAN, TYPE_SELECT].includes(this.settings.typeVal || "")) return true;
     return this.myTextField && this.myTextField.validity.valid;
   }
 
   private _updateParent(name: string, value: any) {
-    console.log("input update parent");
     this.dispatchEvent(
       new CustomEvent("dynalite-input", { detail: { target: name, value: value } })
     );
   }
 
   private _handleTextChange(ev) {
-    console.log("XXX _handleChange");
-    console.dir(ev);
     const target = ev.currentTarget;
-    if (!target) {
-      console.log("invalid event - no target");
-      return;
-    }
+    if (!target) return;
+
     const value =
       this.settings.suffixVal !== "%" || !target.value
         ? target.value
         : Number(target.value) / 100 + "";
-    console.log(
-      "XXX TBD handle change name=%s value=%s target=%s",
-      target.name,
-      value,
-      target.value
-    );
-    console.dir(ev);
     this._updateParent(target.name, value);
   }
 
   private _handleBoolChange(ev) {
     const target = ev.currentTarget as HaSwitch;
     const name = (target as any).preference;
-    console.log("XXX TBD handle change name=%s checked=%s", name, target.checked);
-    console.dir(ev);
     this._updateParent(name, target.checked);
   }
 

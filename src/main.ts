@@ -5,7 +5,13 @@ import "../homeassistant-frontend/src/resources/ha-style";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { ProvideHassLitMixin } from "../homeassistant-frontend/src/mixins/provide-hass-lit-mixin";
 import "./dynalite-router";
-import { capitalizeFirst, Dynalite, DynaliteConfigResponse } from "./common";
+import {
+  capitalizeFirst,
+  Dynalite,
+  DynaliteConfigResponse,
+  DynaliteDefaultTemplates,
+} from "./common";
+import { CONF_ACTIVE_OFF, EVENT_CONFIG_CHANGED, WS_GET_CONFIG, WS_SAVE_CONFIG } from "./const";
 
 @customElement("dynalite-panel")
 class DynalitePanel extends ProvideHassLitMixin(LitElement) {
@@ -20,42 +26,32 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
   @state() private _activeEntry?: string;
 
   public connectedCallback() {
-    console.log("XXX addEventListener");
     super.connectedCallback();
-    this.addEventListener("value-changed", this._updateDynalite);
+    this.addEventListener(EVENT_CONFIG_CHANGED, this._updateDynalite);
     makeDialogManager(this, this.shadowRoot!);
   }
 
   public disconnectedCallback() {
-    console.log("XXX removeEventListener");
-    this.removeEventListener("value-changed", this._updateDynalite);
+    this.removeEventListener(EVENT_CONFIG_CHANGED, this._updateDynalite);
     super.disconnectedCallback();
   }
 
   protected async willUpdate(
     _changedProperties: Map<string | number | symbol, unknown>
   ): Promise<void> {
-    console.log("XXX dynalite-panel willUpdate");
     if (!this.hass) {
-      console.log("XXX no hass");
       return;
     }
     if (!this.dynalite) {
-      console.log("before");
       await this._getDynaliteConfig();
-      console.log("after");
     }
     super.willUpdate(_changedProperties);
   }
 
   protected render(): TemplateResult | void {
-    console.log("XXX dynalite-panel render 1");
     if (!this.hass || !this.dynalite) {
-      console.log("XXX render - no hass(%s) or dynalite(%s)", this.hass, this.dynalite);
       return html``;
     }
-    console.log("XXX dynalite-panel render 2");
-    console.dir(this.hass);
     return html`
       <dynalite-router
         .hass=${this.hass}
@@ -67,13 +63,10 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
   }
 
   private async _getDynaliteConfig(): Promise<void> {
-    console.log("XXX getDynaliteConfig");
     const resp = await this.hass.connection.sendMessagePromise({
-      type: "dynalite/get-config",
+      type: WS_GET_CONFIG,
     });
     if (resp) {
-      console.log("XXX Message success!");
-      console.dir(resp);
       const completeConfig = (resp as DynaliteConfigResponse).config;
       if (completeConfig.length === 1 || !this._activeEntry) {
         this._activeEntry = Object.keys(completeConfig)[0];
@@ -84,12 +77,13 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
       if (!curConfig.default || !curConfig.default.fade) {
         curConfig.default = { fade: "0" };
       }
-      if (!curConfig.active) curConfig.active = "off";
+      if (!curConfig.active) curConfig.active = CONF_ACTIVE_OFF;
       if (!curConfig.template) curConfig.template = {};
-      ["room", "time_cover"].forEach((template) => {
+      Object.keys(DynaliteDefaultTemplates).forEach((template) => {
         if (!curConfig.template![template]) curConfig.template![template] = {};
       });
-      if (!curConfig.template.time_cover?.class) curConfig.template.time_cover!.class = "blind";
+      if (!curConfig.template.time_cover?.class)
+        curConfig.template.time_cover!.class = DynaliteDefaultTemplates.time_cover!.class;
       const defaults = (resp as DynaliteConfigResponse).default;
       this.dynalite = {
         config: curConfig,
@@ -99,23 +93,15 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
           capitalizeFirst(devClass),
         ]),
       };
-      console.log("DEFAULTS");
-      console.dir(this.dynalite.classSelection);
-    } else {
-      console.error("Message failed!");
     }
   }
 
-  private async _updateDynalite(e: Event) {
-    console.log("XXX TBD _updateDynalite");
-    console.dir(e);
-    console.dir(this.dynalite.config);
-    const resp = await this.hass.connection.sendMessagePromise({
-      type: "dynalite/save-config",
+  private async _updateDynalite(_e: Event) {
+    await this.hass.connection.sendMessagePromise({
+      type: WS_SAVE_CONFIG,
       entry_id: this._activeEntry,
       config: this.dynalite.config,
     });
-    console.error("XXX resp=%s", resp);
   }
 }
 

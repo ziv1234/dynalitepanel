@@ -18,7 +18,7 @@ class DynaliteRouter extends HassRouterPage {
   @property({ attribute: false }) public narrow!: boolean;
 
   protected routerOptions: RouterOptions = {
-    defaultPage: "areas",
+    defaultPage: ROUTE_AREAS,
     routes: {
       [ROUTE_AREAS]: {
         tag: "dynalite-areas",
@@ -55,8 +55,6 @@ class DynaliteRouter extends HassRouterPage {
   }
 
   protected updatePageEl(el, changedProps: PropertyValues) {
-    console.log("XXX router updatepage current=%s", this._currentPage);
-    console.dir(this.hass);
     el.route = this.routeTail;
     el.hass = this.hass;
     el.dynalite = this.dynalite;

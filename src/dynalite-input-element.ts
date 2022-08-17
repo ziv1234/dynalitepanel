@@ -17,6 +17,7 @@ export abstract class DynaliteInputElement<T> extends LitElement {
   protected excluded?: { [key in keyof T]?: string[] };
 
   protected genInputElement(param: keyof T): TemplateResult {
+    if (this.settings[param].nameVal !== param) throw new Error("illegal param");
     return html`
       <dynalite-input
         .settings=${this.settings[param]}
@@ -30,11 +31,9 @@ export abstract class DynaliteInputElement<T> extends LitElement {
   }
 
   protected handleDynaliteInputChange(ev) {
-    console.dir(ev);
     const detail = ev.detail;
     const target = detail.target;
     const value = detail.value;
-    console.log("XXX TBD handle change name=%s value=%s", target, value);
     this.result![target] = value;
     this.hasElementChanged = true;
     this.requestUpdate();

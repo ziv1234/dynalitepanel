@@ -1,4 +1,5 @@
 import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
+import { EVENT_SHOW_DIALOG } from "./const";
 import { DynaliteEditDialogParams } from "./dynalite-edit-dialog-types";
 
 export const loadDynaliteEditDialog = () =>
@@ -8,7 +9,7 @@ export function showDynaliteEditDialog(
   element: HTMLElement,
   dialogParams: DynaliteEditDialogParams
 ): void {
-  fireEvent(element, "show-dialog", {
+  fireEvent(element, EVENT_SHOW_DIALOG, {
     dialogTag: "dynalite-edit-dialog",
     dialogImport: loadDynaliteEditDialog,
     dialogParams,

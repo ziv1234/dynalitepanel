@@ -32,6 +32,32 @@ import {
   DynaliteTextInput,
 } from "./dynalite-input-settings";
 import { DynaliteInputElement } from "./dynalite-input-element";
+import {
+  CONF_ACTIVE,
+  CONF_ACTIVE_INIT,
+  CONF_ACTIVE_OFF,
+  CONF_ACTIVE_ON,
+  CONF_AUTODISCOVER,
+  CONF_CHANNEL,
+  CONF_CHANNEL_COVER,
+  CONF_CLASS,
+  CONF_CLOSE,
+  CONF_DURATION,
+  CONF_FADE,
+  CONF_NAME,
+  CONF_OPEN,
+  CONF_OVERRIDE_PRESETS,
+  CONF_OVERRIDE_TEMPLATES,
+  CONF_PRESET,
+  CONF_ROOM_OFF,
+  CONF_ROOM_ON,
+  CONF_STOP,
+  CONF_TILT,
+  CONF_TILT_ENABLED,
+  EVENT_CONFIG_CHANGED,
+  TEMPLATE_COVER,
+  TEMPLATE_ROOM,
+} from "./const";
 
 interface DynaliteGlobalSettingsInput {
   name: string;
@@ -39,7 +65,7 @@ interface DynaliteGlobalSettingsInput {
   fade: string;
   active: string;
   overridePresets: boolean;
-  configureTemplates: boolean;
+  overrideTemplates: boolean;
   room_on: string;
   room_off: string;
   open: string;
@@ -70,19 +96,16 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
 
   protected willUpdate(_changedProperties: Map<string | number | symbol, unknown>): void {
     super.willUpdate(_changedProperties);
-    console.log("XXX conn");
-    console.dir(this.dynalite);
     if (!this.dynalite) return;
     if (!this._hasInitialized) {
-      console.log("initizlizing global settings");
       this.settings.class.selection(this.dynalite.classSelection);
       this.result = {
         name: this.dynalite.config.name || "",
         autodiscover: this.dynalite.config.autodiscover!,
         fade: this.dynalite.config.default!.fade!,
         active: this.dynalite.config.active!,
-        overridePresets: "preset" in this.dynalite.config,
-        configureTemplates: false,
+        overridePresets: CONF_PRESET in this.dynalite.config,
+        overrideTemplates: false,
         room_on: "",
         room_off: "",
         open: "",
@@ -104,7 +127,7 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
           this.result[param] = this.dynalite.config.template![template][param];
         this.helpers![param] = "Default: " + DynaliteDefaultTemplates[template][param];
       });
-      if ("tilt" in this.dynalite.config.template!.time_cover!) {
+      if (CONF_TILT in this.dynalite.config.template!.time_cover!) {
         if (parseFloat(this.result.tilt) === 0) {
           this.result.tiltEnabled = false;
           this.result.tilt = DynaliteDefaultTemplates.time_cover!.tilt!;
@@ -121,20 +144,16 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
   }
 
   protected render(): TemplateResult | void {
-    console.log("XXX global settings render");
-    console.dir(this.hass);
     if (!this.hass || !this.dynalite) {
       return html``;
     }
-    console.log("XXX render global settings len=%s", this._inputElements?.length);
-    console.dir(this._inputElements);
     const canSave =
       this.hasElementChanged &&
       this._inputElements?.length &&
       Array.from(this._inputElements).every(
-        (elem) => elem.isValid() || (elem.settings.nameVal === "tilt" && !this.result.tiltEnabled)
+        (elem) =>
+          elem.isValid() || (elem.settings.nameVal === CONF_TILT && !this.result.tiltEnabled)
       );
-    console.log("canSave=%s", canSave);
     return html`
       <hass-tabs-subpage
         .hass=${this.hass}
@@ -149,18 +168,18 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
               <h1>Configure Global Dynalite Settings</h1>
               <p>Host: ${this.dynalite.config.host} Port: ${this.dynalite.config.port}</p>
               <h2>Global Settings</h2>
-              ${this.genInputElement("name")}
-              ${this.genInputElement("autodiscover")}
-              ${this.genInputElement("fade")}
-              ${this.genInputElement("active")}
+              ${this.genInputElement(CONF_NAME)}
+              ${this.genInputElement(CONF_AUTODISCOVER)}
+              ${this.genInputElement(CONF_FADE)}
+              ${this.genInputElement(CONF_ACTIVE)}
               <h2>Settings for Blinds and Covers</h2>
-              ${this.genInputElement("class")}
-              ${this.genInputElement("duration")}
-              ${this.genInputElement("tiltEnabled")}
-              ${this.result.tiltEnabled ? this.genInputElement("tilt") : html``}
+              ${this.genInputElement(CONF_CLASS)}
+              ${this.genInputElement(CONF_DURATION)}
+              ${this.genInputElement(CONF_TILT_ENABLED)}
+              ${this.result.tiltEnabled ? this.genInputElement(CONF_TILT) : html``}
               <h1>Advanced Settings</h1>
               ${this.result.overridePresets ? html` <h2>Default Presets</h2>` : html``}
-              ${this.genInputElement("overridePresets")}
+              ${this.genInputElement(CONF_OVERRIDE_PRESETS)}
               ${
                 this.result.overridePresets
                   ? html`<dynalite-preset-table
@@ -175,18 +194,18 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
               }
               </dynalite-preset-table>
               ${
-                this.result.configureTemplates
+                this.result.overrideTemplates
                   ? html` <h2>Area Behavior Default Settings</h2>
                       <p>Advanced only - recommended to leave empty</p>`
                   : html``
               }
-              ${this.genInputElement("configureTemplates")}
+              ${this.genInputElement(CONF_OVERRIDE_TEMPLATES)}
               ${
-                this.result.configureTemplates
+                this.result.overrideTemplates
                   ? html`
-                      <b>On/Off Switch</b>
+                      <b>${TEMPLATE_ROOM}</b>
                       ${this.genInputElement("room_on")} ${this.genInputElement("room_off")}
-                      <b>Blind or Cover</b>
+                      <b>${TEMPLATE_COVER}</b>
                       ${this.genInputElement("open")} ${this.genInputElement("close")}
                       ${this.genInputElement("stop")} ${this.genInputElement("channel_cover")}
                     `
@@ -209,7 +228,6 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
 
   private _save() {
     // fill complete and send update signal
-    console.log("XXX save");
     if (this.result.name) this.dynalite.config.name = this.result.name;
     else delete this.dynalite.config.name;
     this.dynalite.config.autodiscover = this.result.autodiscover;
@@ -224,10 +242,8 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
     });
     if (!this.result.tiltEnabled) templates.time_cover!.tilt = "0";
     this.dynalite.config.template = templates;
-    console.dir(this.dynalite.config);
-    console.log("XXX dispatching");
     this.hasElementChanged = false;
-    fireEvent(this, "value-changed");
+    fireEvent(this, EVENT_CONFIG_CHANGED);
   }
 
   protected result = {
@@ -236,7 +252,7 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
     fade: "",
     active: "off",
     overridePresets: false,
-    configureTemplates: false,
+    overrideTemplates: false,
     room_on: "",
     room_off: "",
     open: "",
@@ -250,50 +266,52 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
   };
 
   protected settings = {
-    name: DynaliteTextInput("name")
+    name: DynaliteTextInput(CONF_NAME)
       .heading("System Name")
       .desc("User-defined name for this Dynalite system"),
-    autodiscover: DynaliteBooleanInput("autodiscover")
+    autodiscover: DynaliteBooleanInput(CONF_AUTODISCOVER)
       .heading("Auto Discover")
       .desc("Discover devices dynamically (useful for initial setup)"),
-    fade: DynaliteFadeInput("fade")
+    fade: DynaliteFadeInput(CONF_FADE)
       .heading("Fade Time")
       .desc("Default fade for device actions (seconds)"),
-    active: DynaliteSelectInput("active")
+    active: DynaliteSelectInput(CONF_ACTIVE)
       .heading("Active Mode")
       .desc("Actively poll system - may increase load")
       .selection([
-        ["off", "Not Active (default)"],
-        ["init", "Initial Init"],
-        ["on", "Always Active"],
+        [CONF_ACTIVE_OFF, "Not Active (default)"],
+        [CONF_ACTIVE_INIT, "Initial Init"],
+        [CONF_ACTIVE_ON, "Always Active"],
       ]),
-    class: DynaliteSelectInput("class").heading("Type").desc("Default type for new blinds"),
-    duration: DynaliteDurationInput("duration")
+    class: DynaliteSelectInput(CONF_CLASS).heading("Type").desc("Default type for new blinds"),
+    duration: DynaliteDurationInput(CONF_DURATION)
       .heading("Default Open/Close Duration")
       .desc("Time in seconds to open a blind"),
-    tiltEnabled: DynaliteBooleanInput("tiltEnabled")
+    tiltEnabled: DynaliteBooleanInput(CONF_TILT_ENABLED)
       .heading("Enable Tilt")
       .desc("Enable tilt by default in blinds"),
-    tilt: DynaliteDurationInput("tilt")
+    tilt: DynaliteDurationInput(CONF_TILT)
       .heading("Default Tilt Duration")
       .desc("Time in seconds to open the tilt")
       .required(),
-    overridePresets: DynaliteBooleanInput("overridePresets")
+    overridePresets: DynaliteBooleanInput(CONF_OVERRIDE_PRESETS)
       .heading("Override Default Presets")
       .desc("Not recommended"),
-    configureTemplates: DynaliteBooleanInput("configureTemplates")
+    overrideTemplates: DynaliteBooleanInput(CONF_OVERRIDE_TEMPLATES)
       .heading("Configure Behaviors")
       .desc("Not recommended"),
-    room_on: DynaliteIdInput("room_on", "preset")
+    room_on: DynaliteIdInput(CONF_ROOM_ON, CONF_PRESET)
       .heading("Turn On")
       .desc("Preset that turns an area on"),
-    room_off: DynaliteIdInput("room_off", "preset")
+    room_off: DynaliteIdInput(CONF_ROOM_OFF, CONF_PRESET)
       .heading("Turn Off")
       .desc("Preset that turns an area off"),
-    open: DynaliteIdInput("open", "preset").heading("Open").desc("Preset to open a blind"),
-    close: DynaliteIdInput("close", "preset").heading("Close").desc("Preset to close a blind"),
-    stop: DynaliteIdInput("stop", "preset").heading("Open").desc("Preset to open a blind"),
-    channel_cover: DynaliteIdInput("channel_cover", "channel")
+    open: DynaliteIdInput(CONF_OPEN, CONF_PRESET).heading("Open").desc("Preset to open a blind"),
+    close: DynaliteIdInput(CONF_CLOSE, CONF_PRESET)
+      .heading("Close")
+      .desc("Preset to close a blind"),
+    stop: DynaliteIdInput(CONF_STOP, CONF_PRESET).heading("Open").desc("Preset to open a blind"),
+    channel_cover: DynaliteIdInput(CONF_CHANNEL_COVER, CONF_CHANNEL)
       .heading("Controlling channel")
       .desc("Channel number to control a blind"),
   };

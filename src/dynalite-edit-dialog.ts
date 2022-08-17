@@ -17,6 +17,7 @@ import { DynaliteInput } from "./dynalite-input";
 import { DynaliteEditDialogParams, DynaliteRowData } from "./dynalite-edit-dialog-types";
 import { DynaliteInputElement } from "./dynalite-input-element";
 import "./dynalite-action-button";
+import { CONF_DYNET_ID, EVENT_DIALOG_CLOSED } from "./const";
 
 @customElement("dynalite-edit-dialog")
 export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
@@ -43,18 +44,12 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
     this.settings = params.inputs;
     this.excluded = { dynetId: params.excluded };
     this.disabled = (params.disabled as any) || [];
-    this._isNew = !("dynetId" in this._params.value);
+    this._isNew = !(CONF_DYNET_ID in this._params.value);
     this._genHelpers();
-    console.log("show %s", this._isNew);
   }
 
   protected render(): TemplateResult | void {
     if (!this._params) return html``;
-    console.log("XXX render edit dialog len=%s", this._inputElements?.length);
-    console.dir(this._inputElements);
-    this._inputElements?.forEach((el) => {
-      console.log("aa %s", el.isValid());
-    });
     const canSave =
       this.hasElementChanged &&
       this._inputElements?.length &&
@@ -96,19 +91,16 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
 
   private _onDelete(ev): void {
     const dynetId = ev.detail;
-    console.log("_onDelete edit-dialog num=%s", dynetId);
     this._params!.onDelete!(dynetId);
     this._close();
   }
 
   private _close(): void {
     this._params = undefined;
-    fireEvent(this, "dialog-closed", { dialog: this.localName });
+    fireEvent(this, EVENT_DIALOG_CLOSED, { dialog: this.localName });
   }
 
   private _save(): void {
-    console.log("saving");
-    console.dir(this._params);
     this._params?.onSave(this._params);
     this._close();
   }
@@ -117,17 +109,15 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
     const res: { [key: string]: string } = {};
     if (this._params?.value.dynetId) {
       Object.entries(this._params.helpers!).forEach(([key, value]) => {
-        res[key] = value.replace("DYNETID", this._params!.value.dynetId!);
+        res[key] = value.replace(CONF_DYNET_ID, this._params!.value.dynetId!);
       });
     } else {
       Object.entries(this._params!.helpers!).forEach(([key, value]) => {
-        if (!value.includes("DYNETID")) {
+        if (!value.includes(CONF_DYNET_ID)) {
           res[key] = value;
         }
       });
     }
-    console.log("gen helpers");
-    console.dir(res);
     this.helpers = res;
   }
 

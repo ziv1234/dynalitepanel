@@ -1,3 +1,5 @@
+import { TYPE_NUMBER } from "./const";
+
 export class DynaliteInputSettings {
   public nameVal: string;
 
@@ -53,17 +55,17 @@ export class DynaliteInputSettings {
 
   public min(value: number): DynaliteInputSettings {
     this.minVal = value;
-    return this.type("number");
+    return this.type(TYPE_NUMBER);
   }
 
   public max(value: number): DynaliteInputSettings {
     this.maxVal = value;
-    return this.type("number");
+    return this.type(TYPE_NUMBER);
   }
 
   public step(value: number): DynaliteInputSettings {
     this.stepVal = value;
-    return this.type("number");
+    return this.type(TYPE_NUMBER);
   }
 
   public selection(value: string[][]): DynaliteInputSettings {

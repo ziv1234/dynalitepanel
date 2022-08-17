@@ -14,6 +14,7 @@ import type {
 } from "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import { navigate } from "../homeassistant-frontend/src/common/navigate";
+import { CONF_DYNET_ID, TEMPLATE_COVER, TEMPLATE_MANUAL, TEMPLATE_ROOM } from "./const";
 
 @customElement("dynalite-areas")
 export class DynaliteAreas extends LitElement {
@@ -26,12 +27,9 @@ export class DynaliteAreas extends LitElement {
   @property({ attribute: false }) public narrow = false;
 
   protected render(): TemplateResult | void {
-    console.log("XXX areas render");
-    console.dir(this.hass);
     if (!this.hass || !this.dynalite) {
       return html``;
     }
-    console.log("XXX render areas");
     const data = this._calculateData();
     return html`
       <hass-tabs-subpage
@@ -42,12 +40,9 @@ export class DynaliteAreas extends LitElement {
       >
         <ha-data-table
           .hass=${this.hass}
-          .narrow=${this.narrow}
-          .tabs=${panelTabs}
-          .route=${this.route}
           .columns=${this._columns(this.narrow)}
           .data=${data}
-          id="dynetId"
+          id=${CONF_DYNET_ID}
           clickable
           @row-click=${this._handleRowClicked}
         ></ha-data-table>
@@ -60,8 +55,6 @@ export class DynaliteAreas extends LitElement {
 
   private _handleRowClicked(ev) {
     const dynetId = ev.detail.id;
-    console.log("XXX TBD table row-click dynetId=%s", dynetId);
-    console.dir(ev);
     navigate(`/dynalite/edit/${dynetId}`);
   }
 
@@ -120,22 +113,19 @@ export class DynaliteAreas extends LitElement {
 
   private _calculateData(): DataTableRowData[] {
     function calcSingleArea(areaNum: string, areaConfig: any): DynaliteAreaRowInfo {
-      const templateNames = { room: "On/Off Switch", time_cover: "Blind or Cover" };
+      const templateNames = { room: TEMPLATE_ROOM, time_cover: TEMPLATE_COVER };
       return {
         name: areaConfig.name,
         dynetId: areaNum,
-        template: areaConfig.template ? templateNames[areaConfig.template] : "Manual",
+        template: areaConfig.template ? templateNames[areaConfig.template] : TEMPLATE_MANUAL,
         fade: areaConfig.fade,
         preset: areaConfig.preset ? Object.keys(areaConfig.preset).join(", ") : "-",
         channel: areaConfig.channel ? Object.keys(areaConfig.channel).join(", ") : "-",
       };
     }
-    console.log("XXX calculateData");
-    console.dir(this.dynalite.config.area);
     const areas = this.dynalite.config.area!;
     const areaNumbers = Object.keys(areas);
     const data = areaNumbers.map((area) => calcSingleArea(area, areas[area]));
-    console.log("XXX areas=%s", Object.keys(areas));
     return data;
   }
 
