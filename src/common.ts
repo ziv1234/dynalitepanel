@@ -138,5 +138,6 @@ export function dynaliteCopy<T>(src: T): T {
 }
 
 export function capitalizeFirst(val: string): string {
+  if (!val) return "";
   return val[0].toUpperCase() + val.substring(1);
 }

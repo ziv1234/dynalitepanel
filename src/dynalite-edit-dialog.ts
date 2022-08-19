@@ -45,11 +45,11 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
     this.excluded = { dynetId: params.excluded };
     this.disabled = (params.disabled as any) || [];
     this._isNew = !(CONF_DYNET_ID in this._params.value);
-    this._genHelpers();
   }
 
   protected render(): TemplateResult | void {
     if (!this._params) return html``;
+    this._genHelpers();
     const canSave =
       this.hasElementChanged &&
       this._inputElements?.length &&
@@ -107,9 +107,9 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
 
   private _genHelpers(): void {
     const res: { [key: string]: string } = {};
-    if (this._params?.value.dynetId) {
-      Object.entries(this._params.helpers!).forEach(([key, value]) => {
-        res[key] = value.replace(CONF_DYNET_ID, this._params!.value.dynetId!);
+    if (this._params?.value.dynetId || (this.result as DynaliteRowData).dynetId) {
+      Object.entries(this._params!.helpers!).forEach(([key, value]) => {
+        res[key] = value.replace(CONF_DYNET_ID, (this.result as DynaliteRowData).dynetId!);
       });
     } else {
       Object.entries(this._params!.helpers!).forEach(([key, value]) => {

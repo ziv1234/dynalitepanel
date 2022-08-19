@@ -36,6 +36,7 @@ import { navigate } from "../homeassistant-frontend/src/common/navigate";
 import { DynaliteInputElement } from "./dynalite-input-element";
 import "./dynalite-action-button";
 import {
+  AREA_GENERAL_PARAMS,
   CONF_ADVANCED,
   CONF_AREA,
   CONF_CHANNEL,
@@ -58,9 +59,12 @@ import {
   CONF_TILT_ENABLED,
   CONF_TIME_COVER,
   EVENT_CONFIG_CHANGED,
+  ROOM_PARAMS,
   TEMPLATE_COVER,
   TEMPLATE_MANUAL,
   TEMPLATE_ROOM,
+  TIME_COVER_ADVANCED_PARAMS,
+  TIME_COVER_GENERAL_PARAMS,
 } from "./const";
 
 interface DynaliteEditAreaInputs {
@@ -135,13 +139,18 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
         dynetId: this.areaNumber || "",
         name: areaData.name || "",
         template: areaData.template || "",
-        class: areaData.class || DynaliteDefaultTemplates.time_cover!.class!,
+        class:
+          areaData.class ||
+          this.dynalite.config.template?.time_cover?.class ||
+          DynaliteDefaultTemplates.time_cover!.class!,
         duration: areaData.duration || "",
         tiltEnabled: calcTilt !== 0,
-        tilt: calcTilt.toString() || DynaliteDefaultTemplates.time_cover!.tilt!,
+        tilt: areaData.tilt || "",
         fade: areaData.fade || "",
         nodefault: areaData.nodefault || false,
-        advanced: enumeratedTemplates.some(([_template, param]) => areaData[param]),
+        advanced: enumeratedTemplates.some(
+          ([_template, param]) => areaData[param] && !TIME_COVER_GENERAL_PARAMS.includes(param)
+        ),
         room_on: areaData.room_on || "",
         room_off: areaData.room_off || "",
         open: areaData.open || "",
@@ -250,37 +259,37 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
 
   private _save() {
     // fill complete and send update signal
+    console.log("saving area");
+    console.dir(this.result);
     const res: DynaliteAreaData = {
       channel: dynaliteCopy(this._channels),
       preset: dynaliteCopy(this._presets),
     };
-    [CONF_NAME, CONF_TEMPLATE, CONF_FADE, CONF_NODEFAULT].forEach((param) => {
+    AREA_GENERAL_PARAMS.forEach((param) => {
       if (this.result[param]) res[param] = this.result[param];
     });
-    if (this.result.template && this.result.advanced) {
-      if (this.result.template === CONF_ROOM) {
-        [CONF_ROOM_ON, CONF_ROOM_OFF].forEach((param) => {
+    if (this.result.template) {
+      if (this.result.template === CONF_ROOM && this.result.advanced) {
+        ROOM_PARAMS.forEach((param) => {
           if (this.result[param]) res[param] = this.result[param];
         });
       }
       if (this.result.template === CONF_TIME_COVER) {
-        [
-          CONF_OPEN,
-          CONF_CLOSE,
-          CONF_STOP,
-          CONF_CHANNEL_COVER,
-          CONF_CLASS,
-          CONF_DURATION,
-          CONF_TILT,
-        ].forEach((param) => {
+        const params = this.result.advanced
+          ? TIME_COVER_ADVANCED_PARAMS
+          : TIME_COVER_GENERAL_PARAMS;
+        console.dir(params);
+        params.forEach((param) => {
           if (this.result[param]) res[param] = this.result[param];
         });
         if (!this.result.tiltEnabled) res.tilt = "0";
       }
     }
+    console.dir(res);
     this.dynalite.config.area![this.result.dynetId] = res;
     this.hasElementChanged = false;
     fireEvent(this, EVENT_CONFIG_CHANGED);
+    this.requestUpdate();
   }
 
   private _deleteArea(ev) {

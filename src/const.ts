@@ -41,3 +41,12 @@ export const TYPE_NUMBER = "number";
 export const TYPE_SELECT = "select";
 export const WS_GET_CONFIG = "dynalite/get-config";
 export const WS_SAVE_CONFIG = "dynalite/save-config";
+export const AREA_GENERAL_PARAMS = [CONF_NAME, CONF_TEMPLATE, CONF_FADE, CONF_NODEFAULT];
+export const ROOM_PARAMS = [CONF_ROOM_ON, CONF_ROOM_OFF];
+export const TIME_COVER_GENERAL_PARAMS = [CONF_DURATION, CONF_TILT, CONF_CLASS];
+export const TIME_COVER_ADVANCED_PARAMS = TIME_COVER_GENERAL_PARAMS.concat([
+  CONF_OPEN,
+  CONF_CLOSE,
+  CONF_STOP,
+  CONF_CHANNEL_COVER,
+]);

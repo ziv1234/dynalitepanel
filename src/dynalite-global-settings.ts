@@ -127,17 +127,12 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
           this.result[param] = this.dynalite.config.template![template][param];
         this.helpers![param] = "Default: " + DynaliteDefaultTemplates[template][param];
       });
-      if (CONF_TILT in this.dynalite.config.template!.time_cover!) {
-        if (parseFloat(this.result.tilt) === 0) {
-          this.result.tiltEnabled = false;
-          this.result.tilt = DynaliteDefaultTemplates.time_cover!.tilt!;
-        } else {
-          this.result.tiltEnabled = true;
-          this.result.tilt = this.dynalite.config.template!.time_cover.tilt!;
-        }
-      } else {
+      if (parseFloat(this.result.tilt) === 0) {
+        this.result.tiltEnabled = false;
         this.result.tilt = DynaliteDefaultTemplates.time_cover!.tilt!;
+      } else {
         this.result.tiltEnabled = true;
+        this.result.tilt = this.dynalite.config.template!.time_cover!.tilt!;
       }
       this._hasInitialized = true;
     }
@@ -154,6 +149,7 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
         (elem) =>
           elem.isValid() || (elem.settings.nameVal === CONF_TILT && !this.result.tiltEnabled)
       );
+    const showAdvanced = this.hass.userData?.showAdvanced;
     return html`
       <hass-tabs-subpage
         .hass=${this.hass}
@@ -168,49 +164,51 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
               <h1>Configure Global Dynalite Settings</h1>
               <p>Host: ${this.dynalite.config.host} Port: ${this.dynalite.config.port}</p>
               <h2>Global Settings</h2>
-              ${this.genInputElement(CONF_NAME)}
-              ${this.genInputElement(CONF_AUTODISCOVER)}
-              ${this.genInputElement(CONF_FADE)}
-              ${this.genInputElement(CONF_ACTIVE)}
+              ${this.genInputElement(CONF_NAME)} ${this.genInputElement(CONF_AUTODISCOVER)}
+              ${this.genInputElement(CONF_FADE)} ${this.genInputElement(CONF_ACTIVE)}
               <h2>Settings for Blinds and Covers</h2>
-              ${this.genInputElement(CONF_CLASS)}
-              ${this.genInputElement(CONF_DURATION)}
+              ${this.genInputElement(CONF_CLASS)} ${this.genInputElement(CONF_DURATION)}
               ${this.genInputElement(CONF_TILT_ENABLED)}
               ${this.result.tiltEnabled ? this.genInputElement(CONF_TILT) : html``}
-              <h1>Advanced Settings</h1>
-              ${this.result.overridePresets ? html` <h2>Default Presets</h2>` : html``}
-              ${this.genInputElement(CONF_OVERRIDE_PRESETS)}
-              ${
-                this.result.overridePresets
-                  ? html`<dynalite-preset-table
-                      .hass=${this.hass}
-                      .narrow=${this.narrow}
-                      .route=${this.route}
-                      .presets=${this._presets || {}}
-                      defaultFade=${ifDefined(this.dynalite.config.default?.fade)}
-                      @dynalite-table=${this._onDynaliteTableEvent}
-                    ></dynalite-preset-table>`
-                  : html``
-              }
-              </dynalite-preset-table>
-              ${
-                this.result.overrideTemplates
-                  ? html` <h2>Area Behavior Default Settings</h2>
-                      <p>Advanced only - recommended to leave empty</p>`
-                  : html``
-              }
-              ${this.genInputElement(CONF_OVERRIDE_TEMPLATES)}
-              ${
-                this.result.overrideTemplates
-                  ? html`
-                      <b>${TEMPLATE_ROOM}</b>
-                      ${this.genInputElement("room_on")} ${this.genInputElement("room_off")}
-                      <b>${TEMPLATE_COVER}</b>
-                      ${this.genInputElement("open")} ${this.genInputElement("close")}
-                      ${this.genInputElement("stop")} ${this.genInputElement("channel_cover")}
-                    `
-                  : html``
-              }
+              ${showAdvanced
+                ? html`
+                  <h1>Advanced Settings</h1>
+                  ${this.result.overridePresets ? html` <h2>Default Presets</h2>` : html``}
+                  ${this.genInputElement(CONF_OVERRIDE_PRESETS)}
+                  ${
+                    this.result.overridePresets
+                      ? html`<dynalite-preset-table
+                          .hass=${this.hass}
+                          .narrow=${this.narrow}
+                          .route=${this.route}
+                          .presets=${this._presets || {}}
+                          defaultFade=${ifDefined(this.dynalite.config.default?.fade)}
+                          @dynalite-table=${this._onDynaliteTableEvent}
+                        ></dynalite-preset-table>`
+                      : html``
+                  }
+                  </dynalite-preset-table>
+                  ${
+                    this.result.overrideTemplates
+                      ? html` <h2>Area Behavior Default Settings</h2>
+                          <p>Advanced only - recommended to leave empty</p>`
+                      : html``
+                  }
+                  ${this.genInputElement(CONF_OVERRIDE_TEMPLATES)}
+                  ${
+                    this.result.overrideTemplates
+                      ? html`
+                          <b>${TEMPLATE_ROOM}</b>
+                          ${this.genInputElement(CONF_ROOM_ON)}
+                          ${this.genInputElement(CONF_ROOM_OFF)}
+                          <b>${TEMPLATE_COVER}</b>
+                          ${this.genInputElement(CONF_OPEN)} ${this.genInputElement(CONF_CLOSE)}
+                          ${this.genInputElement(CONF_STOP)}
+                          ${this.genInputElement(CONF_CHANNEL_COVER)}
+                        `
+                      : html``
+                  }`
+                : html``}
             </div>
             <div class="card-actions">
               <mwc-button @click=${this._save} ?disabled=${!canSave}> Save </mwc-button>
@@ -244,6 +242,7 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
     this.dynalite.config.template = templates;
     this.hasElementChanged = false;
     fireEvent(this, EVENT_CONFIG_CHANGED);
+    this.requestUpdate();
   }
 
   protected result = {
@@ -286,7 +285,8 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
     class: DynaliteSelectInput(CONF_CLASS).heading("Type").desc("Default type for new blinds"),
     duration: DynaliteDurationInput(CONF_DURATION)
       .heading("Default Open/Close Duration")
-      .desc("Time in seconds to open a blind"),
+      .desc("Time in seconds to open a blind")
+      .required(),
     tiltEnabled: DynaliteBooleanInput(CONF_TILT_ENABLED)
       .heading("Enable Tilt")
       .desc("Enable tilt by default in blinds"),

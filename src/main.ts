@@ -11,7 +11,13 @@ import {
   DynaliteConfigResponse,
   DynaliteDefaultTemplates,
 } from "./common";
-import { CONF_ACTIVE_OFF, EVENT_CONFIG_CHANGED, WS_GET_CONFIG, WS_SAVE_CONFIG } from "./const";
+import {
+  CONF_ACTIVE_OFF,
+  EVENT_CONFIG_CHANGED,
+  TIME_COVER_GENERAL_PARAMS,
+  WS_GET_CONFIG,
+  WS_SAVE_CONFIG,
+} from "./const";
 
 @customElement("dynalite-panel")
 class DynalitePanel extends ProvideHassLitMixin(LitElement) {
@@ -82,8 +88,10 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
       Object.keys(DynaliteDefaultTemplates).forEach((template) => {
         if (!curConfig.template![template]) curConfig.template![template] = {};
       });
-      if (!curConfig.template.time_cover?.class)
-        curConfig.template.time_cover!.class = DynaliteDefaultTemplates.time_cover!.class;
+      TIME_COVER_GENERAL_PARAMS.forEach((param) => {
+        if (!(param in curConfig.template.time_cover))
+          curConfig.template.time_cover[param] = DynaliteDefaultTemplates.time_cover![param];
+      });
       const defaults = (resp as DynaliteConfigResponse).default;
       this.dynalite = {
         config: curConfig,
@@ -97,6 +105,8 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
   }
 
   private async _updateDynalite(_e: Event) {
+    console.log("XXX updating dynalite");
+    console.dir(this.dynalite.config);
     await this.hass.connection.sendMessagePromise({
       type: WS_SAVE_CONFIG,
       entry_id: this._activeEntry,
