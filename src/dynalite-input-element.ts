@@ -1,7 +1,7 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { ifDefined } from "lit/directives/if-defined";
-import "./dynalite-input";
 import { DynaliteInputSettings } from "./dynalite-input-settings";
+import "./dynalite-input";
 
 export abstract class DynaliteInputElement<T> extends LitElement {
   protected abstract result: T;

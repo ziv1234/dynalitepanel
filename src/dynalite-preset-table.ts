@@ -1,6 +1,7 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators";
 import type { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
+import { CONF_DYNET_ID, CONF_FADE, CONF_LEVEL, CONF_NAME, CONF_PRESET } from "./const";
 import { DynalitePresetData } from "./common";
 import {
   DynaliteFadeInput,
@@ -10,7 +11,6 @@ import {
 } from "./dynalite-input-settings";
 import type { DynaliteTableSettings } from "./dynalite-table";
 import "./dynalite-table";
-import { CONF_DYNET_ID, CONF_FADE, CONF_LEVEL, CONF_NAME, CONF_PRESET } from "./const";
 
 @customElement("dynalite-preset-table")
 export class DynalitePresetTable extends LitElement {

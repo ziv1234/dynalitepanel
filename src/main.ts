@@ -1,7 +1,6 @@
 import { html, TemplateResult, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators";
 import { makeDialogManager } from "../homeassistant-frontend/src/dialogs/make-dialog-manager";
-import "../homeassistant-frontend/src/resources/ha-style";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { ProvideHassLitMixin } from "../homeassistant-frontend/src/mixins/provide-hass-lit-mixin";
 import "./dynalite-router";
@@ -19,6 +18,7 @@ import {
   WS_GET_CONFIG,
   WS_SAVE_CONFIG,
 } from "./const";
+import "../homeassistant-frontend/src/resources/ha-style";
 
 @customElement("dynalite-panel")
 class DynalitePanel extends ProvideHassLitMixin(LitElement) {

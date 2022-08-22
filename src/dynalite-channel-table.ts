@@ -1,15 +1,6 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
-import { capitalizeFirst, DynaliteChannelData } from "./common";
-import "./dynalite-table";
-import type { DynaliteTableSettings } from "./dynalite-table";
-import {
-  DynaliteFadeInput,
-  DynaliteIdInput,
-  DynaliteSelectInput,
-  DynaliteTextInput,
-} from "./dynalite-input-settings";
 import {
   CONF_CHANNEL,
   CONF_DYNET_ID,
@@ -19,6 +10,15 @@ import {
   CONF_SWITCH,
   CONF_TYPE,
 } from "./const";
+import { capitalizeFirst, DynaliteChannelData } from "./common";
+import type { DynaliteTableSettings } from "./dynalite-table";
+import {
+  DynaliteFadeInput,
+  DynaliteIdInput,
+  DynaliteSelectInput,
+  DynaliteTextInput,
+} from "./dynalite-input-settings";
+import "./dynalite-table";
 
 @customElement("dynalite-channel-table")
 export class DynaliteChannelTable extends LitElement {

@@ -1,40 +1,9 @@
 import { css, CSSResultGroup, html, TemplateResult } from "lit";
 import { customElement, property, queryAll, state } from "lit/decorators";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
-import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
-import "../homeassistant-frontend/src/components/ha-card";
-import "../homeassistant-frontend/src/components/ha-button-menu";
-import "../homeassistant-frontend/src/components/ha-icon-button";
-import "../homeassistant-frontend/src/components/ha-svg-icon";
-import "@material/mwc-button/mwc-button";
-import "@material/mwc-list";
-import {
-  Dynalite,
-  DynaliteAreaData,
-  DynaliteChannelData,
-  dynaliteCopy,
-  DynaliteDefaultTemplates,
-  DynalitePresetData,
-  enumeratedTemplates,
-  panelTabs,
-} from "./common";
-import "./dynalite-input";
-import type { DynaliteInput } from "./dynalite-input";
-import "./dynalite-preset-table";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
-import "./dynalite-channel-table";
 import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
-import {
-  DynaliteBooleanInput,
-  DynaliteDurationInput,
-  DynaliteFadeInput,
-  DynaliteIdInput,
-  DynaliteSelectInput,
-  DynaliteTextInput,
-} from "./dynalite-input-settings";
 import { navigate } from "../homeassistant-frontend/src/common/navigate";
-import { DynaliteInputElement } from "./dynalite-input-element";
-import "./dynalite-action-button";
 import {
   AREA_GENERAL_PARAMS,
   CONF_ADVANCED,
@@ -66,6 +35,32 @@ import {
   TIME_COVER_ADVANCED_PARAMS,
   TIME_COVER_GENERAL_PARAMS,
 } from "./const";
+import {
+  Dynalite,
+  DynaliteAreaData,
+  DynaliteChannelData,
+  dynaliteCopy,
+  DynaliteDefaultTemplates,
+  DynalitePresetData,
+  enumeratedTemplates,
+  panelTabs,
+} from "./common";
+import type { DynaliteInput } from "./dynalite-input";
+import {
+  DynaliteBooleanInput,
+  DynaliteDurationInput,
+  DynaliteFadeInput,
+  DynaliteIdInput,
+  DynaliteSelectInput,
+  DynaliteTextInput,
+} from "./dynalite-input-settings";
+import { DynaliteInputElement } from "./dynalite-input-element";
+import "@material/mwc-button/mwc-button";
+import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
+import "../homeassistant-frontend/src/components/ha-card";
+import "./dynalite-action-button";
+import "./dynalite-preset-table";
+import "./dynalite-channel-table";
 
 interface DynaliteEditAreaInputs {
   dynetId: string;

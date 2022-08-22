@@ -5,14 +5,17 @@ import type {
   DataTableColumnContainer,
   DataTableRowData,
 } from "../homeassistant-frontend/src/components/data-table/ha-data-table";
-import "../homeassistant-frontend/src/components/data-table/ha-data-table";
-import "../homeassistant-frontend/src/components/ha-fab";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
-import { showDynaliteEditDialog } from "./show-dialog-dynalite-edit";
-import type { DynaliteEditDialogParams, DynaliteRowData } from "./show-dialog-dynalite-edit";
-import { DynaliteInputSettings } from "./dynalite-input-settings";
 import { CONF_DYNET_ID } from "./const";
+import {
+  showDynaliteEditDialog,
+  DynaliteEditDialogParams,
+  DynaliteRowData,
+} from "./show-dialog-dynalite-edit";
+import type { DynaliteInputSettings } from "./dynalite-input-settings";
+import "../homeassistant-frontend/src/components/data-table/ha-data-table";
+import "../homeassistant-frontend/src/components/ha-fab";
 
 export interface DynaliteTableSettings {
   name: string;

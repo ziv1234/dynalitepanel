@@ -1,14 +1,14 @@
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement, property, query } from "lit/decorators";
 import { ifDefined } from "lit/directives/if-defined";
+import type { HaSwitch } from "../homeassistant-frontend/src/components/ha-switch";
+import { TYPE_BOOLEAN, TYPE_NUMBER, TYPE_SELECT } from "./const";
+import type { DynaliteInputSettings } from "./dynalite-input-settings";
+import "@material/mwc-list/mwc-list-item";
 import "../homeassistant-frontend/src/components/ha-settings-row";
 import "../homeassistant-frontend/src/components/ha-textfield";
 import "../homeassistant-frontend/src/components/ha-switch";
-import type { HaSwitch } from "../homeassistant-frontend/src/components/ha-switch";
 import "../homeassistant-frontend/src/components/ha-select";
-import "@material/mwc-list/mwc-list-item";
-import { DynaliteInputSettings } from "./dynalite-input-settings";
-import { TYPE_BOOLEAN, TYPE_NUMBER, TYPE_SELECT } from "./const";
 
 @customElement("dynalite-input")
 export class DynaliteInput extends LitElement {

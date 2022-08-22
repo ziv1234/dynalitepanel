@@ -1,4 +1,4 @@
-import { TYPE_NUMBER } from "./const";
+import { TYPE_NUMBER, TYPE_SELECT } from "./const";
 
 export class DynaliteInputSettings {
   public nameVal: string;
@@ -72,7 +72,7 @@ export class DynaliteInputSettings {
 
   public selection(value: string[][]): DynaliteInputSettings {
     this.selectionVal = value;
-    return this;
+    return this.type(TYPE_SELECT);
   }
 
   public excluded(value: string[]): DynaliteInputSettings {

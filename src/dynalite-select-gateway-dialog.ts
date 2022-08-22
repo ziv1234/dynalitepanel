@@ -1,15 +1,14 @@
 import { css, CSSResultGroup, html, LitElement, TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators";
 import type { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
+import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
+import { haStyle } from "../homeassistant-frontend/src/resources/styles";
+import { CONF_HOST, CONF_PORT, CONF_NAME, EVENT_DIALOG_CLOSED } from "./const";
 import type { DynaliteSelectGatewayDialogParams } from "./show-dialog-select-gateway";
+import "@material/mwc-button/mwc-button";
 import "../homeassistant-frontend/src/components/ha-dialog";
 import "../homeassistant-frontend/src/components/ha-header-bar";
 import "../homeassistant-frontend/src/components/ha-card";
-import "@material/mwc-button/mwc-button";
-import { fireEvent } from "../homeassistant-frontend/src/common/dom/fire_event";
-import { CONF_HOST, CONF_PORT, CONF_NAME, EVENT_DIALOG_CLOSED } from "./const";
-import { haStyle } from "../homeassistant-frontend/src/resources/styles";
-import "@material/mwc-radio/mwc-radio";
 import "../homeassistant-frontend/src/components/ha-formfield";
 import "../homeassistant-frontend/src/components/ha-radio";
 

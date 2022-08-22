@@ -1,11 +1,12 @@
-import { CSSResultGroup, html, LitElement, TemplateResult } from "lit";
-import { customElement, property } from "lit/decorators";
-import "../homeassistant-frontend/src/components/ha-button-menu";
-import "../homeassistant-frontend/src/components/ha-icon-button";
 import { mdiDelete, mdiDotsVertical } from "@mdi/js";
 import "@material/mwc-list/mwc-list-item";
+import { CSSResultGroup, html, LitElement, TemplateResult } from "lit";
+import { customElement, property } from "lit/decorators";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import { showConfirmationDialog } from "../homeassistant-frontend/src/dialogs/generic/show-dialog-box";
+import "../homeassistant-frontend/src/components/ha-button-menu";
+import "../homeassistant-frontend/src/components/ha-icon-button";
+import "../homeassistant-frontend/src/components/ha-svg-icon";
 
 @customElement("dynalite-action-button")
 export class DynaliteActionButton extends LitElement {

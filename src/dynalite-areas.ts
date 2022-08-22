@@ -2,19 +2,18 @@ import memoizeOne from "memoize-one";
 import { mdiPlus } from "@mdi/js";
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators";
-import "../homeassistant-frontend/src/components/ha-card";
-import "../homeassistant-frontend/src/layouts/hass-subpage";
-import "../homeassistant-frontend/src/components/ha-fab";
-import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
-import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
-import { Dynalite, panelTabs, DynaliteAreaRowInfo, dynaliteRoute } from "./common";
+import type { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import type {
   DataTableColumnContainer,
   DataTableRowData,
 } from "../homeassistant-frontend/src/components/data-table/ha-data-table";
-import "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import { navigate } from "../homeassistant-frontend/src/common/navigate";
 import { CONF_DYNET_ID, ROUTE_EDIT, TEMPLATE_COVER, TEMPLATE_MANUAL, TEMPLATE_ROOM } from "./const";
+import { Dynalite, panelTabs, DynaliteAreaRowInfo, dynaliteRoute } from "./common";
+import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
+import "../homeassistant-frontend/src/components/data-table/ha-data-table";
+import "../homeassistant-frontend/src/components/ha-fab";
+import "../homeassistant-frontend/src/components/ha-svg-icon";
 
 @customElement("dynalite-areas")
 export class DynaliteAreas extends LitElement {
