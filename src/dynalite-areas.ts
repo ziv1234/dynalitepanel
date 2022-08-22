@@ -7,7 +7,7 @@ import "../homeassistant-frontend/src/layouts/hass-subpage";
 import "../homeassistant-frontend/src/components/ha-fab";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
-import { Dynalite, panelTabs, DynaliteAreaRowInfo } from "./common";
+import { Dynalite, panelTabs, DynaliteAreaRowInfo, dynaliteRoute, ROUTE_EDIT } from "./common";
 import type {
   DataTableColumnContainer,
   DataTableRowData,
@@ -130,7 +130,7 @@ export class DynaliteAreas extends LitElement {
   }
 
   private _createNew() {
-    navigate("/dynalite/edit/new");
+    navigate(`${dynaliteRoute(ROUTE_EDIT)}/new`);
   }
 }
 

@@ -13,9 +13,11 @@ import {
   dynaliteCopy,
   DynaliteDefaultTemplates,
   DynalitePresetData,
+  dynaliteRoute,
   DynaliteTemplateData,
   enumeratedTemplates,
   panelTabs,
+  ROUTE_AREAS,
 } from "./common";
 import "@material/mwc-button/mwc-button";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
@@ -58,6 +60,8 @@ import {
   TEMPLATE_COVER,
   TEMPLATE_ROOM,
 } from "./const";
+import { showDynaliteSelectGatewayDialog } from "./show-dialog-select-gateway";
+import { navigate } from "../homeassistant-frontend/src/common/navigate";
 
 interface DynaliteGlobalSettingsInput {
   name: string;
@@ -163,6 +167,9 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
             <div class="card-content">
               <h1>Configure Global Dynalite Settings</h1>
               <p>Host: ${this.dynalite.config.host} Port: ${this.dynalite.config.port}</p>
+              ${Object.keys(this.dynalite.completeConfig).length > 1
+                ? html`<a @click=${this._handleChangeHost} href="#select-gateway">Change</a>`
+                : html``}
               <h2>Global Settings</h2>
               ${this.genInputElement(CONF_NAME)} ${this.genInputElement(CONF_AUTODISCOVER)}
               ${this.genInputElement(CONF_FADE)} ${this.genInputElement(CONF_ACTIVE)}
@@ -241,8 +248,25 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
     if (!this.result.tiltEnabled) templates.time_cover!.tilt = "0";
     this.dynalite.config.template = templates;
     this.hasElementChanged = false;
-    fireEvent(this, EVENT_CONFIG_CHANGED);
+    fireEvent(this, EVENT_CONFIG_CHANGED, { value: true });
     this.requestUpdate();
+  }
+
+  private _handleChangeHost(ev) {
+    console.dir(ev);
+    ev.preventDefault();
+    showDynaliteSelectGatewayDialog(this, {
+      hass: this.hass,
+      dynalite: this.dynalite,
+      onSave: this._hostChanged.bind(this),
+    });
+  }
+
+  private _hostChanged(entry_id: string): void {
+    console.error("selected %s", entry_id);
+    this.dynalite.entry_id = entry_id;
+    fireEvent(this, EVENT_CONFIG_CHANGED, { value: false });
+    navigate(dynaliteRoute(ROUTE_AREAS));
   }
 
   protected result = {

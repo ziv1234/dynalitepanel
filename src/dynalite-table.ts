@@ -10,7 +10,7 @@ import "../homeassistant-frontend/src/components/ha-fab";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
 import { showDynaliteEditDialog } from "./show-dialog-dynalite-edit";
-import { DynaliteEditDialogParams, DynaliteRowData } from "./dynalite-edit-dialog-types";
+import type { DynaliteEditDialogParams, DynaliteRowData } from "./show-dialog-dynalite-edit";
 import { DynaliteInputSettings } from "./dynalite-input-settings";
 import { CONF_DYNET_ID } from "./const";
 

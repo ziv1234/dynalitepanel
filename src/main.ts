@@ -8,6 +8,7 @@ import "./dynalite-router";
 import {
   capitalizeFirst,
   Dynalite,
+  DynaliteConfigData,
   DynaliteConfigResponse,
   DynaliteDefaultTemplates,
 } from "./common";
@@ -69,49 +70,65 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
   }
 
   private async _getDynaliteConfig(): Promise<void> {
-    const resp = await this.hass.connection.sendMessagePromise({
+    const resp: DynaliteConfigResponse = await this.hass.connection.sendMessagePromise({
       type: WS_GET_CONFIG,
     });
     if (resp) {
-      const completeConfig = (resp as DynaliteConfigResponse).config;
-      if (completeConfig.length === 1 || !this._activeEntry) {
+      const completeConfig = resp.config;
+      if (!this._activeEntry) {
         this._activeEntry = Object.keys(completeConfig)[0];
       }
-      const curConfig = completeConfig[this._activeEntry];
-      if (!curConfig.area) curConfig.area = {};
-      if (!curConfig.autodiscover) curConfig.autodiscover = false;
-      if (!curConfig.default || !curConfig.default.fade) {
-        curConfig.default = { fade: "0" };
-      }
-      if (!curConfig.active) curConfig.active = CONF_ACTIVE_OFF;
-      if (!curConfig.template) curConfig.template = {};
-      Object.keys(DynaliteDefaultTemplates).forEach((template) => {
-        if (!curConfig.template![template]) curConfig.template![template] = {};
-      });
-      TIME_COVER_GENERAL_PARAMS.forEach((param) => {
-        if (!(param in curConfig.template.time_cover))
-          curConfig.template.time_cover[param] = DynaliteDefaultTemplates.time_cover![param];
-      });
-      const defaults = (resp as DynaliteConfigResponse).default;
       this.dynalite = {
-        config: curConfig,
-        default: defaults,
-        classSelection: defaults.DEVICE_CLASSES.map((devClass) => [
+        config: this._processDynaliteConfig(completeConfig, this._activeEntry),
+        default: resp.default,
+        classSelection: resp.default.DEVICE_CLASSES.map((devClass) => [
           devClass,
           capitalizeFirst(devClass),
         ]),
+        completeConfig: completeConfig,
+        entry_id: this._activeEntry,
       };
     }
   }
 
-  private async _updateDynalite(_e: Event) {
-    console.log("XXX updating dynalite");
-    console.dir(this.dynalite.config);
-    await this.hass.connection.sendMessagePromise({
-      type: WS_SAVE_CONFIG,
-      entry_id: this._activeEntry,
-      config: this.dynalite.config,
+  private _processDynaliteConfig(
+    completeConfig: { [key: string]: DynaliteConfigData },
+    entry_id: string
+  ): DynaliteConfigData {
+    const curConfig = completeConfig[entry_id];
+    if (!curConfig.area) curConfig.area = {};
+    if (!curConfig.autodiscover) curConfig.autodiscover = false;
+    if (!curConfig.default || !curConfig.default.fade) {
+      curConfig.default = { fade: "0" };
+    }
+    if (!curConfig.active) curConfig.active = CONF_ACTIVE_OFF;
+    if (!curConfig.template) curConfig.template = {};
+    Object.keys(DynaliteDefaultTemplates).forEach((template) => {
+      if (!curConfig.template![template]) curConfig.template![template] = {};
     });
+    TIME_COVER_GENERAL_PARAMS.forEach((param) => {
+      if (!(param in curConfig.template!.time_cover!))
+        curConfig.template!.time_cover![param] = DynaliteDefaultTemplates.time_cover![param];
+    });
+    return curConfig;
+  }
+
+  private async _updateDynalite(ev: Event) {
+    const shouldSave = (ev as CustomEvent).detail.value;
+    console.log("XXX updating dynalite - %s", shouldSave);
+    console.dir(this.dynalite.config);
+    this._activeEntry = this.dynalite.entry_id;
+    this.dynalite.config = this._processDynaliteConfig(
+      this.dynalite.completeConfig,
+      this._activeEntry
+    );
+    if (shouldSave) {
+      await this.hass.connection.sendMessagePromise({
+        type: WS_SAVE_CONFIG,
+        entry_id: this._activeEntry,
+        config: this.dynalite.config,
+      });
+    }
   }
 }
 

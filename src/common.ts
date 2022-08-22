@@ -84,16 +84,19 @@ export interface DynaliteConfigData {
 export interface DynaliteDefaultData {
   DEFAULT_NAME: string;
   DEVICE_CLASSES: string[];
+  DEFAULT_PORT: string;
 }
 
 export interface Dynalite {
   config: DynaliteConfigData;
   default: DynaliteDefaultData;
   classSelection: string[][];
+  completeConfig: { [key: string]: DynaliteConfigData };
+  entry_id: string;
 }
 
 export interface DynaliteConfigResponse {
-  config: DynaliteConfigData[];
+  config: { [key: string]: DynaliteConfigData };
   default: DynaliteDefaultData;
 }
 
@@ -112,20 +115,20 @@ export const ROUTE_GLOBAL_SETTINGS = "global-settings";
 export const ROUTE_EDIT = "edit";
 export const BASE_URL = "/dynalite";
 
-function _fullPath(route: string) {
+export function dynaliteRoute(route: string) {
   return `${BASE_URL}/${route}`;
 }
 
 export const panelTabs = [
   {
-    path: _fullPath(ROUTE_AREAS),
+    path: dynaliteRoute(ROUTE_AREAS),
     name: "Dynalite Areas",
     iconPath: mdiPuzzle,
     iconColor: "#2D338F",
     core: true,
   },
   {
-    path: _fullPath(ROUTE_GLOBAL_SETTINGS),
+    path: dynaliteRoute(ROUTE_GLOBAL_SETTINGS),
     name: "Global Settings",
     iconPath: mdiDevices,
     iconColor: "#2D338F",

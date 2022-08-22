@@ -288,14 +288,14 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
     console.dir(res);
     this.dynalite.config.area![this.result.dynetId] = res;
     this.hasElementChanged = false;
-    fireEvent(this, EVENT_CONFIG_CHANGED);
+    fireEvent(this, EVENT_CONFIG_CHANGED, { value: true });
     this.requestUpdate();
   }
 
   private _deleteArea(ev) {
     const areaNumber = ev.detail;
     delete this.dynalite.config.area![areaNumber];
-    fireEvent(this, EVENT_CONFIG_CHANGED);
+    fireEvent(this, EVENT_CONFIG_CHANGED, { value: true });
     navigate("/dynalite/areas");
   }
 
