@@ -80,7 +80,7 @@ export class DynaliteInput extends LitElement {
               >
                 ${this.settings.selectionVal?.map(
                   (entry) =>
-                    html` <mwc-list-item .value=${entry[0]} .selected=${entry[0] === this.value}>
+                    html` <mwc-list-item .value=${entry[0]} ?selected=${entry[0] === this.value}>
                       ${entry[1]}
                     </mwc-list-item>`
                 )}
