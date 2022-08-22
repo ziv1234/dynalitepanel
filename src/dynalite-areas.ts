@@ -7,14 +7,14 @@ import "../homeassistant-frontend/src/layouts/hass-subpage";
 import "../homeassistant-frontend/src/components/ha-fab";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import "../homeassistant-frontend/src/layouts/hass-tabs-subpage";
-import { Dynalite, panelTabs, DynaliteAreaRowInfo, dynaliteRoute, ROUTE_EDIT } from "./common";
+import { Dynalite, panelTabs, DynaliteAreaRowInfo, dynaliteRoute } from "./common";
 import type {
   DataTableColumnContainer,
   DataTableRowData,
 } from "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import "../homeassistant-frontend/src/components/data-table/ha-data-table";
 import { navigate } from "../homeassistant-frontend/src/common/navigate";
-import { CONF_DYNET_ID, TEMPLATE_COVER, TEMPLATE_MANUAL, TEMPLATE_ROOM } from "./const";
+import { CONF_DYNET_ID, ROUTE_EDIT, TEMPLATE_COVER, TEMPLATE_MANUAL, TEMPLATE_ROOM } from "./const";
 
 @customElement("dynalite-areas")
 export class DynaliteAreas extends LitElement {
@@ -55,7 +55,7 @@ export class DynaliteAreas extends LitElement {
 
   private _handleRowClicked(ev) {
     const dynetId = ev.detail.id;
-    navigate(`/dynalite/edit/${dynetId}`);
+    navigate(`${dynaliteRoute(ROUTE_EDIT)}/${dynetId}`);
   }
 
   private _columns = memoizeOne((narrow: boolean): DataTableColumnContainer => {

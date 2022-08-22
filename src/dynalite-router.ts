@@ -5,7 +5,8 @@ import {
   RouterOptions,
 } from "../homeassistant-frontend/src/layouts/hass-router-page";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
-import { Dynalite, ROUTE_AREAS, ROUTE_GLOBAL_SETTINGS, ROUTE_EDIT } from "./common";
+import { Dynalite } from "./common";
+import { ROUTE_AREAS, ROUTE_EDIT, ROUTE_GLOBAL_SETTINGS } from "./const";
 
 @customElement("dynalite-router")
 class DynaliteRouter extends HassRouterPage {

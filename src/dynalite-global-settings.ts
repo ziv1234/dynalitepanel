@@ -17,7 +17,6 @@ import {
   DynaliteTemplateData,
   enumeratedTemplates,
   panelTabs,
-  ROUTE_AREAS,
 } from "./common";
 import "@material/mwc-button/mwc-button";
 import { haStyle } from "../homeassistant-frontend/src/resources/styles";
@@ -57,6 +56,7 @@ import {
   CONF_TILT,
   CONF_TILT_ENABLED,
   EVENT_CONFIG_CHANGED,
+  ROUTE_AREAS,
   TEMPLATE_COVER,
   TEMPLATE_ROOM,
 } from "./const";

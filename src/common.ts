@@ -1,4 +1,5 @@
 import { mdiDevices, mdiPuzzle } from "@mdi/js";
+import { BASE_URL, ROUTE_AREAS, ROUTE_GLOBAL_SETTINGS } from "./const";
 
 export interface DynaliteChannelData {
   name?: string;
@@ -109,11 +110,6 @@ export interface DynaliteAreaRowInfo {
   channel?: string;
   preset?: string;
 }
-
-export const ROUTE_AREAS = "areas";
-export const ROUTE_GLOBAL_SETTINGS = "global-settings";
-export const ROUTE_EDIT = "edit";
-export const BASE_URL = "/dynalite";
 
 export function dynaliteRoute(route: string) {
   return `${BASE_URL}/${route}`;

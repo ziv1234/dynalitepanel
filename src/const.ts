@@ -1,3 +1,4 @@
+// Various indices for configuration
 export const CONF_ACTIVE = "active";
 export const CONF_ACTIVE_INIT = "init";
 export const CONF_ACTIVE_OFF = "off";
@@ -41,8 +42,10 @@ export const TEMPLATE_COVER = "Blind or Cover";
 export const TYPE_BOOLEAN = "boolean";
 export const TYPE_NUMBER = "number";
 export const TYPE_SELECT = "select";
+// Websocket commands
 export const WS_GET_CONFIG = "dynalite/get-config";
 export const WS_SAVE_CONFIG = "dynalite/save-config";
+// Conf items relevant to templates and generally
 export const AREA_GENERAL_PARAMS = [CONF_NAME, CONF_TEMPLATE, CONF_FADE, CONF_NODEFAULT];
 export const ROOM_PARAMS = [CONF_ROOM_ON, CONF_ROOM_OFF];
 export const TIME_COVER_GENERAL_PARAMS = [CONF_DURATION, CONF_TILT, CONF_CLASS];
@@ -52,3 +55,8 @@ export const TIME_COVER_ADVANCED_PARAMS = TIME_COVER_GENERAL_PARAMS.concat([
   CONF_STOP,
   CONF_CHANNEL_COVER,
 ]);
+// Website routes
+export const ROUTE_AREAS = "areas";
+export const ROUTE_GLOBAL_SETTINGS = "global-settings";
+export const ROUTE_EDIT = "edit";
+export const BASE_URL = "/dynalite";

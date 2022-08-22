@@ -10,7 +10,7 @@ import {
 } from "./dynalite-input-settings";
 import type { DynaliteTableSettings } from "./dynalite-table";
 import "./dynalite-table";
-import { CONF_DYNET_ID, CONF_FADE, CONF_LEVEL, CONF_NAME } from "./const";
+import { CONF_DYNET_ID, CONF_FADE, CONF_LEVEL, CONF_NAME, CONF_PRESET } from "./const";
 
 @customElement("dynalite-preset-table")
 export class DynalitePresetTable extends LitElement {
@@ -56,7 +56,7 @@ export class DynalitePresetTable extends LitElement {
   }
 
   private _inputs = {
-    dynetId: DynaliteIdInput(CONF_DYNET_ID, "preset")
+    dynetId: DynaliteIdInput(CONF_DYNET_ID, CONF_PRESET)
       .heading("Number")
       .width("15%")
       .narrowWidth("30%")
