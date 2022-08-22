@@ -59,9 +59,14 @@ export class DynalitePresetTable extends LitElement {
     dynetId: DynaliteIdInput(CONF_DYNET_ID, "preset")
       .heading("Number")
       .width("15%")
+      .narrowWidth("30%")
       .desc("Dynalite preset number (1-255)")
       .required(),
-    name: DynaliteTextInput(CONF_NAME).heading("Name").desc("Name for this preset").width("35%"),
+    name: DynaliteTextInput(CONF_NAME)
+      .heading("Name")
+      .desc("Name for this preset")
+      .width("35%")
+      .narrowWidth("70%"),
     level: DynalitePercentageInput(CONF_LEVEL)
       .heading("Level")
       .desc("Channel levels for this preset")

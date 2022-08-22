@@ -51,12 +51,13 @@ export class DynaliteTable extends LitElement {
       });
       return temp;
     });
+    // XXX move to memoizeOne
     this._columns = {};
     Object.entries(this.settings.inputs).forEach(([field, input]) => {
       this._columns[field] = {
         title: input.headingVal!,
-        width: input.widthVal!,
-        hidden: false,
+        width: this.narrow ? input.narrowWidthVal : input.widthVal,
+        hidden: this.narrow && !input.narrowWidthVal,
         sortable: true,
         filterable: false,
       };

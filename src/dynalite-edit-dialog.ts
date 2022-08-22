@@ -82,7 +82,7 @@ export class DynaliteEditDialog extends DynaliteInputElement<DynaliteRowData> {
           </ha-card>
         </div>
         <mwc-button slot="primaryAction" @click=${this._save} ?disabled=${!canSave}
-          >Save</mwc-button
+          >Update</mwc-button
         >
         <mwc-button slot="secondaryAction" @click=${this._close}>Cancel</mwc-button>
       </ha-dialog>

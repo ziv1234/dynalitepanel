@@ -29,6 +29,8 @@ export class DynaliteInputSettings {
 
   public widthVal?: string;
 
+  public narrowWidthVal?: string;
+
   public constructor(name: string) {
     this.nameVal = name;
   }
@@ -100,6 +102,11 @@ export class DynaliteInputSettings {
 
   public width(value: string): DynaliteInputSettings {
     this.widthVal = value;
+    return this;
+  }
+
+  public narrowWidth(value: string): DynaliteInputSettings {
+    this.narrowWidthVal = value;
     return this;
   }
 }

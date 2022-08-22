@@ -59,25 +59,20 @@ export class DynaliteAreas extends LitElement {
   }
 
   private _columns = memoizeOne((narrow: boolean): DataTableColumnContainer => {
-    if (narrow) {
-      const columns: DataTableColumnContainer = {};
-      // XXX TODO narrow
-      return columns;
-    }
     const columns: DataTableColumnContainer = {
       dynetId: {
         title: "Area Number",
         sortable: true,
         hidden: false,
         filterable: false,
-        width: "10%",
+        width: narrow ? "30%" : "10%",
       },
       name: {
         title: "Name",
         sortable: true,
         hidden: false,
         filterable: false,
-        width: "15%",
+        width: narrow ? "70%" : "15%",
       },
       template: {
         title: "Behavior",

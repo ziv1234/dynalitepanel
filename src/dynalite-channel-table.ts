@@ -66,9 +66,14 @@ export class DynaliteChannelTable extends LitElement {
     dynetId: DynaliteIdInput(CONF_DYNET_ID, CONF_CHANNEL)
       .heading("Number")
       .width("15%")
+      .narrowWidth("30%")
       .desc("Dynalite channel number (1-255)")
       .required(),
-    name: DynaliteTextInput(CONF_NAME).heading("Name").desc("Name for this channel").width("15%"),
+    name: DynaliteTextInput(CONF_NAME)
+      .heading("Name")
+      .desc("Name for this channel")
+      .width("15%")
+      .narrowWidth("70%"),
     fade: DynaliteFadeInput(CONF_FADE)
       .heading("Fade")
       .desc("Preset fade time (seconds)")
