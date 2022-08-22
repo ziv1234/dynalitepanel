@@ -23,27 +23,15 @@ class DynaliteRouter extends HassRouterPage {
     routes: {
       [ROUTE_AREAS]: {
         tag: "dynalite-areas",
-        load: () => {
-          // eslint-disable-next-line no-console
-          console.info("Importing dynalite-areas");
-          return import("./dynalite-areas");
-        },
+        load: () => import("./dynalite-areas"),
       },
       [ROUTE_GLOBAL_SETTINGS]: {
         tag: "dynalite-global-settings",
-        load: () => {
-          // eslint-disable-next-line no-console
-          console.info("Importing dynalite-global-settings");
-          return import("./dynalite-global-settings");
-        },
+        load: () => import("./dynalite-global-settings"),
       },
       [ROUTE_EDIT]: {
         tag: "dynalite-edit-area",
-        load: () => {
-          // eslint-disable-next-line no-console
-          console.info("Importing dynalite-edit-area");
-          return import("./dynalite-edit-area");
-        },
+        load: () => import("./dynalite-edit-area"),
       },
     },
   };

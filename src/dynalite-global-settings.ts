@@ -248,7 +248,6 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
   }
 
   private _handleChangeHost(ev) {
-    console.dir(ev);
     ev.preventDefault();
     showDynaliteSelectGatewayDialog(this, {
       hass: this.hass,
@@ -258,7 +257,6 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
   }
 
   private _hostChanged(entry_id: string): void {
-    console.error("selected %s", entry_id);
     this.dynalite.entry_id = entry_id;
     fireEvent(this, EVENT_CONFIG_CHANGED, { value: false });
     navigate(dynaliteRoute(ROUTE_AREAS));

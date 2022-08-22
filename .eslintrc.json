@@ -51,7 +51,7 @@
     "no-continue": "off",
     "no-param-reassign": "off",
     "no-multi-assign": "off",
-    "no-console": "off", // XXX TBD
+    "no-console": "error", // XXX TBD
     "radix": "off",
     "no-alert": "off",
     "no-nested-ternary": "off",

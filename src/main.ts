@@ -115,8 +115,6 @@ class DynalitePanel extends ProvideHassLitMixin(LitElement) {
 
   private async _updateDynalite(ev: Event) {
     const shouldSave = (ev as CustomEvent).detail.value;
-    console.log("XXX updating dynalite - %s", shouldSave);
-    console.dir(this.dynalite.config);
     this._activeEntry = this.dynalite.entry_id;
     this.dynalite.config = this._processDynaliteConfig(
       this.dynalite.completeConfig,

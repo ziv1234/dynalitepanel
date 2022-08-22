@@ -254,8 +254,6 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
 
   private _save() {
     // fill complete and send update signal
-    console.log("saving area");
-    console.dir(this.result);
     const res: DynaliteAreaData = {
       channel: dynaliteCopy(this._channels),
       preset: dynaliteCopy(this._presets),
@@ -273,14 +271,12 @@ export class DynaliteEditArea extends DynaliteInputElement<DynaliteEditAreaInput
         const params = this.result.advanced
           ? TIME_COVER_ADVANCED_PARAMS
           : TIME_COVER_GENERAL_PARAMS;
-        console.dir(params);
         params.forEach((param) => {
           if (this.result[param]) res[param] = this.result[param];
         });
         if (!this.result.tiltEnabled) res.tilt = "0";
       }
     }
-    console.dir(res);
     this.dynalite.config.area![this.result.dynetId] = res;
     this.hasElementChanged = false;
     fireEvent(this, EVENT_CONFIG_CHANGED, { value: true });
