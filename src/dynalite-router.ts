@@ -48,13 +48,6 @@ class DynaliteRouter extends HassRouterPage {
     },
   };
 
-  protected firstUpdated(_changedProps: Map<string | number | symbol, unknown>): void {
-    this.style.setProperty("--app-header-background-color", "var(--sidebar-background-color)");
-    this.style.setProperty("--app-header-text-color", "var(--sidebar-text-color)");
-    this.style.setProperty("--app-header-border-bottom", "1px solid var(--divider-color)");
-    this.style.setProperty("--ha-card-border-radius", "var(--ha-config-card-border-radius, 8px)");
-  }
-
   protected updatePageEl(el, changedProps: PropertyValues) {
     el.route = this.routeTail;
     el.hass = this.hass;

@@ -339,15 +339,9 @@ export class DynaliteGlobalSettings extends DynaliteInputElement<DynaliteGlobalS
     return [
       haStyle,
       css`
-        ha-settings-row {
-          padding: 0;
-        }
         p {
           margin-top: 0;
-        }
-        .footer {
-          padding: 32px 0 16px;
-          text-align: center;
+          margin-bottom: 0;
         }
         .content {
           padding: 28px 20px 0;

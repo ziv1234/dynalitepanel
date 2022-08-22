@@ -94,11 +94,6 @@ export class DynaliteSelectGatewayDialog extends LitElement {
     return [
       haStyle,
       css`
-        ha-header-bar {
-          --mdc-theme-on-primary: var(--primary-text-color);
-          --mdc-theme-primary: var(--mdc-theme-surface);
-          flex-shrink: 0;
-        }
         ha-dialog {
           --dialog-content-position: static;
           --dialog-content-padding: 0;

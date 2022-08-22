@@ -58,6 +58,7 @@ export class DynaliteActionButton extends LitElement {
     ev.stopPropagation();
   }
 
+  // needed to make it red XXX TODO - simpler
   static get styles(): CSSResultGroup {
     return [haStyle];
   }

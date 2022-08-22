@@ -3,14 +3,6 @@ import { customElement, property, state } from "lit/decorators";
 import { makeDialogManager } from "../homeassistant-frontend/src/dialogs/make-dialog-manager";
 import { HomeAssistant, Route } from "../homeassistant-frontend/src/types";
 import { ProvideHassLitMixin } from "../homeassistant-frontend/src/mixins/provide-hass-lit-mixin";
-import "./dynalite-router";
-import {
-  capitalizeFirst,
-  Dynalite,
-  DynaliteConfigData,
-  DynaliteConfigResponse,
-  DynaliteDefaultTemplates,
-} from "./common";
 import {
   CONF_ACTIVE_OFF,
   EVENT_CONFIG_CHANGED,
@@ -18,6 +10,14 @@ import {
   WS_GET_CONFIG,
   WS_SAVE_CONFIG,
 } from "./const";
+import {
+  capitalizeFirst,
+  Dynalite,
+  DynaliteConfigData,
+  DynaliteConfigResponse,
+  DynaliteDefaultTemplates,
+} from "./common";
+import "./dynalite-router";
 import "../homeassistant-frontend/src/resources/ha-style";
 
 @customElement("dynalite-panel")
