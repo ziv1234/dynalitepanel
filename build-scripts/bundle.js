@@ -50,7 +50,6 @@ module.exports.emptyPackages = ({ latestBuild, isHassioBuild }) =>
 module.exports.definedVars = ({ isProdBuild, latestBuild, defineOverlay }) => ({
   __DEV__: !isProdBuild,
   __BUILD__: JSON.stringify(latestBuild ? "latest" : "es5"),
-  __VERSION__: JSON.stringify(env.version()),
   __DEMO__: false,
   __SUPERVISOR__: false,
   __BACKWARDS_COMPAT__: false,

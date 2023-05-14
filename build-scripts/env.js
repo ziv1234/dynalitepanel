@@ -22,14 +22,4 @@ module.exports = {
   isNetlify() {
     return process.env.NETLIFY === "true";
   },
-  version() {
-    const version = fs
-      .readFileSync(path.resolve(paths.polymer_dir, "setup.cfg"), "utf8")
-      .match(/version\W+=\W(\d{8}\.\d)/);
-    if (!version) {
-      return "0.1.0";
-      //throw Error("Version not found");
-    }
-    return version[1];
-  },
 };
